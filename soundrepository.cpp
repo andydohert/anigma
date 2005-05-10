@@ -32,8 +32,8 @@
 
 #include <qsound.h>
 #include <qfile.h>
-#include "SoundRepository.h"
-#include "Puzzle.h"
+#include "soundrepository.h"
+#include "puzzle.h"
 #include <unistd.h>
 
 

@@ -32,7 +32,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "Puzzle.h"
+#include "puzzle.h"
 
 #ifdef KDE_RELEASE
 #include <kconfig.h>

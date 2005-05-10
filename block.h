@@ -34,7 +34,7 @@
 #ifndef PLAYBLOCK_H
 #define PLAYBLOCK_H
 
-#include "Puzzle.h"
+#include "puzzle.h"
 
 class QPixmap;
 class QPainter;

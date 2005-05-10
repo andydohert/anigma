@@ -30,8 +30,8 @@
 **
 **********************************************************************/ 
 
-#include "GameDialog.h"
-#include "MenuButton.h"    
+#include "gamedialog.h"
+#include "menubutton.h"    
 #include <qtimer.h>
 #include <qfontmetrics.h>
 #include <qpainter.h>
@@ -39,7 +39,7 @@
 #include <qlineedit.h>
 #include <qdatetime.h>
 #include <stdlib.h>
-#include "Puzzle.h"
+#include "puzzle.h"
 
 
 GameDialog::GameDialog( QWidget *parent, const char *name):QDialog(parent,name,true,WStyle_Customize|WStyle_NoBorderEx )

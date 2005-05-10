@@ -39,8 +39,8 @@
 #include "graphics/freezing_animation.xpm"
 #include "graphics/images.h"
 #include <qdir.h>
-#include "Puzzle.h"
-#include <qarray.h>
+#include "puzzle.h"
+#include <qmemarray.h>
 #include <qbitmap.h>
 #include <stdlib.h>
 #include <qpicture.h>

@@ -34,15 +34,15 @@
 #ifndef PLAYGROUND_H
 #define PLAYGROUND_H
 
-#include <qvector.h>
-#include <qlist.h>
+#include <qptrvector.h>
+#include <qptrlist.h>
 #include <qsortedlist.h>
 #include <qbitarray.h>
 #include <qpoint.h>
 #include <qpixmap.h>
-#include <qarray.h> 
+#include <qmemarray.h> 
 #include <math.h>
-#include "Puzzle.h"
+#include "puzzle.h"
 #include "block.h"
 
 class QPixmap;

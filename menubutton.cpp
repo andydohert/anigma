@@ -30,11 +30,11 @@
 **
 **********************************************************************/
 
-#include "MenuButton.h"
+#include "menubutton.h"
 #include <qpainter.h>
 #include <qtimer.h>
 #include <qpixmap.h>
-#include "Puzzle.h"
+#include "puzzle.h"
 
 
 

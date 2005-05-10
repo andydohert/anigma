@@ -34,7 +34,7 @@
 #include <qbitmap.h>
 #include <qpaintdevicemetrics.h>
 #include "block.h"
-#include "Playground.h"
+#include "playground.h"
 
 Playblock::Playblock(int bx, int by,int x1, int y1,int x2,int y2, int aframe,GAME_BLOCK type,bool sel, bool grab)
 :cx(bx),cy(by),ix1(x1),iy1(y1),ix2(x2),iy2(y2),iaf(aframe),itype(type),iSel(sel),iGrab(grab),ix(0),iy(0),iay(0),cnt(0),iat(0),iDir(0)

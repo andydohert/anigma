@@ -28,8 +28,8 @@
 #include <qmotifstyle.h>
 #include <qcdestyle.h>
 #include <qplatinumstyle.h>
-#include "Puzzle.h"
-#include "PuzzleWindow.h"
+#include "puzzle.h"
+#include "puzzlewindow.h"
 #include <stdlib.h>
 #include <time.h>
 

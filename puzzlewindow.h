@@ -27,7 +27,7 @@
 #define PUZZLE_WINDOW_H
 
 #include <qmainwindow.h>
-#include "Playground.h"
+#include "playground.h"
 
 class QTimer;
 class MenuButton;

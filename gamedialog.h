@@ -32,7 +32,7 @@
 #include <qdialog.h>
 #include <qstring.h>
 #include <qpixmap.h>
-#include "Fixed.h"
+#include "fixed.h"
 
 
 class QTimer;

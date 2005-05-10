@@ -29,7 +29,7 @@
 #define MENU_BUTTON_H
 
 #include <qbutton.h>
-#include <qlist.h>
+#include <qptrlist.h>
 
 
 class QTimer;

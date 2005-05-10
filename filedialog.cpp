@@ -36,10 +36,10 @@
 #include <qpalette.h>
 #include <qpainter.h>
 #include <stdlib.h>
-#include "FileDialog.h"
-#include "MenuButton.h"
-#include "Playground.h"
-#include "GameDialog.h"
+#include "filedialog.h"
+#include "menubutton.h"
+#include "playground.h"
+#include "gamedialog.h"
 
 FileDialog::FileDialog( const QString &dir,QWidget *parent,const char *name):QWidget(parent,name)
 {
