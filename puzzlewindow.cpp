@@ -50,15 +50,15 @@
 #include "levels.dat"
 #include "level_demo.h"
 #include <stdlib.h>
-#include "SoundRepository.h"
-#include "PuzzleWindow.h"
-#include "ImageRepository.h"
-#include "AboutDialog.h"
-#include "FileDialog.h"
-#include "Puzzle.h"
-#include "MenuButton.h"
-#include "GameDialog.h"
-#include "OptionsDialog.h"
+#include "soundrepository.h"
+#include "puzzlewindow.h"
+#include "imagerepository.h"
+#include "aboutdialog.h"
+#include "filedialog.h"
+#include "puzzle.h"
+#include "menubutton.h"
+#include "gamedialog.h"
+#include "optionsdialog.h"
 
 DemoMove::DemoMove(int x, int y, int t):ix(x),iy(y),it(t)
 {

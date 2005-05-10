@@ -31,11 +31,11 @@
 **********************************************************************/
 
 #include <qpainter.h>
-#include "AboutDialog.h"
-#include "MenuButton.h"
-#include "Playground.h"    
-#include "ImageRepository.h"
-#include "Puzzle.h"
+#include "aboutdialog.h"
+#include "menubutton.h"
+#include "playground.h"    
+#include "imagerepository.h"
+#include "puzzle.h"
 
 static const char *historyData[]= {
     "",

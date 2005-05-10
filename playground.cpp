@@ -37,9 +37,9 @@
 #include <qtextstream.h>
 #include <qpaintdevicemetrics.h>
 #include <stdlib.h>
-#include "Playground.h"
-#include "ImageRepository.h"
-#include "SoundRepository.h"
+#include "playground.h"
+#include "imagerepository.h"
+#include "soundrepository.h"
 
 Playground::Playground()
 {

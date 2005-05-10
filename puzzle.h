@@ -28,8 +28,8 @@
 #define PUZZLE_H
 
 #include <qstring.h>
-#include "ImageRepository.h"
-#include "SoundRepository.h"
+#include "imagerepository.h"
+#include "aoundrepository.h"
 
 class Puzzle
 {
