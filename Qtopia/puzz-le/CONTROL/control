@@ -1,0 +1,8 @@
+Package: puzz-le
+Priority: optional
+Section: Games
+Maintainer: Walter Rawdanik <wrawdanik@warmi.net>
+Architecture: arm
+Version: 2.0.0
+License: BSD
+Description: Puzz-le  -colorful logic/arcade game for Qtopia

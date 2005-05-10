@@ -1,0 +1,14 @@
+Version 2.0.0 (July, 15 , 2002)
+
+ - added ability to create additional sets of colored blocks ( themes.)
+ - new themes ( Flags and Letters)
+ - 400 new levels courtesy of the Vexed project ( ported to Puzz-le level format by
+   Alexander Paersch)
+ - minor bug fixes  
+
+Version 1.0.3 ( June, 3 , 2002)
+ 
+ - ability to disable/enable time limit
+ - ability to pause/resume game ( makes sense only in timed games)
+ - default compile with result in full version game  
+ 
