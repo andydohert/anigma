@@ -1,0 +1,18 @@
+#!/bin/bash
+echo "Checking for qmake..."
+
+qmake -v &> /dev/null
+if [[ $? = 127 ]]; then
+	echo
+	echo "Sorry, qmake was not found, is Qt4 installed? You will want to install your "
+	echo "distribution's packages of qt4 _and_ qt4-devel."
+	exit
+fi
+
+echo "Generating Makefiles..."
+
+qmake -config release -after "CONFIG-=debug"
+
+echo
+echo "Configure is finished. Now type 'make'"
+echo
