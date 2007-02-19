@@ -29,6 +29,7 @@
 #include <qpainter.h>
 #include <qpixmap.h>
 #include <qdebug.h>
+#include <QLinearGradient>
 #include "puzzle.h"
 #include "imagerepository.h"
 #include "soundrepository.h"
@@ -70,10 +71,26 @@ void MenuButton::paintEvent(QPaintEvent *)
         x = (width() - fm.width(text())) / 2;
     }
 
-    if ( isDown() || hasFocus())
-        MenuButton::drawColorizedText(text(), x, y, &painter, QColor(255, 255, 255), 150);
-    else
-        MenuButton::drawColorizedText(text(), x, y, &painter, colorGroup().text(), 150);
+    if ( isDown() || hasFocus()) {
+        if (textFocusCache.isNull()) {
+            textFocusCache = QImage(width(), height(), QImage::Format_ARGB32);
+            textFocusCache.fill(0);
+            QPainter t(&textFocusCache);
+            t.setFont(painter.font());
+            MenuButton::drawColorizedText(text(), x, y + 4, &t, QColor(255, 255, 255), 150);
+        }
+        painter.drawImage(0, 0, textFocusCache);
+    }
+    else {
+        if (textCache.isNull()) {
+            textCache = QImage(width(), height(), QImage::Format_ARGB32);
+            textCache.fill(0);
+            QPainter t(&textCache);
+            t.setFont(painter.font());
+            MenuButton::drawColorizedText(text(), x, y + 4, &t, colorGroup().text(), 150);
+        }
+        painter.drawImage(0, 0, textCache);
+    }
 
     if ( drawFrame ) {
         if ( !isDown() )
@@ -86,32 +103,45 @@ void MenuButton::paintEvent(QPaintEvent *)
 
 void MenuButton::drawColorizedText(const QString& text, int x, int y, QPainter *p, const QColor& clr, int min)
 {
-    if ( p && p->isActive() && text.length() ) {
-        p->save();
-        QFontMetrics fm = p->fontMetrics();
-        y = y + fm.ascent();
-        int cs, ch, cv;
-        QColor tmp = clr;
-        tmp.getHsv(&cs, &ch, &cv);
-        int step = (cv - min) / qMax(((int)text.length() / 2), 1);
-        if ( step < 0 ) {
-            step = 0;
-            min = 0;
-        }
+    if ( !p || !p->isActive() || text.isEmpty())
+        return;
 
-        for (int i = 0;i < text.length();i++ ) {
-            clr.getHsv(&cs, &ch, &cv);
-            if ( i < text.length() / 2 )
-                tmp.setHsv(cs, ch, min + (step*i));
-            else
-                tmp.setHsv(cs, ch, cv - (step*(i - (text.length() / 2))));
-            p->setPen(tmp);
-
-            p->drawText(x, y, text.at(i));
-            x += fm.width(text.at(i));
-        }
-        p->restore();
+    p->save();
+#ifdef QT4GRADIANTTEXT
+    qDebug() << "slower";
+    QFontMetrics fm = p->fontMetrics();
+    QLinearGradient gradient(0, fm.height()/2,
+                             fm.width(text)/2, fm.height()/2);
+    gradient.setSpread(QGradient::ReflectSpread);
+    gradient.setColorAt(0, clr.dark(200));
+    gradient.setColorAt(1, clr);
+    p->setPen(QPen(gradient, 0));
+    p->drawText(x, y + fm.ascent(), text);
+#else
+    QFontMetrics fm = p->fontMetrics();
+    y = y + fm.ascent();
+    int cs, ch, cv;
+    QColor tmp = clr;
+    tmp.getHsv(&cs, &ch, &cv);
+    int step = (cv - min) / qMax(((int)text.length() / 2), 1);
+    if ( step < 0 ) {
+        step = 0;
+        min = 0;
     }
+
+    for (int i = 0;i < text.length();i++ ) {
+        clr.getHsv(&cs, &ch, &cv);
+        if ( i < text.length() / 2 )
+            tmp.setHsv(cs, ch, min + (step*i));
+        else
+            tmp.setHsv(cs, ch, cv - (step*(i - (text.length() / 2))));
+        p->setPen(tmp);
+
+        p->drawText(x, y, text.at(i));
+        x += fm.width(text.at(i));
+    }
+#endif
+    p->restore();
 }
 
 MenuButtonList::MenuButtonList(QObject * parent): QObject(parent)

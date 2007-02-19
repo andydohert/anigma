@@ -64,6 +64,9 @@ public:
     void paintEvent(QPaintEvent *);
 
 private:
+    QImage textCache;
+    QImage textFocusCache;
+
     bool centered;
     int iId;
     bool drawFrame;
