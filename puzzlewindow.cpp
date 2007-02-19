@@ -319,14 +319,13 @@ void PuzzleWindow::drawTitleScreen(QPainter * p)
     if (Puzzle::images) {
         QPixmap tmp = Puzzle::images->findPixmap("front_title");
         p->drawPixmap(10, 10, tmp);
-    
             if (gameState() != InfoBar::BROWSE) {
             tmp = Puzzle::images->findPixmap("front_1");
             p->drawPixmap(10, loadSavedGame->y() + loadSavedGame->height() - 40, tmp);
             p->setPen(QColor(0, 135, 234));
-            MenuButton::drawColorizedText("Copyright (c) 2002 Walter Rawdanik",
+            MenuButton::drawColorizedText("Copyright (C) 2001 Walter Rawdanik",
                                           10, 80, p, menuClr, 150);
-            MenuButton::drawColorizedText("Copyright (c) 2007 Benjamin Meyer", 10,
+            MenuButton::drawColorizedText("Copyright (C) 2005 Benjamin Meyer", 10,
                                           95, p, menuClr, 150);
             MenuButton::drawColorizedText("ver: " + Puzzle::gameVersion, 174,
                                           278, p, menuClr, 150);
@@ -611,7 +610,6 @@ void PuzzleWindow::updateInfoBar()
 void InfoBar::paintEvent(QPaintEvent *) {
     if (!play)
         return;
-    static bool flash = true;
     QString msg;
     int rx = 46;
     if (state == InfoBar::DEMO) {
@@ -632,42 +630,30 @@ void InfoBar::paintEvent(QPaintEvent *) {
             msg.sprintf("LEVEL: %02d   SCORE: %05d", play->currentLevel,
                         totalPoints + play->currentPoints());
     }
-    
+
     QPainter p(this);
-    /*
-    p.fillRect(0, 0, width(), height(), Qt::white);
-    
-    QLinearGradient gradient(0, 0, 100, 100);
-    gradient.setColorAt(0, Qt::blue);
-    gradient.setColorAt(1, Qt::red);
-    p.setPen(QPen(gradient, 0));
-    for (int y=10; y<100; y+=10)
-        drawText(0, y, "Qt");
-    */
-    //p.setPen(Qt::red);
-    p.setFont(QFont("Helvetica", 15, QFont::Bold));
-    
-    QLinearGradient linearGrad(QPointF(120, 0), QPointF(120, 24));
-    linearGrad.setColorAt(0, Qt::blue);
-    linearGrad.setColorAt(1, Qt::white);
-    QBrush brush(linearGrad);
-    //p.setBrush(brush);
-    QPen pen(brush, 2);
-    p.setPen(pen);
+    QLinearGradient gradient(width()/2, 0, width()/2, height());
     QColor start(0,179,255);
-    //p.setPen(QPen(brush, 2));
-    p.setPen(start);
-    //p.fillRect(0, 0, width(), height(), brush);
+    QColor end(start);
+    end = end.dark(100 + (height()*100 / height()));
+    gradient.setColorAt(0, start);
+    gradient.setColorAt(1, end);
+    p.setPen(QPen(gradient, 0));
+    QFont font("Helvetica", 16, QFont::Bold);
+    int length = width() * 2;
+    while(length > width()) {
+        font.setPointSize(font.pointSize() - 1);
+        QFontMetrics fm(font);
+        length = fm.width(msg);
+    }
+
+    p.setFont(font);
     p.drawText(2, 2, width() - 4, height() - 4, Qt::AlignCenter, msg);
     if (Puzzle::timeLimit && play->gameType() == Playground::TIME_BASED) {
-        if (play->timeLimit() < 10) {
-            //if (flash)
-                flash = play->timeLimit() % 2;//false;
-            //else
-            //    flash = true;
+        if (play->timeLimit() < 10 && (play->timeLimit() % 2)) {
+            QFontMetrics fm(font);
+            p.drawRect(fm.width("DEMO  ")-2, 2, fm.width("TIME :000 "), fm.height() - 7);
         }
-        if (flash)
-            p.drawRect(rx, 2, 78, 16);
     }
 }
 

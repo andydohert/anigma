@@ -1,6 +1,6 @@
 /*
 * Copyright (C) 2005-2007 Benjamin C Meyer
-* Copyright (c) 2001-2002, Walter Rawdanik
+* Copyright (C) 2001-2002 Walter Rawdanik
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without

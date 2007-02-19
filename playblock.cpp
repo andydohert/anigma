@@ -1,6 +1,6 @@
 /*
 * Copyright (C) 2005-2007 Benjamin C Meyer
-* Copyright (c) 2001-2002, Walter Rawdanik
+* Copyright (C) 2001-2002 Walter Rawdanik
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -27,15 +27,12 @@
 
 #include <qpainter.h>
 #include <qbitmap.h>
-#include <q3paintdevicemetrics.h>
-//Added by qt3to4:
-#include <QPixmap>
+#include <qpixmap.h>
 #include <qdebug.h>
-#include "block.h"
-#include "playground.h"
 
+#include "playblock.h"
+#include "playground.h"
 #include "imagerepository.h"
-#include "soundrepository.h"
 
 Playblock::Playblock(int bx, int by, int x1, int y1, int x2, int y2, GAME_BLOCK type)
         : cx(bx), cy(by), ix1(x1), iy1(y1), ix2(x2), iy2(y2), iaf(0), itype(type), iSel(false), iGrab(false), ix(0), iy(0), iay(0), cnt(0), iat(0), iDir(0)
@@ -85,6 +82,7 @@ void Playblock::recalculatePos()
 
 QImage& Playblock::blend(QImage& src, QImage& dst, float opacity)
 {
+    Q_ASSERT(src.depth() != 24 && dst.depth() != 24);
     unsigned int mult = (unsigned int)(opacity * (1 << 8));
     if ( src.depth() != 32 ) src = src.convertDepth(32);
     if ( dst.depth() != 32 ) dst = dst.convertDepth(32);
@@ -118,8 +116,11 @@ void Playblock::createBlendedImage(QPixmap *tile, QPixmap *back, int ox, int oy,
 
     bitBlt(&tmpTile, 0, 0, back, (int)(ix + ox), (int)(iy + oy));
     QImage backImage = tmpTile.convertToImage();
-    QImage final(tile->width(), tile->height(), tile->depth());
+    backImage = backImage.convertDepth(32);
+    QImage final(tile->width(), tile->height(), 32);
+    final = final.convertDepth(32);
     QImage tileImage = tile->convertToImage();
+    tileImage = tileImage.convertDepth(32);
 
     QBitmap mask(tile->mask());
 
@@ -132,7 +133,7 @@ void Playblock::createBlendedImage(QPixmap *tile, QPixmap *back, int ox, int oy,
 
 void Playblock::paint(QPainter *p, int ox, int oy) const
 {
-    if ( p && Puzzle::images && p->isActive() ) {
+    if (p && Puzzle::images && p->isActive() ) {
         QString tmp;
         int sx = 0;
         if ( itype != TRAP_STONE ) {

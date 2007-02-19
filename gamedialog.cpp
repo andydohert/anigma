@@ -1,6 +1,6 @@
 /*
 * Copyright (C) 2005-2007 Benjamin C Meyer
-* Copyright (c) 2001-2002, Walter Rawdanik
+* Copyright (C) 2001-2002 Walter Rawdanik
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -26,20 +26,19 @@
 */
 
 #include "gamedialog.h"
-#include "menubutton.h"
+
 #include <qtimer.h>
 #include <qfontmetrics.h>
 #include <qpainter.h>
 #include <qimage.h>
 #include <qlineedit.h>
 #include <qdatetime.h>
-//Added by qt3to4:
+#include <qevent.h>
+#include <qpixmap.h>
 #include <qdebug.h>
-#include <QPaintEvent>
-#include <QResizeEvent>
-#include <QPixmap>
-#include <QKeyEvent>
 #include <stdlib.h>
+
+#include "menubutton.h"
 #include "puzzle.h"
 
 GameDialog::GameDialog( QWidget *parent): QDialog(parent, "", true, Qt::WStyle_Customize | Qt::WStyle_NoBorder )
@@ -83,12 +82,13 @@ void GameDialog::keyPressEvent ( QKeyEvent * e )
 
 void GameDialog::timeSynch()
 {
-    update();
     if ( tCounter != -1 ) {
-        if ( tCounter == 0 )
+        if ( tCounter == 0 ) {
             accept();
-        else
+        } else {
+            update();
             tCounter--;
+        }
     }
 }
 
@@ -97,7 +97,6 @@ void GameDialog::updateFireworks()
     QPainter p(this);
     int i, j;
     int index;
-    
     p.drawPixmap(0, 0, tinted);
     if ( doFancy ) {
         for ( i = 0;i < NUM_FW;i++ ) {
@@ -198,7 +197,6 @@ void GameDialog::configure(QPixmap *background , const QString &text, bool fancy
         bool requester, int timeout, const QString &ls,
                            const QString &ms, const QString &rs )
 {
-
     reqText.truncate(0);
     dText = text;
     doFancy = fancy;
@@ -328,7 +326,7 @@ void GameDialog::buttonClicked(int b)
 void GameDialog::createTintedBackground(QPixmap *back)
 {
     QRect r = parentWidget()->geometry();
-    tinted.resize(r.width(), r.height());
+    tinted.resize(width(), height());
     QPainter p(&tinted);
     p.drawPixmap(QPoint(0, 0), *back, QRect(x()-r.x(), y()-r.y(), width(), height()));
     p.end();

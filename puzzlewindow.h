@@ -129,7 +129,7 @@ private:
     void gameCompleted();
     void demoCompleted();
     void nextLevelLoaded();
-        
+
     QTimer *timer;
     QColor menuClr;
     QColor hMenuClr;

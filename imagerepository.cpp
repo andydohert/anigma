@@ -1,6 +1,6 @@
 /*
 * Copyright (C) 2005-2007 Benjamin C Meyer
-* Copyright (c) 2001-2002, Walter Rawdanik
+* Copyright (C) 2001-2002 Walter Rawdanik
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -73,6 +73,8 @@ ImageRepository::ImageRepository()
 void ImageRepository::addImage(const QString &name)
 {
     QImage img("graphics/" + name + ".png");
+    if (img.isNull())
+        qWarning() << "error loading image:" << name;
     if (img.depth() < 32)
         img = img.convertDepth(32); // we MUST have 32 bit image for createHighlight to work.
     pixmaps.insert(name, QPixmap::fromImage(img));
@@ -93,8 +95,10 @@ QPixmap ImageRepository::findPixmap(IMAGE_NAMES id) const
 bool ImageRepository::initTheme(const QString &theme)
 {
     QDir directory(ROOTHOME + "pics/puzz-le/themes/" + theme);
-    if (theme.isEmpty() || !directory.exists())
+    if (theme.isEmpty() || !directory.exists()) {
+        qWarning() << "error loading theme" << theme;
         return false;
+    }
 
     currentTheme.clear();
     currentHighlightTheme.clear();
@@ -113,13 +117,12 @@ bool ImageRepository::initTheme(const QString &theme)
             if (img.depth() < 32)
                 img = img.convertDepth(32);
             QPixmap pix;
-            pix.fromImage(img);
+            pix.convertFromImage(img);
             pix.setMask(pix.createHeuristicMask());
             currentTheme.append(pix);
-            
             createHighlighted(img);
             QPixmap hPix;
-            hPix.QPixmap::fromImage(img);
+            hPix.QPixmap::convertFromImage(img);
             hPix.setMask(pix.mask());
             currentHighlightTheme.append(hPix);
         } else {
@@ -148,10 +151,8 @@ void ImageRepository::shuffleTheme()
             ns[cnt] = n;
             QString name = imageNames[cnt];
             QString hName = name + "h";
-            
             pixmaps.remove(name);
             pixmaps.remove(hName);
-            
             pixmaps.insert(name, currentTheme[n]);
             pixmaps.insert(hName, currentHighlightTheme[n]);
             cnt++;
