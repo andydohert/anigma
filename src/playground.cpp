@@ -65,6 +65,7 @@ void Playground::cleanup()
     for (int i = 0; i < dBlocks.count(); ++i) {
         while (!dBlocks[i]->isEmpty())
             delete dBlocks[i]->takeAt(0);
+        delete dBlocks[i];
     }
     dBlocks.clear();
     while (!sBlocks.isEmpty())
@@ -108,20 +109,20 @@ bool Playground::loadLevel(const QString & fileName, unsigned int levelNumberber
     gState = INVALID;
     QFile f(fileName);
     if ( f.exists() && f.open(QIODevice::ReadOnly) ) {
-        QTextStream t( &f );
+        QTextStream stream( &f );
         QString line;
         int counter = 1;
 
-        line = t.readLine();
+        line = stream.readLine();
         gType = TIME_BASED;
         if ( line.at(0) == '.' ) {
             if ( line.at(1) == '1' )
                 gType = MOVES_BASED;
-            line = t.readLine();
+            line = stream.readLine();
         }
         sscanf( line.toLatin1(), "%d", &numLevels);
-        while ( !t.atEnd() ) {
-            line = t.readLine();
+        while ( !stream.atEnd() ) {
+            line = stream.readLine();
             counter--;
             if ( !counter ) {
                 if ( !parseLevelHeader(line.toLatin1()) ) {
@@ -130,7 +131,7 @@ bool Playground::loadLevel(const QString & fileName, unsigned int levelNumberber
                 if ( levelNumber == levelNumberber ) {
                     initGrid(w, h);
                     for (int j = 0;j < h;j++ ) {
-                        if ( !parseLevelLine(t.readLine().toLatin1(), j) ) {
+                        if ( !parseLevelLine(stream.readLine().toLatin1(), j) ) {
                             return (bool)gState;
                         }
                     }
@@ -200,8 +201,7 @@ void Playground::parseAttachedBlocks()
 
 bool Playground::parseLevelHeader(const char *line)
 {
-
-    if ( !line || sscanf( line, "%d-%d-%d-%d", &levelNumber, &w, &h, &t ) < 4 )
+    if ( !line || sscanf( line, "%d-%d-%d-%d", &levelNumber, &w, &h, &timeLeft ) < 4 )
         return false;
     else
         return true;
@@ -518,7 +518,7 @@ bool Playground::setSelected(int px, int py, bool keyBoardMode)
                 if ( result ) {
                     //Puzzle::sounds->playSound("move");
                     if ( Puzzle::timeLimit && gType == MOVES_BASED ) {
-                        t--;
+                        timeLeft--;
                         updateInfoBar = true;
                     }
                 }
@@ -572,7 +572,6 @@ void Playground::handleAnimation()
 
 bool Playground::update()
 {
-    bool result = false;
     if ( gState != INPROGRESS ) {
         if ( gState == ANIMATE ) {
             handleAnimation();
@@ -582,6 +581,7 @@ bool Playground::update()
     }
 
     tick++;
+    bool result = false;
     if (deletionCounter) {
         handleDeletion();
         for (int i = 0; i < sBlocks.count(); ++i) {
@@ -607,10 +607,10 @@ bool Playground::update()
                     beat--;
                 else {
                     beat = 33;
-                    t--;
+                    timeLeft--;
                     updateInfoBar = true;
                 }
-                if ( !t ) {
+                if ( !timeLeft ) {
                     gState = OVER;
                 }
 
@@ -644,7 +644,7 @@ bool Playground::update()
         }
     }
 
-    if ( Puzzle::timeLimit && gType == MOVES_BASED && !t && !result ) {
+    if (Puzzle::timeLimit && gType == MOVES_BASED && !timeLeft && !result ) {
         gState = OVER;
         updateInfoBar = true;
     }
@@ -705,7 +705,7 @@ void Playground::handleDeletion()
         gState = OVER;
         gameWon = true;
         if ( Puzzle::timeLimit )
-            levelPoints += Puzzle::timeBonus * t;
+            levelPoints += Puzzle::timeBonus * timeLeft;
     }
 }
 
@@ -1249,10 +1249,11 @@ bool Playground::clearBlocks()
 
     return cleared;
 }
+
 void Playground::setGameState(GAME_STATE s)
 {
     gState = s;
-    if ( s == INPROGRESS ) {
+    if (s == INPROGRESS ) {
         tick = 0;
         gState = ANIMATE;
         needsClearCheck = true;
@@ -1311,7 +1312,7 @@ bool Playground::savePlayground(const QString &fileName, int currPoints, const Q
         if ( gType == MOVES_BASED ) {
             ts << ".1\n";
         }
-        ts << levelNumber << "-" << w << "-" << h << "-" << t << "\n";      // level levelNumberber, width, height, time left
+        ts << levelNumber << "-" << w << "-" << h << "-" << timeLeft << "\n";      // level levelNumberber, width, height, time left
         ts << levelFileName << "\n";                                                    // empty line or level file name
         ts << currPoints << "\n";
         ts << levelPoints << "\n";
@@ -1374,28 +1375,27 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
     gState = INVALID;
     QFile f(fileName);
 
-
     if ( f.exists() && f.open(QIODevice::ReadOnly) ) {
         QString line;
-        QTextStream t( &f );
+        QTextStream stream( &f );
 
         // load basic level information
-        line = t.readLine();
+        line = stream.readLine();
         gType = TIME_BASED;
         if ( line.at(0) == '.' ) {
             if ( line.at(1) == '1' )
                 gType = MOVES_BASED;
-            line = t.readLine();
+            line = stream.readLine();
         }
 
-        if ( sscanf( line.toLatin1(), "%d-%d-%d-%d", &levelNumber, &w, &h, &this->t) != 4 )
+        if ( sscanf( line.toLatin1(), "%d-%d-%d-%d", &levelNumber, &w, &h, &timeLeft) != 4 )
             goto error;
 
 
-        int savedLimit = this->t;
+        int savedLimit = timeLeft;
 
         // load level file name
-        line = t.readLine();
+        line = stream.readLine();
         if ( !line.isEmpty() ) {
 #ifndef DEMO_VERSION
             if ( QFile::exists(line) )                             // see if this is full file path or just level set name
@@ -1417,28 +1417,28 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
             loadLevel(level, levelNumber);
         }
 
-        this->t = savedLimit;
+        timeLeft = savedLimit;
 
 
         // load points information
-        line = t.readLine();
+        line = stream.readLine();
         initGrid(w, h);
         if ( currPoints ) {
             if ( sscanf( line.toLatin1(), "%d", currPoints) != 1 )
                 goto error;
         }
-        line = t.readLine();
+        line = stream.readLine();
         if ( sscanf( line.toLatin1(), "%d", &levelPoints) != 1 )
             goto error;
 
-        line = t.readLine();
+        line = stream.readLine();
 
         // load grid entries
         int x, y;
 
         for ( y = 0;y < h;y++ ) {
 
-            line = t.readLine();
+            line = stream.readLine();
             if ( line.isEmpty() )
                 goto error;
             for ( x = 0;x < w;x++ ) {
@@ -1461,20 +1461,20 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
             }
         }
 
-        line = t.readLine();
+        line = stream.readLine();
 
         // get standard blocks
         int slevelNumber, blevelNumber;
         QList<Playblock*> *plist;
         Playblock *block;
         for ( x = 0;x < w;x++ ) {
-            line = t.readLine();
+            line = stream.readLine();
             if ( sscanf( line.toLatin1(), "%d-%d", &slevelNumber, &blevelNumber) != 2 )
                 goto error;
 
             plist = dBlocks[x];
             for ( y = 0;y < blevelNumber;y++ ) {
-                line = t.readLine();
+                line = stream.readLine();
                 block = new Playblock(0, 0);
                 plist->append(block);
                 if ( !block->fromString(line) )
@@ -1484,25 +1484,25 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
             }
         }
 
-        line = t.readLine();
+        line = stream.readLine();
 
         // load special blocks
-        line = t.readLine();
+        line = stream.readLine();
         if ( sscanf( line.toLatin1(), "%d", &blevelNumber) != 1 )
             goto error;
 
         for ( y = 0;y < blevelNumber;y++ ) {
-            line = t.readLine();
+            line = stream.readLine();
             block = new Playblock(0, 0);
             sBlocks.append(block);
             if ( !block->fromString(line) )
                 goto error;
         }
 
-        line = t.readLine();
+        line = stream.readLine();
 
         // load Playblock class variables
-        line = t.readLine();
+        line = stream.readLine();
         if ( sscanf( line.toLatin1(), "%d-%d-%d", &deletionCounter, &beat, &totalNumBlocks) != 3 )
             goto error;
 
@@ -1535,27 +1535,27 @@ bool Playground::savedPlaygroundInfo(const QString &fileName, unsigned int *poin
     
     int wd, hg, tm, pt;
     QString line;
-    QTextStream t( &f );
+    QTextStream stream( &f );
 
     // load basic level information
-    line = t.readLine();
+    line = stream.readLine();
     if ( line.at(0) == '.' ) {
-        line = t.readLine();
+        line = stream.readLine();
     }
 
     if ( sscanf( line.toLatin1(), "%d-%d-%d-%d", level, &wd, &hg, &tm) != 4 )
         return false;
     // skip level file name
-    line = t.readLine();
+    line = stream.readLine();
 
     // get points information
-    line = t.readLine();
+    line = stream.readLine();
 
     if ( sscanf( line.toLatin1(), "%d", &pt) != 1 )
         return false;
 
     *points = pt;
-    line = t.readLine();
+    line = stream.readLine();
     if ( sscanf( line.toLatin1(), "%d", &pt) != 1 )
         return false;
     (*points) += pt;

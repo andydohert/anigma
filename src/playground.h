@@ -103,7 +103,7 @@ public:
     }
     inline int timeLimit() const
     {
-        return t;
+        return timeLeft;
     }
     inline int totalLevels() const
     {
@@ -223,7 +223,7 @@ private:
     int h;     // height of the level ( in blocks)
 
     unsigned int levelNumber;
-    unsigned int t;     // time alloted for level completion (in seconds)
+    unsigned int timeLeft;     // time alloted for level completion (in seconds)
     Playblock *empty;
     Playblock *stone;
     Playblock *selectedBlock;
