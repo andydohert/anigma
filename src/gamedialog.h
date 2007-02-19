@@ -101,6 +101,9 @@ private:
     QPixmap tinted;
     bool doTinted;
     QString reqText;
+
+    QImage textLightCache;
+    QImage textDarkCache;
 };
 
 #endif // GAMEDIALOG_H

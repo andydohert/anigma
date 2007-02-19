@@ -161,15 +161,28 @@ void GameDialog::updateFireworks()
         topPos -= 10;
     }
 
-    MenuButton::drawColorizedText(dText, (width() - textWidth) / 2 + 1, topPos + 1, &p, QColor(0, 0, 0), 150);
-    MenuButton::drawColorizedText(dText, (width() - textWidth) / 2, topPos, &p, QColor(255, 255, 255), 180);
+    if (textLightCache.isNull()) {
+        textLightCache = QImage(width(), height(), QImage::Format_ARGB32);
+        textDarkCache = QImage(width(), height(), QImage::Format_ARGB32);
+        QPainter t(&textLightCache);
+        t.setFont(font());
+        textLightCache.fill(0);
+        MenuButton::drawColorizedText(dText, (width() - textWidth) / 2 + 1, topPos + 1, &t, QColor(0, 0, 0), 150);
+        QPainter u(&textDarkCache);
+        u.setFont(font());
+        textDarkCache.fill(0);
+        MenuButton::drawColorizedText(dText, (width() - textWidth) / 2, topPos, &u, QColor(255, 255, 255), 180);
+    }
+    p.drawImage(0, 0, textLightCache);
+    p.drawImage(0, 0, textDarkCache);
 
     p.setPen(QColor(0, 148, 255));
-    p.drawRect(0, 0, width(), height());
+    p.drawRect(0, 0, width()-1, height()-1);
 }
 
 void GameDialog::show()
 {
+    update();
     if (doFancy)
         timer->start(33);
     QDialog::show();
