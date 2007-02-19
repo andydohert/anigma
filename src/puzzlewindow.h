@@ -31,6 +31,7 @@
 #include <qmainwindow.h>
 #include "playground.h"
 #include "demo.h"
+#include "infobar.h"
 
 class QTimer;
 class MenuButton;
@@ -40,29 +41,6 @@ class QBitmap;
 class GameDialog;
 class AboutDialog;
 class FileDialog;
-
-class InfoBar : public QWidget
-{
-Q_OBJECT;
-public:
-    enum GAME_STATE {
-        GAME,
-        ABOUT,
-        HISTORY,
-        WELCOME,
-        BROWSE,
-        DEMO
-    };
-
-    InfoBar(QWidget *parent) : QWidget(parent), play(0), totalPoints(0), state(WELCOME){
-        setFocusPolicy(Qt::NoFocus);
-    }
-    void paintEvent(QPaintEvent * e);
-    Playground *play;
-
-    int totalPoints;
-    GAME_STATE state;
-};
 
 class PuzzleWindow: public QMainWindow
 {
@@ -89,7 +67,7 @@ public:
 
     inline InfoBar::GAME_STATE gameState()
     {
-        return infoBar->state;
+        return infoBar->state();
     };
 
 public slots:
@@ -113,7 +91,6 @@ private:
     void drawTitleScreen(QPainter *p);
     void drawPlayground(QPainter *p = 0, QPainter *lp = 0, bool drawAll = false);
     void drawAboutScreen(QPainter *p);
-    void updateInfoBar();
     void initGame();
     void startLevel(bool shuffle = true);
     void restartLevel();

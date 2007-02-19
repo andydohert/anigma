@@ -56,7 +56,7 @@ PuzzleWindow::PuzzleWindow(QWidget * parent): QMainWindow(parent)
     infoBar = new InfoBar(this);
     infoBar->setGeometry(0, 0, 240, 24);
     infoBar->hide();
-    
+
     srand(time(NULL));
     QColor black(0, 0, 0);
     QColor blue(0, 148, 255);
@@ -105,8 +105,8 @@ PuzzleWindow::~PuzzleWindow()
 // Game main state machine
 void PuzzleWindow::switchState(InfoBar::GAME_STATE s)
 {
-    infoBar->state = s;
-    switch (infoBar->state) {
+    infoBar->setState(s);
+    switch (infoBar->state()) {
     case InfoBar::WELCOME:
         timer->stop();
         mainButtonList->setVisible(true);
@@ -165,7 +165,7 @@ void PuzzleWindow::switchState(InfoBar::GAME_STATE s)
             errorMsg("Unable to play demo !");
             switchState(InfoBar::ABOUT);
         } else {
-            infoBar->totalPoints = 0;
+            infoBar->setTotalPoints(0);
             nextLevelLoaded();
         }
         break;
@@ -380,7 +380,7 @@ void PuzzleWindow::drawPlayground(QPainter * p, QPainter * lp, bool drawAll)
                 }
                 stripes->fill(false);
                 if (play->isInfoChange() || drawAll) {
-                    updateInfoBar();
+                    infoBar->update();
                 }
             }
             if (deleteP)
@@ -602,68 +602,12 @@ void PuzzleWindow::buttonClicked(int id)
     }
 }
 
-void PuzzleWindow::updateInfoBar()
-{
-    infoBar->update();
-}
-
-void InfoBar::paintEvent(QPaintEvent *) {
-    if (!play)
-        return;
-    QString msg;
-    int rx = 46;
-    if (state == InfoBar::DEMO) {
-        rx += 6;
-        msg.sprintf("DEMO  TIME: %03d  SCORE: %05d", play->timeLimit(),
-                     totalPoints + play->currentPoints());
-    } else {
-        if (Puzzle::timeLimit) {
-            if (play->gameType() == Playground::TIME_BASED)
-                msg.sprintf("L: %02d   TIME: %03d   SCORE: %05d",
-                            play->currentLevel, play->timeLimit(),
-                            totalPoints + play->currentPoints());
-            else
-                msg.sprintf("L: %02d   MOV: %03d   SCORE: %05d",
-                            play->currentLevel, play->timeLimit(),
-                            totalPoints + play->currentPoints());
-        } else
-            msg.sprintf("LEVEL: %02d   SCORE: %05d", play->currentLevel,
-                        totalPoints + play->currentPoints());
-    }
-
-    QPainter p(this);
-    QLinearGradient gradient(width()/2, 0, width()/2, height());
-    QColor start(0,179,255);
-    QColor end(start);
-    end = end.dark(100 + (height()*100 / height()));
-    gradient.setColorAt(0, start);
-    gradient.setColorAt(1, end);
-    p.setPen(QPen(gradient, 0));
-    QFont font("Helvetica", 16, QFont::Bold);
-    int length = width() * 2;
-    while(length > width()) {
-        font.setPointSize(font.pointSize() - 1);
-        QFontMetrics fm(font);
-        length = fm.width(msg);
-    }
-
-    p.setFont(font);
-    p.drawText(2, 2, width() - 4, height() - 4, Qt::AlignCenter, msg);
-    if (Puzzle::timeLimit && play->gameType() == Playground::TIME_BASED) {
-        if (play->timeLimit() < 10 && (play->timeLimit() % 2)) {
-            QFontMetrics fm(font);
-            p.drawRect(fm.width("DEMO  ")-2, 2, fm.width("TIME :000 "), fm.height() - 7);
-        }
-    }
-}
-
-
 void PuzzleWindow::initGame()
 {
     play->currentLevel = Puzzle::startLevel;
     demo.clearRecording();
     play->clearPoints();
-    infoBar->totalPoints = 0;
+    infoBar->setTotalPoints(0);
     timer->start(Puzzle::timeoutValue);
 }
 
@@ -672,8 +616,7 @@ void PuzzleWindow::startLevel(bool shuffle)
 {
     if (shuffle)
         Puzzle::images->shuffleTheme();
-    infoBar->totalPoints += play->currentPoints();
-    
+    infoBar->setTotalPoints(infoBar->totalPoints() + play->currentPoints());
     bool result;
     if (Puzzle::levelFileName.isEmpty() && Puzzle::currLevelsName.isEmpty())
         result = play->loadLevel(levels, play->currentLevel);
@@ -735,14 +678,14 @@ void PuzzleWindow::demoCompleted()
         dlg->exec();
 
         play->currentLevel++;
-        infoBar->totalPoints += play->currentPoints();
+        infoBar->setTotalPoints(infoBar->totalPoints() + play->currentPoints());
         if (!demo.initDemo()) {
             play->currentLevel = -1;
             if (!demo.initDemo()) {
                 switchState(InfoBar::ABOUT);     // if somebody deleted starting files
                                         // we better get out to avoid infinite loop
             } else {
-                infoBar->totalPoints = 0;
+                infoBar->setTotalPoints(0);
                 nextLevelLoaded();
             }
         } else {
@@ -763,10 +706,10 @@ void PuzzleWindow::restartLevel()
                    QString::null, "No");
     if (dlg->exec() == 0) {
         play->clearPoints();
-        if (infoBar->totalPoints >= Puzzle::blockBonus)
-            infoBar->totalPoints -= Puzzle::blockBonus;
+        if (infoBar->totalPoints() >= Puzzle::blockBonus)
+            infoBar->setTotalPoints(infoBar->totalPoints() - Puzzle::blockBonus);
         else
-            infoBar->totalPoints = 0;
+            infoBar->setTotalPoints(0);
         startLevel(false);
     }
     timer->start(Puzzle::timeoutValue);
@@ -785,10 +728,10 @@ void PuzzleWindow::outOfTime()
                    "Quit");
     if (dlg->exec() == 0) {
         play->clearPoints();
-        if (infoBar->totalPoints >= Puzzle::blockBonus)
-            infoBar->totalPoints -= Puzzle::blockBonus;
+        if (infoBar->totalPoints() >= Puzzle::blockBonus)
+            infoBar->setTotalPoints(infoBar->totalPoints() - Puzzle::blockBonus);
         else
-            infoBar->totalPoints = 0;
+            infoBar->setTotalPoints(0);
         startLevel(false);
         timer->start(Puzzle::timeoutValue);
     } else {
@@ -835,10 +778,10 @@ void PuzzleWindow::saveGameState(const QString & fileName)
     }
     QString tmp = dir.absolutePath() + "/" + fileName;
     if (!Puzzle::levelFileName.isEmpty())
-        play->savePlayground(tmp.append(".puzzle"), infoBar->totalPoints,
+        play->savePlayground(tmp.append(".puzzle"), infoBar->totalPoints(),
                              Puzzle::levelFileName);
     else
-        play->savePlayground(tmp.append(".puzzle"), infoBar->totalPoints,
+        play->savePlayground(tmp.append(".puzzle"), infoBar->totalPoints(),
                              Puzzle::currLevelsName);
 }
 
@@ -850,6 +793,7 @@ void PuzzleWindow::loadGame(const QString & fileName)
         errorMsg("Unable to load saved game.");
     }
 }
+
 void PuzzleWindow::fileDialogDone()
 {
     switchState(InfoBar::WELCOME);
@@ -858,10 +802,12 @@ void PuzzleWindow::fileDialogDone()
 bool PuzzleWindow::loadGameState(const QString & fileName)
 {
     QString oldCurrLevelsName = Puzzle::currLevelsName;
-    if (play->loadPlayground(fileName, &infoBar->totalPoints, levels)) {
+    int currPoints = 0;
+    if (play->loadPlayground(fileName, &currPoints, levels)) {
+        infoBar->setTotalPoints(currPoints);
         aboutDialog->hide();
         fileDialog->hide();
-        infoBar->state = InfoBar::GAME;
+        infoBar->setState(InfoBar::GAME);
         play->currentLevel = play->number();
         mainButtonList->setVisible(false);
         aboutButtonList->setVisible(false);
