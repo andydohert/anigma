@@ -1,35 +1,29 @@
-/* 
-   Copyright (C) 2005 Benjamin C Meyer <ben+ksearch@meyerhome.net>
-
-   This program is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 2 of the License, or (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.
+/*
+* Copyright (C) 2005-2007 Benjamin C Meyer
+* Copyright (C) 2001-2002 Walter Rawdanik
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright
+*       notice, this list of conditions and the following disclaimer in the
+*       documentation and/or other materials provided with the distribution.
+*     * The name of the contributors may not be used to endorse or promote products
+*       derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY <copyright holder> ``AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL <copyright holder> BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-/**********************************************************************
-** Copyright (C) 2001 Walter Rawdanik.  All rights reserved.
-** Copyright (C) 2004 Benjamin Meyer.   All rights reserved.
-**
-** This file is part of Puzz-le game.
-**
-** This file may be distributed and/or modified under the terms of the
-** BSD license appearing in the file LICENSEL included in the
-** packaging of this file.
-** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
-** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-**
-**********************************************************************/
 
 #ifndef PLAYBLOCK_H
 #define PLAYBLOCK_H
@@ -43,260 +37,247 @@ class Playblock
 {
 
 public:
+    enum GAME_BLOCK
+    {
+        RED = 0,
+        YELLOW,
+        BLUE,
+        GREEN,
+        PURPLE,
+        STONE,
+        BROKEN_STONE,
+        MOVING_STONE,
+        FIRE_STONE,
+        TRAP_STONE,
+        EMPTY,
+        TRANSITIONAL,
+        WHITE,
+        CYAN,
+        GREY,
+        INVALID
+    };
 
-	enum GAME_BLOCK
-	{
-		RED,
-		YELLOW,
-		BLUE,
-		GREEN,
-		PURPLE,
-		STONE,
-		BROKEN_STONE,
-		MOVING_STONE,
-		FIRE_STONE,
-		TRAP_STONE,
-		EMPTY,
-		TRANSITIONAL,
-		WHITE,
-		CYAN,
-		GREY,
-		INVALID
-	};
-	
-	Playblock(int bx, int by,int x1=-1,int y1=-1, int x2=-9999,int y2=-9999, int aframe=0,GAME_BLOCK type=EMPTY,bool sel=false, bool grab=false);
+    Playblock(int bx = -1, int by = -1,
+              int x1 = -1, int y1 = -1,
+              int x2 = -9999, int y2 = -9999,
+              GAME_BLOCK type = EMPTY);
 
-	void recalculatePos(int nx, int ny);
-	void recalculatePos();
-	void createBlendedImage(QPixmap *tile, QPixmap *back, int ox, int oy, QPixmap *f);
-	static QImage& blend(QImage& src, QImage& dst, float opacity);
+    void recalculatePos(int nx, int ny);
+    void recalculatePos();
+    void createBlendedImage(QPixmap *tile, QPixmap *back, int ox, int oy, QPixmap *f) const;
+    static QImage& blend(QImage& src, QImage& dst, float opacity);
 
-	inline bool attached()
-	{
-		return iat;
-	}
+    inline bool attached() const
+    {
+        return iat;
+    }
 
-	inline void setLastDirection(int d)
-	{
-		iDir=d;
-	}
+    inline void setLastDirection(int d)
+    {
+        iDir = d;
+    }
 
-	inline int lastDirection()
-	{
-		return iDir;
-	}
+    inline int lastDirection()
+    {
+        return iDir;
+    }
 
-	inline void setAttached(bool f=true)
-	{
-		iat=f;
-	}
+    inline void setAttached(bool f = true)
+    {
+        iat = f;
+    }
 
-	inline void updatePos()
-	{
-		iy+=iay;
-		ix+=iax;
-	}
+    inline void updatePos()
+    {
+        iy += iay;
+        ix += iax;
+    }
 
-	inline void setX(int x)
-	{
-		ix=x;
-	}
+    inline void setX(int x)
+    {
+        ix = x;
+    }
 
-	inline void setY(int y)
-	{
-		iy=y;
-	}
+    inline void setY(int y)
+    {
+        iy = y;
+    }
 
-	inline void setAccelY(float a)
-	{
-		iay=a;
-	}
+    inline void setAccelY(float a)
+    {
+        iay = a;
+    }
 
-	inline float accelY()
-	{
-		return iay;
-	}
+    inline float accelY() const
+    {
+        return iay;
+    }
 
-	inline void setAccelX(float a)
-	{
-		iax=a;
-	}
+    inline void setAccelX(float a)
+    {
+        iax = a;
+    }
 
-	inline float accelX()
-	{
-		return iax;
-	}
+    inline float accelX() const
+    {
+        return iax;
+    }
 
-	inline int x()
-	{
-		return (int) (ix+0.5);
-	}
+    inline int x() const
+    {
+        return (int) (ix + 0.5);
+    }
 
-	inline int y()
-	{
-		return (int)(iy+0.5);
-	}
+    inline int y() const
+    {
+        return (int)(iy + 0.5);
+    }
 
-	inline int frame()
-	{
-		return iaf;
-	}
+    inline int frame() const
+    {
+        return iaf;
+    }
 
-	inline void setFrame(int f)
-	{
-		iaf=f;
-	}
+    inline void setFrame(int f)
+    {
+        iaf = f;
+    }
 
-	inline void setStartPos(int x1, int y1)
-	{
-		ix1=x1;
-		iy1=y1;
-	}
+    inline void setStartPos(int x1, int y1)
+    {
+        ix1 = x1;
+        iy1 = y1;
+    }
 
-	inline void setEndPos(int x2, int y2)
-	{
-		ix2=x2;
-		iy2=y2;
-	}
+    inline void setEndPos(int x2, int y2)
+    {
+        ix2 = x2;
+        iy2 = y2;
+    }
 
-	inline void setCounter(int c)
-	{
-		cnt=c;
-	}
+    inline void setCounter(int c)
+    {
+        cnt = c;
+    }
 
-	inline int counter()
-	{
-		return cnt;
-	}
+    inline int counter() const
+    {
+        return cnt;
+    }
 
-	inline bool isPointInside(int y)
-	{
-		if(y>=iy && y<iy+Puzzle::bSize)
-			return true;
-		else
-			return false;
-	}
+    inline bool isPointInside(int y) const
+    {
+        if(y >= iy && y < iy + Puzzle::blockPixelSize)
+            return true;
+        else
+            return false;
+    }
 
+    inline int bx() const
+    {
+        return cx;
+    }
 
-	inline int bx()
-	{
-		return cx;
-	}
+    inline int by() const
+    {
+        return cy;
+    }
 
-	inline int by()
-	{
-		return cy;
-	}
+    inline void setCurrentBlockPos(int bx, int by)
+    {
+        cx = bx;
+        cy = by;
+    }
 
-	inline void setCurrentBlockPos(int bx, int by)
-	{
-		cx=bx;
-		cy=by;
-	}
+    inline int x1() const
+    {
+        return ix1;
+    }
 
-	inline int x1()
-	{
-		return ix1;
-	}
-	inline int y1()
-	{
-		return iy1;
-	}
-	inline int x2()
-	{
-		return ix2;
-	}
-	inline int y2()
-	{
-		return iy2;
-	}
+    inline int y1() const
+    {
+        return iy1;
+    }
 
-	inline GAME_BLOCK type()
-	{
-		return itype;
-	}
+    inline int x2() const
+    {
+        return ix2;
+    }
 
-	inline void setType(GAME_BLOCK t)
-	{
-		itype=t;
-	}
-	
-	
-	inline void setSelected(bool f)
-	{
-		iSel=f;
-	}
+    inline int y2() const
+    {
+        return iy2;
+    }
 
-	inline bool selected()
-	{
-		return iSel;
-	}
+    inline GAME_BLOCK type() const
+    {
+        return itype;
+    }
 
-	inline void setGrabbed( bool f)
-	{
-		iGrab=f;
-	}
+    inline void setType(GAME_BLOCK t)
+    {
+        itype = t;
+    }
 
-	inline bool grabbed()
-	{
-		return iGrab;
-	}
+    inline void setSelected(bool f)
+    {
+        iSel = f;
+    }
 
-	inline bool updated()
-	{
-		return iUpd;
-	}
+    inline bool selected() const
+    {
+        return iSel;
+    }
 
-	inline void setUpdated(bool f)
-	{
-		iUpd=f;
-	}
+    inline void setGrabbed(bool f)
+    {
+        iGrab = f;
+    }
 
-	void draw(QPainter *p,int ox=0,int oy=0);
+    inline bool grabbed() const
+    {
+        return iGrab;
+    }
 
-// We need these operators for QSortedList.sort()
+    inline bool updated() const
+    {
+        return iUpd;
+    }
 
-	friend inline int operator < (Playblock& left, Playblock& right)
-	{
-		if(left.iy>right.iy)
-			return true;
-		else
-			return false;
-	}
-	friend inline int operator == (Playblock& left, Playblock& right)
-	{
-		if(left.iy==right.iy)
-			return true;
-		else
-			return false;
-	}
+    inline void setUpdated(bool f)
+    {
+        iUpd = f;
+    }
 
-	QString toString();
-	bool fromString(const QString &s);
+    void paint(QPainter *p, int ox = 0, int oy = 0) const;
+
+    static bool lessThan(Playblock* left, Playblock *right)
+    {
+        return (left->iy > right->iy);
+    }
+
+    QString toString() const;
+    bool fromString(const QString &s);
 
 private:
-
-	GAME_BLOCK itype; // type of block
-
-	int iSel;		// is selected ( used to paint selection box)
-	int iGrab;	// is grabbed ( used to paint selection box)
-	int iaf;		// current frame of animation
-	float ix;		// pos x ( in pixels)
-	float iy;		// pos y ( in pixels)
-	int cx;			// current pos x ( in blocks)
-	int cy;			// current pos y ( in blocks)
-	int ix1;		// starting pos x ( in blocks , used by movable blocks) 
-	int iy1;		// starting pos y ( in blocks , used by movable blocks) 
-	int ix2;		// ending pos x ( in blocks , used by movable blocks) 
-	int iy2;		// ending pos y ( in blocks , used for moving blocks)
-	float iay;	// vertical acceleration
-	float iax;	// horizontal acceleration ( used only for initial animation)
-	int iat;		// whetber this box is attached to moving column
-	int cnt;		// this is a generic counter used for controling speed of animation etc .. ( 33/sec )
-	int iUpd;		// if true, block has been already processes by the current update()
-	int iDir;		// last direction (1=up 0 =down)
-
+    int cx;   // current pos x ( in blocks)
+    int cy;   // current pos y ( in blocks)
+    int ix1;  // starting pos x ( in blocks , used by movable blocks)
+    int iy1;  // starting pos y ( in blocks , used by movable blocks)
+    int ix2;  // ending pos x ( in blocks , used by movable blocks)
+    int iy2;  // ending pos y ( in blocks , used for moving blocks)
+    int iaf;  // current frame of animation
+    GAME_BLOCK itype; // type of block
+    int iSel;  // is selected ( used to paint selection box)
+    int iGrab; // is grabbed ( used to paint selection box)
+    float ix;  // pos x ( in pixels)
+    float iy;  // pos y ( in pixels)
+    float iay; // vertical acceleration
+    float iax; // horizontal acceleration ( used only for initial animation)
+    int cnt;   // this is a generic counter used for controling speed of animation etc .. ( 33/sec )
+    int iat;   // whetber this box is attached to moving column
+    int iUpd;  // if true, block has been already processes by the current update()
+    int iDir;  // last direction (1=up 0 =down)
 };
 
 #endif // PLAYBLOCK_H
-

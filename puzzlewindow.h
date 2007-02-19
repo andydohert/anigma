@@ -1,33 +1,36 @@
-/* 
-   Copyright (C) 2005 Benjamin C Meyer <ben+ksearch@meyerhome.net>
-
-   This program is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 2 of the License, or (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.
+/*
+* Copyright (C) 2005-2007 Benjamin C Meyer
+* Copyright (C) 2001-2002 Walter Rawdanik
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright
+*       notice, this list of conditions and the following disclaimer in the
+*       documentation and/or other materials provided with the distribution.
+*     * The name of the contributors may not be used to endorse or promote products
+*       derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY <copyright holder> ``AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL <copyright holder> BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/****************************************************************************
-** Main Game Window
-**
-** Copyright (C) 2001 Walter Rawdanik.  All rights reserved.
-**
-****************************************************************************/
-#ifndef PUZZLE_WINDOW_H
-#define PUZZLE_WINDOW_H
+#ifndef PUZZLEWINDOW_H
+#define PUZZLEWINDOW_H
 
 #include <qmainwindow.h>
 #include "playground.h"
+#include "demo.h"
 
 class QTimer;
 class MenuButton;
@@ -38,172 +41,128 @@ class GameDialog;
 class AboutDialog;
 class FileDialog;
 
-class DemoMove 
-{ 
+class InfoBar : public QWidget
+{
+Q_OBJECT;
 public:
+    enum GAME_STATE {
+        GAME,
+        ABOUT,
+        HISTORY,
+        WELCOME,
+        BROWSE,
+        DEMO
+    };
 
-    DemoMove(int x, int y, int t);
-	
-	inline QString toString()
-	{
-		QString t;
-		t.sprintf("%d %d %d",ix,iy,it);
-		return t;
-	}
+    InfoBar(QWidget *parent) : QWidget(parent), play(0), totalPoints(0), state(WELCOME){
+        setFocusPolicy(Qt::NoFocus);
+    }
+    void paintEvent(QPaintEvent * e);
+    Playground *play;
 
-	inline QPoint getPos()
-	{
-		return QPoint(ix,iy);
-	}
-	inline int getTick()
-	{
-		return it;
-	}
-
-private:
-	int ix;
-	int iy;
-	int	it;
-
+    int totalPoints;
+    GAME_STATE state;
 };
 
-class PuzzleWindow : public QMainWindow
-{ 
-    Q_OBJECT
+class PuzzleWindow: public QMainWindow
+{
+
+Q_OBJECT
 
 public:
+    enum BUTTONS {
+        PLAY_GAME,
+        OPTIONS_GAME,
+        ABOUT_GAME,
+        HISTORY_GAME,
+        LOAD_GAME,
+        BACK_TO_WELCOME_FROM_ABOUT,
+        BACK_TO_WELCOME_FROM_GAME,
+        PLAY_DEMO,
+        RESTART_LEVEL,
+        PAUSE_GAME,
+        QUIT
+    };
 
-   enum GAME_STATE 
-   {
-      GAME,
-      ABOUT,
-      HISTORY,
-	  WELCOME,
-	  BROWSE,
-	  DEMO
-   };
-
-   enum BUTTONS 
-   {
-      PLAY_GAME,
-      OPTIONS_GAME,
-      ABOUT_GAME,
-      HISTORY_GAME,
-	  LOAD_GAME,
-      BACK_TO_WELCOME_FROM_ABOUT,
-	  BACK_TO_WELCOME_FROM_GAME,
-	  PLAY_DEMO,
-	  RESTART_LEVEL,
-     PAUSE_GAME,
-	  QUIT
-   };
-
-
-    PuzzleWindow( QWidget* parent = 0, const char* name = 0, WFlags fl = 0 );
+    PuzzleWindow(QWidget * parent = 0);
     ~PuzzleWindow();
 
-
-
-	inline GAME_STATE gameState()
-	{
-		return state;
-	};
+    inline InfoBar::GAME_STATE gameState()
+    {
+        return infoBar->state;
+    };
 
 public slots:
-	void switchState(GAME_STATE s);
+    void switchState(InfoBar::GAME_STATE s);
 
-	
 protected:
-    void keyPressEvent ( QKeyEvent * e );
-    void mousePressEvent ( QMouseEvent * e );
-    void paintEvent ( QPaintEvent *e ); 
-    void resizeEvent ( QResizeEvent *e ); 
-    void closeEvent ( QCloseEvent * e );
-   
+    void keyPressEvent(QKeyEvent * e);
+    void mousePressEvent(QMouseEvent * e);
+    void paintEvent(QPaintEvent * e);
+    void resizeEvent(QResizeEvent * e);
+    void closeEvent(QCloseEvent * e);
+
 private slots:
-	void synchTimeout();
-   void buttonClicked(int id);
-	void loadGame(const QString &fileName);
-	void fileDialogDone();
+    void synchTimeout();
+    void buttonClicked(int id);
+    void loadGame(const QString & fileName);
+    void fileDialogDone();
 
 private:
-      
-   void generateMovement(int x, int y, bool keyBoardMode=false);
+    void generateMovement(int x, int y, bool keyBoardMode = false);
+    void drawTitleScreen(QPainter *p);
+    void drawPlayground(QPainter *p = 0, QPainter *lp = 0, bool drawAll = false);
+    void drawAboutScreen(QPainter *p);
+    void updateInfoBar();
+    void initGame();
+    void startLevel(bool shuffle = true);
+    void restartLevel();
+    void outOfTime();
+    void abortGame();
+    void saveGameState(const QString & fileName);
+    bool loadGameState(const QString & fileName);
+    void init();
+    void initImages();
+    void errorMsg(const QString & error);
 
-   void drawTitleScreen(QPainter *p);
-   void drawPlayground(QPainter *p=0,QPainter *lp=0,bool drawAll=false);
-   void drawAboutScreen(QPainter *p);
+    void levelCompleted();
+    void gameCompleted();
+    void demoCompleted();
+    void nextLevelLoaded();
+        
+    QTimer *timer;
+    QColor menuClr;
+    QColor hMenuClr;
 
-   void updateInfoBar();
+    MenuButton *playGame;
+    MenuButton *optionsGame;
+    MenuButton *aboutGame;
+    MenuButton *historyGame;
+    MenuButton *loadSavedGame;
+    MenuButton *quitGame;
+    MenuButtonList *mainButtonList;
 
-   void initGame();
-   void startLevel(bool shuffle=true);   
-   void restartLevel();
-   void outOfTime();
-   void abortGame();
-   void levelCompleted();
-   void gameCompleted();
-   void demoCompleted();
+    MenuButton *backToWelcomeFromAbout;
+    MenuButton *playDemo;
+    MenuButtonList *aboutButtonList;
 
-   bool initDemo();
-   void loadDemo(const QString &fileName);
-   void loadDemo(const char * demo[]);
-   void saveDemo();
-   void saveDemoCPPVersion();
+    MenuButton *backToWelcomeFromGame;
+    MenuButton *restartCurrent;
+    MenuButton *pauseGame;
+    MenuButtonList *gameButtonList;
 
-   void saveGameState(const QString &fileName);
-   bool loadGameState(const QString &fileName);
+    InfoBar *infoBar;
 
-   void	init();
-   void initImages();
-
-   void errorMsg(const QString &error);
-   GAME_STATE  state;
-   QTimer *timer;
-
-
-
-   QColor  menuClr;
-   QColor  hMenuClr;
-
-   MenuButton *playGame;
-   MenuButton *optionsGame;
-   MenuButton *aboutGame;	
-   MenuButton *historyGame;
-   MenuButton *loadSavedGame;
-   MenuButton *quitGame;
-   MenuButtonList *mainButtonList;
-
-   MenuButton *backToWelcomeFromAbout;
-   MenuButton *playDemo;
-   MenuButtonList *aboutButtonList;
-
-   MenuButton *backToWelcomeFromGame;
-   MenuButton *restartCurrent;
-   MenuButton *pauseGame;
-   MenuButtonList *gameButtonList;
-
-// Title Screen Variables
-
-
-	QPixmap *pix;
-	Playground *play;
-	QPixmap *info;
-	QBitmap *infoMask;
-	QList<DemoMove> demoList;
-	DemoMove *curMove;
-	int demoLevel;
-	int currentLevel;
-	unsigned int currPoints;
-	unsigned int firstDemoLevel;
-	int ox;
-	int oy;
-   bool isPaused;
-	static int infoBarHeight;
-	GameDialog *dlg;
-	AboutDialog *aDlg;
-	FileDialog  *fDlg;
+    // Title Screen Variables
+    QPixmap *pix;
+    Playground *play;
+    int ox;
+    int oy;
+    bool isPaused;
+    GameDialog *dlg;
+    AboutDialog *aboutDialog;
+    FileDialog *fileDialog;
+    Demo demo;
 };
 
 #endif // PUZZLE_WINDOW_H
-

@@ -1,23 +1,16 @@
 Couple of random remarks about how Puzz-le works ...
 ----------------------------------------------------
 
-PuzzleWindow.cpp is a main widget class which is responsible for handling
+puzzlewindow.cpp is a main widget class which is responsible for handling
 all user generated events ( some of which get passed to another classes.)
-Dependig on user action addition widgets ( AboutDialog.cpp, FileDialog.cpp) are displayed
-on top of the main widget.
-GameDialog.cpp and OptionsDialog.cpp are the only real dialogs ( derived from QDialog).
+Depending on user action addition widgets ( aboutdialog.cpp, filedialog.cpp) are displayed on top of the main widget.
+
+gamedialog.cpp and optionsdialog.cpp are the only real dialogs ( derived from QDialog).
 
 Playground.cpp is a class responsible for handling game logic, game display.
-It's main game loop is being called from PuzzleWindow.cpp which has at regular intervals
+It's main game loop is being called from puzzlewindow.cpp which has at regular intervals
 (synch provided by QTimer.)
 
 Shortcomings
 ------------
-
-There is definately too much code for in the Playground.cpp class. This stuff could easily
-be optimized as far as code size is concerned.
-ImageRepository.cpp class should be made to return QImage instead of QPixmap ( right now it holds
-QPixmaps for each image in addition to static image data from image.h)
-MenuButton.cpp is a relic from early version of the game and most of the code inside
-is not used anymore.
-There is a still problem with DEMO games not going into to sleep when focus is switched to another application.
+There is definately too much code for in the playground.cpp class. This stuff could easily be optimized as far as code size is concerned.  ImageRepository.cpp class should be made to return QImage instead of QPixmap ( right now it holds QPixmaps for each image in addition to static image data from image.h)  MenuButton.cpp is a relic from early version of the game and most of the code inside is not used anymore.   There is a still problem with DEMO games not going into to sleep when focus is switched to another application.

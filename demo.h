@@ -1,5 +1,6 @@
 /*
 * Copyright (C) 2005-2007 Benjamin C Meyer
+* Copyright (c) 2001-2002, Walter Rawdanik
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -24,50 +25,65 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "soundrepository.h"
+#ifndef DEMO_H
+#define DEMO_H
 
-#include <qsound.h>
-#include <qfile.h>
-#include <qdir.h>
-#include <qdebug.h>
-#include "puzzle.h"
+#include <qobject.h>
+#include <qstring.h>
+#include <qpoint.h>
 
-SoundRepository::SoundRepository(const QString &directory)
+class DemoMove
 {
-    findSound(directory, "delete");
-    findSound(directory, "button");
-}
+public:
+    DemoMove(int x = 0, int y = 0, int t = 0);
 
-SoundRepository::~SoundRepository()
-{
-    QHashIterator<QString, QSound*> i(sounds);
-    while (i.hasNext()) {
-        i.next();
-        delete i.value();
+    inline QString toString() const
+    {
+        return QString("%1 %2 %3").arg(ix).arg(iy).arg(it);
     }
-}
 
-void SoundRepository::playSound(const QString &name) const
-{
-    if (Puzzle::playSound) {
-        if (sounds.contains(name))
-            sounds[name]->play();
-        else
-            qWarning() << "unknown sound" << name;
+    inline QPoint getPos() const
+    {
+        return QPoint(ix, iy);
     }
-}
 
-void SoundRepository::findSound(const QString &directory, const QString &name)
-{
-    if (sounds.contains(name))
-        return;
-
-    QString fileName(directory + QDir::separator() + name + ".dav");
-    if (QFile::exists(fileName)) {
-        QSound *newSound = new QSound(fileName);
-        sounds.insert(name, newSound);
-    } else {
-        qWarning() << "missing sound" << name;
+    inline int getTick() const
+    {
+        return it;
     }
-}
+
+private:
+    int ix;
+    int iy;
+    int it;
+};
+
+class Playground;
+
+class Demo : public QObject
+{
+Q_OBJECT
+
+public:
+    bool initDemo();
+    bool timeout(int tick);
+    void recordDemo(const DemoMove &move) { demoList.append(move); }
+    void clearRecording() { demoList.clear(); }
+    void saveDemo() {
+        saveDemoToFile();
+        demoList.clear();
+    }
+
+    Playground *play;
+private:
+    void loadDemo(const QString &fileName);
+    void saveDemoToFile();
+    
+    int currentDemoMove;
+    int demoLevel;
+    DemoMove curMove;
+    QList <DemoMove> demoList;
+};
+
+#endif
 

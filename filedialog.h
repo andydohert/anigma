@@ -1,118 +1,107 @@
-/* 
-   Copyright (C) 2005 Benjamin C Meyer <ben+ksearch@meyerhome.net>
-
-   This program is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 2 of the License, or (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.
+/*
+* Copyright (C) 2005-2007 Benjamin C Meyer
+* Copyright (C) 2001-2002 Walter Rawdanik
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright
+*       notice, this list of conditions and the following disclaimer in the
+*       documentation and/or other materials provided with the distribution.
+*     * The name of the contributors may not be used to endorse or promote products
+*       derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY <copyright holder> ``AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL <copyright holder> BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/****************************************************************************
-** Simple file requester for selecting saved games.
-**
-**
-** Copyright (C) 2001 Walter Rawdanik.  All rights reserved.
-**
-****************************************************************************/
-
-
-#ifndef FILE_DIALOG_H
-#define FILE_DIALOG_H
+#ifndef FILEDIALOG_H
+#define FILEDIALOG_H
 
 #include <qwidget.h>
 #include <qstring.h>
 #include <qpixmap.h>
-#include <qlistbox.h> 
-
+#include <qevent.h>
+#include <q3listbox.h>
 
 class MenuButton;
 class MenuButtonList;
 class Playground;
 
-class FileDialogItem: public QListBoxItem
+class FileDialogItem: public Q3ListBoxItem
 {
 public:
-	FileDialogItem(const QString &fileName,const QString &visibleFileNam,int levelNum, QListBox *lb);
-	
-	virtual int height ( const QListBox * ) const;
-	virtual int width ( const QListBox * ) const;
+    FileDialogItem(const QString &fileName, const QString &visibleFileNam, int levelNum, Q3ListBox *lb);
 
-	inline QString fileName()
-	{
-		return QString(fName);
-	}
+    virtual int height ( const Q3ListBox * ) const;
+    virtual int width ( const Q3ListBox * ) const;
 
+    inline QString fileName()
+    {
+        return QString(fName);
+    }
 
 protected:
-	virtual void paint ( QPainter * );
-
+    virtual void paint ( QPainter * );
 
 private:
-	QString fName;
-	int number;
-	int numOffset;
-	int fHeight;
+    QString fName;
+    int number;
+    int numOffset;
+    int fHeight;
 };
 
+/*
+ * Simple file requester for selecting saved games.
+ */
 class FileDialog : public QWidget
-{ 
+{
     Q_OBJECT
 
-public:
-
-    FileDialog( const QString &dir,QWidget *parent=0,const char *name=0);
-
-	unsigned int refresh(Playground *play);
-
-
-
 signals:
+    void loadSavedGame(const QString &fileName);
+    void done();
 
-	void loadSavedGame(const QString &fileName);
-	void done(void);
+public:
+    FileDialog(const QString &dir, QWidget *parent = 0);
+    void refresh();
 
-protected: 
-	virtual void paintEvent ( QPaintEvent * ) ; 
-	virtual void keyPressEvent ( QKeyEvent * e );
-	virtual void resizeEvent ( QResizeEvent * );    
+protected:
+    virtual void paintEvent(QPaintEvent *) ;
+    virtual void keyPressEvent(QKeyEvent * e);
+    virtual void resizeEvent(QResizeEvent *);
 
-	
 private slots:
-	void buttonClicked(int);
-	void listBoxSelected(QListBoxItem * );
+    void deleteSelected();
+    void load();
+    void listBoxSelected(Q3ListBoxItem * );
 
 private:
-	
-	void deleteSelected();
+    enum BUTTONS
+    {
+        GO_BACK,
+        DELETE,
+        LOAD
+    };
 
-	enum BUTTONS 
-	{
-		GO_BACK,
-		DELETE,
-		LOAD
-	};
-
-	QString dDir;				
-	MenuButton *backButton;
-	MenuButton *loadButton;
-	MenuButton *deleteButton;
-	MenuButtonList *dButtonList;
-	QListBox	*lBox;
-	int vMargin;			// horizontal margin
-	int	hMargin;			// vertical margin ( should include size of MenuButton
-
+    QString dDir;
+    MenuButton *backButton;
+    MenuButton *loadButton;
+    MenuButton *deleteButton;
+    MenuButtonList *dButtonList;
+    Q3ListBox *lBox;
+    int vMargin;   // horizontal margin
+    int hMargin;   // vertical margin ( should include size of MenuButton
 };
 
-
-
-#endif // FILE_DIALOG_H
+#endif // FILEDIALOG_H

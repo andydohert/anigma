@@ -1,100 +1,77 @@
-/* 
-   Copyright (C) 2005 Benjamin C Meyer <ben+ksearch@meyerhome.net>
-
-   This program is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 2 of the License, or (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program; see the file COPYING.  If not, write to
-   the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.
+/*
+* Copyright (C) 2005-2007 Benjamin C Meyer
+* Copyright (C) 2001-2002 Walter Rawdanik
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright
+*       notice, this list of conditions and the following disclaimer in the
+*       documentation and/or other materials provided with the distribution.
+*     * The name of the contributors may not be used to endorse or promote products
+*       derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY <copyright holder> ``AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL <copyright holder> BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/****************************************************************************
-** Class for initialization, storing and quick retrieval of various game images.
-**
-**
-** Copyright (C) 2001 Walter Rawdanik.  All rights reserved.
-**
-****************************************************************************/
-
-#ifndef IMAGE_REPOSITORY_H
-#define IMAGE_REPOSITORY_H
+#ifndef IMAGEREPOSITORY_H
+#define IMAGEREPOSITORY_H
 
 #include <qpixmap.h>
 #include <qimage.h>
-#include <qdict.h>
+#include <qhash.h>
 #include <qdir.h>
 
-#ifdef KDE_RELEASE
-#define ROOTHOME (QDir::currentDirPath()+"/Qtopia/puzz-le/opt/QtPalmtop/")
-#else
-#include <qpe/qpeapplication.h>
-#define ROOTHOME QPEApplication::qpeDir()
-#endif
-
+/**
+ * Class for initialization, storing and quick retrieval of various game images.
+ */
 class ImageRepository
-{ 
-
+{
 public:
-	
-		enum I_NAMES
-	{
-		RED,
-		GREEN,
+    enum IMAGE_NAMES {
+        RED = 0,
+        GREEN,
         BLUE,
-		PURPLE,
-		YELLOW,
+        PURPLE,
+        YELLOW,
         CYAN,
-		WHITE,
-        GREY,       
-		WALL,
-		FIRE,
-		TRAP_RIGHT,
-		TRAP_LEFT,
-		BROKEN_WALL,
-		FRONT_1,
-		BACKGROUND,
-		FRONT_TITLE,
-		FREEZING_ANIMATION
-	};
-
+        WHITE,
+        GREY,
+        WALL,
+        FIRE,
+        TRAP_RIGHT,
+        TRAP_LEFT,
+        BROKEN_WALL,
+        FRONT_1,
+        BACKGROUND,
+        FRONT_TITLE,
+        FREEZING_ANIMATION
+    };
 
     ImageRepository();
-    ~ImageRepository();
 
-	void init(int sw, int sh);
-
-    bool initTheme( const QString &theme);
+    bool initTheme(const QString &theme);
     void shuffleTheme();
-
-    QPixmap* findPixmap(const QString& name);
-	QPixmap* findPixmap(I_NAMES id);
-
+    QPixmap findPixmap(const QString &name) const;
+    QPixmap findPixmap(IMAGE_NAMES id) const;
 
 private:
-
-   enum I_TYPES 
-   {
-      NORMAL,
-      HIGHLIGHT,
-      RESIZE
-   };
-  
-   void createHighlighted(QImage &img);
-
-   QDict<QPixmap> pixmaps;
-   QList<QPixmap> cTheme;
-   QList<QPixmap> cHTheme;
-	 QList<QPicture> svgTheme;
+    void addImage(const QString &name);
+    void createHighlighted(QImage &img) const;
+    QHash<QString, QPixmap> pixmaps;  // both theme and stock icons 
+    QList<QPixmap> currentTheme;
+    QList<QPixmap> currentHighlightTheme;
 };
 
-#endif // IMAGE_REPOSITORY_H
-
+#endif  // IMAGEREPOSITORY_H
