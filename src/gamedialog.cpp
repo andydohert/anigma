@@ -41,8 +41,9 @@
 #include "menubutton.h"
 #include "puzzle.h"
 
-GameDialog::GameDialog( QWidget *parent): QDialog(parent, "", true, Qt::WStyle_Customize | Qt::WStyle_NoBorder )
+GameDialog::GameDialog( QWidget *parent): QDialog(parent, Qt::FramelessWindowHint )
 {
+    setModal(true);
     margin = 16;
     leftButton = 0;
     rightButton = 0;
@@ -65,7 +66,7 @@ void GameDialog::paintEvent ( QPaintEvent * )
 
 void GameDialog::resizeEvent(QResizeEvent *)
 {
-    tinted.resize(width(), height());
+    tinted = QPixmap(width(), height());
 }
 
 void GameDialog::keyPressEvent ( QKeyEvent * e )
@@ -248,7 +249,7 @@ void GameDialog::configure(QPixmap *background , const QString &text, bool fancy
 
         QDate cdate = QDate::currentDate();
         QTime ctime = QTime::currentTime();
-        fileName.sprintf("%s-%d_%d_%d_%d_%d", fileName.latin1(), cdate.day(), cdate.month(), ctime.hour(), ctime.minute(), ctime.second());
+        fileName.sprintf("%s-%d_%d_%d_%d_%d", fileName.toLatin1().constData(), cdate.day(), cdate.month(), ctime.hour(), ctime.minute(), ctime.second());
         lEdit = new QLineEdit(this);
         lEdit->setMaxLength (36);
         lEdit->setGeometry((width() - 160) / 2, (height() - 20) / 2, 160, 20);
@@ -326,12 +327,12 @@ void GameDialog::buttonClicked(int b)
 void GameDialog::createTintedBackground(QPixmap *back)
 {
     QRect r = parentWidget()->geometry();
-    tinted.resize(width(), height());
+    tinted = QPixmap(width(), height());
     QPainter p(&tinted);
     p.drawPixmap(QPoint(0, 0), *back, QRect(x()-r.x(), y()-r.y(), width(), height()));
     p.end();
     QImage img = tinted.convertToImage();     // this one is slow like hell !!!!
-    img.convertDepth(32);
+    img = img.convertToFormat(QImage::Format_RGB32);
     QRgb *pixel = (QRgb*)img.bits();
     QRgb *pixel2 = pixel + (img.width() * img.height());
     while ( pixel != pixel2 ) {

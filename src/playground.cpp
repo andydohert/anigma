@@ -119,18 +119,18 @@ bool Playground::loadLevel(const QString & fileName, unsigned int levelNumberber
                 gType = MOVES_BASED;
             line = t.readLine();
         }
-        sscanf( line, "%d", &numLevels);
+        sscanf( line.toLatin1(), "%d", &numLevels);
         while ( !t.atEnd() ) {
             line = t.readLine();
             counter--;
             if ( !counter ) {
-                if ( !parseLevelHeader(line.latin1()) ) {
+                if ( !parseLevelHeader(line.toLatin1()) ) {
                     break;
                 }
                 if ( levelNumber == levelNumberber ) {
                     initGrid(w, h);
                     for (int j = 0;j < h;j++ ) {
-                        if ( !parseLevelLine(t.readLine().latin1(), j) ) {
+                        if ( !parseLevelLine(t.readLine().toLatin1(), j) ) {
                             return (bool)gState;
                         }
                     }
@@ -1388,7 +1388,7 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
             line = t.readLine();
         }
 
-        if ( sscanf( line, "%d-%d-%d-%d", &levelNumber, &w, &h, &this->t) != 4 )
+        if ( sscanf( line.toLatin1(), "%d-%d-%d-%d", &levelNumber, &w, &h, &this->t) != 4 )
             goto error;
 
 
@@ -1424,11 +1424,11 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
         line = t.readLine();
         initGrid(w, h);
         if ( currPoints ) {
-            if ( sscanf( line, "%d", currPoints) != 1 )
+            if ( sscanf( line.toLatin1(), "%d", currPoints) != 1 )
                 goto error;
         }
         line = t.readLine();
-        if ( sscanf( line, "%d", &levelPoints) != 1 )
+        if ( sscanf( line.toLatin1(), "%d", &levelPoints) != 1 )
             goto error;
 
         line = t.readLine();
@@ -1442,7 +1442,7 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
             if ( line.isEmpty() )
                 goto error;
             for ( x = 0;x < w;x++ ) {
-                switch ( line.at(x).latin1() ) {
+                switch ( line.at(x).toLatin1() ) {
                 case    '.':
                     grid[y * w + x] = Playblock::EMPTY;
                     break;
@@ -1469,7 +1469,7 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
         Playblock *block;
         for ( x = 0;x < w;x++ ) {
             line = t.readLine();
-            if ( sscanf( line, "%d-%d", &slevelNumber, &blevelNumber) != 2 )
+            if ( sscanf( line.toLatin1(), "%d-%d", &slevelNumber, &blevelNumber) != 2 )
                 goto error;
 
             plist = dBlocks[x];
@@ -1488,7 +1488,7 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
 
         // load special blocks
         line = t.readLine();
-        if ( sscanf( line, "%d", &blevelNumber) != 1 )
+        if ( sscanf( line.toLatin1(), "%d", &blevelNumber) != 1 )
             goto error;
 
         for ( y = 0;y < blevelNumber;y++ ) {
@@ -1503,7 +1503,7 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
 
         // load Playblock class variables
         line = t.readLine();
-        if ( sscanf( line, "%d-%d-%d", &deletionCounter, &beat, &totalNumBlocks) != 3 )
+        if ( sscanf( line.toLatin1(), "%d-%d-%d", &deletionCounter, &beat, &totalNumBlocks) != 3 )
             goto error;
 
         gState = INPROGRESS;
@@ -1543,7 +1543,7 @@ bool Playground::savedPlaygroundInfo(const QString &fileName, unsigned int *poin
         line = t.readLine();
     }
 
-    if ( sscanf( line, "%d-%d-%d-%d", level, &wd, &hg, &tm) != 4 )
+    if ( sscanf( line.toLatin1(), "%d-%d-%d-%d", level, &wd, &hg, &tm) != 4 )
         return false;
     // skip level file name
     line = t.readLine();
@@ -1551,12 +1551,12 @@ bool Playground::savedPlaygroundInfo(const QString &fileName, unsigned int *poin
     // get points information
     line = t.readLine();
 
-    if ( sscanf( line, "%d", &pt) != 1 )
+    if ( sscanf( line.toLatin1(), "%d", &pt) != 1 )
         return false;
 
     *points = pt;
     line = t.readLine();
-    if ( sscanf( line, "%d", &pt) != 1 )
+    if ( sscanf( line.toLatin1(), "%d", &pt) != 1 )
         return false;
     (*points) += pt;
     return true;

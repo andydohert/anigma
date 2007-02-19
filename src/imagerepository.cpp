@@ -76,7 +76,7 @@ void ImageRepository::addImage(const QString &name)
     if (img.isNull())
         qWarning() << "error loading image:" << name;
     if (img.depth() < 32)
-        img = img.convertDepth(32); // we MUST have 32 bit image for createHighlight to work.
+        img = img.convertToFormat(QImage::Format_RGB32); // we MUST have 32 bit image for createHighlight to work.
     pixmaps.insert(name, QPixmap::fromImage(img));
 }
 
