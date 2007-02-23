@@ -61,20 +61,11 @@ PuzzleWindow::PuzzleWindow(QWidget * parent): QMainWindow(parent)
     QColor black(0, 0, 0);
     QColor blue(0, 148, 255);
     setFont(QFont("Helvetica", 10, QFont::Bold));
+
     QPalette pal = palette();
-    QColorGroup cg = pal.active();
-    cg.setColor(QColorGroup::Base, black);
-    cg.setColor(QColorGroup::Background, black);
-    cg.setColor(QColorGroup::Button, black);
-    cg.setColor(QColorGroup::ButtonText, blue);
-    cg.setColor(QColorGroup::Midlight, blue);
-    cg.setColor(QColorGroup::Shadow, blue);
-    cg.setColor(QColorGroup::Dark, blue);
-    cg.setColor(QColorGroup::Light, black);
-    cg.setColor(QColorGroup::Mid, black);
-    pal.setActive(cg);
-    pal.setInactive(cg);
-    pal.setDisabled(cg);
+    pal.setColor(QPalette::Base, black);
+    pal.setColor(QPalette::Background, black);
+    pal.setColor(QPalette::WindowText, blue);
     setPalette(pal);
 
     setWindowTitle("Puzz-le");

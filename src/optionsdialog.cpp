@@ -46,36 +46,7 @@ OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar
     igs = gs;
     itl = tl;
 
-    QFont f = font();
-    f.setBold(true);
-    setFont(f);
-
-    QColor black(0, 0, 0);
-    QColor blue(0, 148, 255);
-
     setFont(QFont("Helvetica", 10, QFont::Bold));
-    
-    QPalette pal = palette();
-    QColorGroup cg = pal.active();
-    cg.setColor(QColorGroup::Base, Qt::black);
-    cg.setColor(QColorGroup::Text, Qt::blue);
-    cg.setColor(QColorGroup::Background, Qt::black);
-    cg.setColor(QColorGroup::Button, Qt::black);
-    cg.setColor(QColorGroup::ButtonText, Qt::blue);
-    cg.setColor(QColorGroup::Midlight, Qt::blue);
-    cg.setColor(QColorGroup::Shadow, Qt::blue);
-    cg.setColor(QColorGroup::Dark, Qt::black);
-    cg.setColor(QColorGroup::Light, Qt::blue);
-    cg.setColor(QColorGroup::Mid, Qt::blue);
-    cg.setColor(QColorGroup::Highlight, Qt::blue);
-    cg.setColor(QColorGroup::HighlightedText, Qt::black);
-
-    pal.setActive(cg);
-    pal.setInactive(cg);
-    pal.setDisabled(cg);
-    setPalette(pal);
-    setBackgroundMode(Qt::NoBackground);
-    
     setFixedSize(220, 260);
 
     if ( parentWidget() ) {
@@ -126,7 +97,7 @@ OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar
     abortConfirmation->setCurrentItem(!(*iar));
 
     themes = new QComboBox(this);
-    QDir    dir(ROOTHOME + "/pics/puzz-le/themes");
+    QDir dir(ROOTHOME + "/pics/puzz-le/themes");
     if ( dir.exists() )
     {
         dir.setFilter( QDir::Dirs);
@@ -152,50 +123,28 @@ OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar
     customLevel->setEnabled(false);
 #endif
 
-        QDir    cl(ROOTHOME+"/pics/puzz-le/levels");
-        if ( cl.exists() )
+    QDir cl(ROOTHOME+"/pics/puzz-le/levels");
+    if (cl.exists()) {
+        if (ile->isEmpty())
+            customLevel->setCurrentItem(0);
+        cl.setFilter( QDir::Dirs);
+        const QFileInfoList list = cl.entryInfoList();
+        i=1;
+        for (int i = 0; i < list.count(); ++i)
         {
-            if ( ile->isEmpty() )
-                customLevel->setCurrentItem(0);
-            cl.setFilter( QDir::Dirs);
-            const QFileInfoList list = cl.entryInfoList();
-            i=1;
-            for (int i = 0; i < list.count(); ++i)
+            QFileInfo info = list.at(i);
+            QString fName = info.fileName();
+            if ( fName!="." && fName!=".." && QFile::exists(info.absFilePath()+"/levels") )
             {
-                QFileInfo info = list.at(i);
-                QString fName = info.fileName();
-                if ( fName!="." && fName!=".." && QFile::exists(info.absFilePath()+"/levels") )
+                customLevel->insertItem(fName);
+                if ( fName==*ile )
                 {
-                    customLevel->insertItem(fName);
-                    if ( fName==*ile )
-                    {
-                        customLevel->setCurrentItem(i);
-                    }
-                    i++;
+                    customLevel->setCurrentItem(i);
                 }
+                i++;
             }
         }
-        
-        //Q3ListBox *lb = soundEffects->listBox();
-        //pal=lb->palette();
-        //cg=pal.active();
-        //cg.setColor(QColorGroup::Highlight,QColor(0,80,170));
-        //pal.setActive(cg);
-        //pal.setInactive(cg);
-        //pal.setDisabled(cg);
-        /*
-        lb->setPalette(pal);
-        lb=gameSpeed->listBox();
-        lb->setPalette(pal);
-        lb=abortConfirmation->listBox();
-        lb->setPalette(pal);
-        lb=customLevel->listBox();
-        lb->setPalette(pal);
-        lb=timeLimit->listBox();
-        lb->setPalette(pal);
-        lb=themes->listBox();
-        lb->setPalette(pal);
-        */
+    }
 }
 
 void OptionsDialog::paintEvent ( QPaintEvent * )
@@ -214,7 +163,6 @@ void OptionsDialog::paintEvent ( QPaintEvent * )
 
     p.setPen(QColor(0, 148, 255));
     p.drawRect(0, 0, width() - 1, height() - 1);
-
 }
 
 void OptionsDialog::resizeEvent ( QResizeEvent * )

@@ -53,8 +53,8 @@ MenuButton::~MenuButton()
 void MenuButton::setColors(const QColor& foreground, const QColor& background)
 {
     QPalette pl = palette();
-    pl.setColor(QColorGroup::Background, background);
-    pl.setColor(QColorGroup::Text, foreground);
+    pl.setColor(QPalette::Background, background);
+    pl.setColor(QPalette::WindowText, foreground);
     setPalette(pl);
 }
 
