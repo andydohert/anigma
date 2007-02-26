@@ -29,8 +29,9 @@
 #define ABOUTDIALOG_H
 
 #include <qwidget.h>
-#include <qtextedit.h>
-#include <q3listbox.h>
+
+class QTextEdit;
+class MenuButton;
 
 /*
  * A simple paged widget for displaying help files.
@@ -39,6 +40,10 @@ class AboutDialog : public QWidget
 {
 
 Q_OBJECT
+
+signals:
+    void showDemo();
+    void showWelcomeScreen();
 
 public:
     AboutDialog(QWidget *parent);
@@ -54,7 +59,9 @@ protected:
     virtual void resizeEvent(QResizeEvent *);
 
 private:
-    Q3ListBox *lBox;
+    bool loadedImages;
+    MenuButton *backButton;
+    MenuButton *demoButton;
     QTextEdit *textEdit;
 };
 

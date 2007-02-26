@@ -28,7 +28,7 @@
 #ifndef PUZZLE_H
 #define PUZZLE_H
 
-#define ROOTHOME (QDir::currentPath() + "/Qtopia/puzz-le/opt/QtPalmtop/")
+#define ROOTHOME (QDir::currentPath())
 
 #include <qstring.h>
 

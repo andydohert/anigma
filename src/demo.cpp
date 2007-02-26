@@ -41,13 +41,14 @@ DemoMove::DemoMove(int x, int y, int t): ix(x), iy(y), it(t)
 
 void Demo::loadDemo(const QString &fileName)
 {
+    demoList.clear();
+    
     QFile file(fileName);
     if (!file.exists() || !file.open(QIODevice::ReadOnly)) {
         qWarning() << "can't load demo" << fileName;
         return;
     }
 
-    demoList.clear();
     QTextStream ts(&file);
     QString line;
     

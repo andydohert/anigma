@@ -74,7 +74,7 @@ void ImageRepository::addImage(const QString &name)
 {
     QImage img("graphics/" + name + ".png");
     if (img.isNull())
-        qWarning() << "error loading image:" << name;
+        qWarning() << "missing image file:" << name;
     if (img.depth() < 32)
         img = img.convertToFormat(QImage::Format_RGB32); // we MUST have 32 bit image for createHighlight to work.
     pixmaps.insert(name, QPixmap::fromImage(img));
@@ -94,7 +94,7 @@ QPixmap ImageRepository::findPixmap(IMAGE_NAMES id) const
 
 bool ImageRepository::initTheme(const QString &theme)
 {
-    QDir directory(ROOTHOME + "pics/puzz-le/themes/" + theme);
+    QDir directory("pics/themes/" + theme);
     if (theme.isEmpty() || !directory.exists()) {
         qWarning() << "error loading theme" << theme;
         return false;
@@ -115,14 +115,13 @@ bool ImageRepository::initTheme(const QString &theme)
                 img = img.scaled(Puzzle::blockPixelSize, Puzzle::blockPixelSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
             }
             if (img.depth() < 32)
-                img = img.convertDepth(32);
+                img = img.convertToFormat(QImage::Format_ARGB32);
             QPixmap pix;
-            pix.convertFromImage(img);
+            pix = QPixmap::fromImage(img);
             pix.setMask(pix.createHeuristicMask());
             currentTheme.append(pix);
             createHighlighted(img);
-            QPixmap hPix;
-            hPix.QPixmap::convertFromImage(img);
+            QPixmap hPix = QPixmap::fromImage(img);
             hPix.setMask(pix.mask());
             currentHighlightTheme.append(hPix);
         } else {

@@ -59,7 +59,7 @@ QString Playblock::toString() const
 
 bool Playblock::fromString(const QString &s)
 {
-    if ( sscanf( s, "%d-%d-%d-%d-%f-%f-%d-%d-%d-%d-%d-%d-%f-%f-%d-%d-%d-%d",
+    if ( sscanf( s.toLatin1(), "%d-%d-%d-%d-%f-%f-%d-%d-%d-%d-%d-%d-%f-%f-%d-%d-%d-%d",
                  (int*)&itype, &iSel, &iGrab, &iaf, &ix, &iy, &cx, &cy, &ix1, &iy1, &ix2, &iy2, &iay, &iax, &iat, &cnt, &iUpd, &iDir) == 18 )
         return true;
     else
@@ -84,8 +84,8 @@ QImage& Playblock::blend(QImage& src, QImage& dst, float opacity)
 {
     Q_ASSERT(src.depth() != 24 && dst.depth() != 24);
     unsigned int mult = (unsigned int)(opacity * (1 << 8));
-    if ( src.depth() != 32 ) src = src.convertDepth(32);
-    if ( dst.depth() != 32 ) dst = dst.convertDepth(32);
+    if ( src.depth() != 32 ) src = src.convertToFormat(QImage::Format_ARGB32);
+    if ( dst.depth() != 32 ) dst = dst.convertToFormat(QImage::Format_ARGB32);
     int pixels = src.width() * src.height();
 
     register unsigned char *data1;
@@ -110,25 +110,23 @@ QImage& Playblock::blend(QImage& src, QImage& dst, float opacity)
     return dst;
 }
 
-void Playblock::createBlendedImage(QPixmap *tile, QPixmap *back, int ox, int oy, QPixmap *f) const
+QPixmap Playblock::createBlendedImage(const QPixmap &tile, const QPixmap &back, int ox, int oy) const
 {
-    QPixmap tmpTile(tile->width(), tile->height());
+    QImage backImage(tile.width(), tile.height(), QImage::Format_ARGB32);
+    QImage tmpImage = back.toImage();
+    QPainter p(&backImage);
+    p.drawImage(QPoint(0, 0), tmpImage, QRect((int)(ix + ox), (int)(iy + oy), -1, -1), Qt::AutoColor);
+    backImage = backImage.convertToFormat(QImage::Format_ARGB32);
+    QImage final(tile.width(), tile.height(), QImage::Format_ARGB32);
+    QImage tileImage = tile.toImage();
+    tileImage = tileImage.convertToFormat(QImage::Format_ARGB32);
 
-    bitBlt(&tmpTile, 0, 0, back, (int)(ix + ox), (int)(iy + oy));
-    QImage backImage = tmpTile.convertToImage();
-    backImage = backImage.convertDepth(32);
-    QImage final(tile->width(), tile->height(), 32);
-    final = final.convertDepth(32);
-    QImage tileImage = tile->convertToImage();
-    tileImage = tileImage.convertDepth(32);
-
-    QBitmap mask(tile->mask());
-
+    QBitmap mask(tile.mask());
     float t = (float)cnt / 16;
-
     blend(tileImage, backImage , t);
-    f->convertFromImage(backImage);
-    f->setMask(mask);
+    QPixmap f = QPixmap::fromImage(backImage);
+    f.setMask(mask);
+    return f;
 }
 
 void Playblock::paint(QPainter *p, int ox, int oy) const
@@ -193,7 +191,7 @@ void Playblock::paint(QPainter *p, int ox, int oy) const
             if ( cnt && (itype < STONE || itype > TRANSITIONAL)) {
                 QPixmap apix(pix);
                 QPixmap background = Puzzle::images->findPixmap("background");
-                createBlendedImage(&pix, &background, ox, oy, &apix);
+                apix = createBlendedImage(pix, background, ox, oy);
                 p->drawPixmap(ix + ox, iy + oy, apix, sx, 0, Puzzle::blockPixelSize, Puzzle::blockPixelSize);
             } else {
                 p->drawPixmap(ix + ox, iy + oy, pix, sx, 0, Puzzle::blockPixelSize, Puzzle::blockPixelSize);

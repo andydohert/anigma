@@ -53,7 +53,7 @@ void SoundRepository::playSound(const QString &name) const
         if (sounds.contains(name))
             sounds[name]->play();
         else
-            qWarning() << "unknown sound" << name;
+            qWarning() << "sound not loaded" << name;
     }
 }
 
@@ -67,7 +67,7 @@ void SoundRepository::findSound(const QString &directory, const QString &name)
         QSound *newSound = new QSound(fileName);
         sounds.insert(name, newSound);
     } else {
-        qWarning() << "missing sound" << name;
+        qWarning() << "missing sound file:" << fileName;
     }
 }
 

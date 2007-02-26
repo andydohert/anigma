@@ -32,34 +32,11 @@
 #include <qstring.h>
 #include <qpixmap.h>
 #include <qevent.h>
-#include <q3listbox.h>
 
 class MenuButton;
-class MenuButtonList;
 class Playground;
-
-class FileDialogItem: public Q3ListBoxItem
-{
-public:
-    FileDialogItem(const QString &fileName, const QString &visibleFileNam, int levelNum, Q3ListBox *lb);
-
-    virtual int height ( const Q3ListBox * ) const;
-    virtual int width ( const Q3ListBox * ) const;
-
-    inline QString fileName()
-    {
-        return QString(fName);
-    }
-
-protected:
-    virtual void paint ( QPainter * );
-
-private:
-    QString fName;
-    int number;
-    int numOffset;
-    int fHeight;
-};
+class QStandardItemModel;
+class QTreeView;
 
 /*
  * Simple file requester for selecting saved games.
@@ -73,8 +50,12 @@ signals:
     void done();
 
 public:
-    FileDialog(const QString &dir, QWidget *parent = 0);
+    FileDialog(const QString &directory, QWidget *parent = 0);
     void refresh();
+
+public slots:
+    void setVisible(bool visible);
+
 
 protected:
     virtual void paintEvent(QPaintEvent *) ;
@@ -84,22 +65,15 @@ protected:
 private slots:
     void deleteSelected();
     void load();
-    void listBoxSelected(Q3ListBoxItem * );
-
+    
 private:
-    enum BUTTONS
-    {
-        GO_BACK,
-        DELETE,
-        LOAD
-    };
+    QString directory;
 
-    QString dDir;
     MenuButton *backButton;
     MenuButton *loadButton;
     MenuButton *deleteButton;
-    MenuButtonList *dButtonList;
-    Q3ListBox *lBox;
+    QTreeView *treeView;
+    QStandardItemModel *model;
     int vMargin;   // horizontal margin
     int hMargin;   // vertical margin ( should include size of MenuButton
 };

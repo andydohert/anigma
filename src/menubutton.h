@@ -40,17 +40,16 @@ class MenuButton : public QPushButton
     Q_OBJECT
 
 public:
-    MenuButton(int id, const QString& label, QWidget* parent = 0, bool df = false);
+    MenuButton(const QString &text, QWidget *parent = 0);
     ~MenuButton();
 
     void setColors(const QColor& foreground, const QColor& background);
     static void drawColorizedText(const QString& text, int x, int y, QPainter *p, const QColor& clr, int min = 0);
 
-    inline int id() const
+    void showFrame(bool draw)
     {
-        return iId;
+        drawFrame = draw;
     }
-
     inline void setCentered(bool f)
     {
         centered = f;
@@ -63,12 +62,14 @@ public:
 
     void paintEvent(QPaintEvent *);
 
+private slots:
+    void buttonClicked();
+
 private:
     QImage textCache;
     QImage textFocusCache;
 
     bool centered;
-    int iId;
     bool drawFrame;
 };
 
@@ -76,20 +77,12 @@ class MenuButtonList: public QObject
 {
     Q_OBJECT
 public:
-    MenuButtonList(QObject * parent = 0);
-
-    void appendMenuButton(MenuButton *btn);
-    void removeMenuButton(MenuButton *btn);
+    MenuButtonList(QObject * parent = 0) : QObject(parent){} ;
+    void addButton(QAbstractButton *button);
     void setVisible(bool show);
 
-signals:
-    void clicked(int id);
-
-private slots:
-    void buttonClicked();
-
 private:
-    QList<MenuButton*> list;
+    QList<QAbstractButton *> list;
 };
 
 #endif // MENU_BUTTON_H

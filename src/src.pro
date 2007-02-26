@@ -1,14 +1,54 @@
-TEMPLATE	= app
+TEMPLATE = app
+TARGET = puzz-le
+DEPENDPATH += .
+INCLUDEPATH += .
 DESTDIR         = ../
 OBJECTS_DIR = build
 MOC_DIR = build
 UI_DIR = build
-CONFIG		= qt warn_on debug
-#CONFIG		= qt warn_on release
-HEADERS		= puzzlewindow.h imagerepository.h menubutton.h playground.h gamedialog.h filedialog.h aboutdialog.h soundrepository.h puzzle.h optionsdialog.h playblock.h demo.h infobar.h
-SOURCES		= puzzlewindow.cpp imagerepository.cpp menubutton.cpp playground.cpp gamedialog.cpp filedialog.cpp aboutdialog.cpp soundrepository.cpp puzzle.cpp optionsdialog.cpp playblock.cpp main.cpp demo.cpp infobar.cpp
-TARGET		= puzz-le
+
+CONFIG		+= qt warn_on debug
+#CONFIG		+= qt warn_on release
 #DEFINES		= DEMO_VERSION
-#The following line was inserted by qt3to4
-QT +=  qt3support
-QT -= sql
+#QT +=  qt3support
+
+RESOURCES     = resources.qrc
+
+mac {
+    ICON = puzz-le.icns
+    QMAKE_INFO_PLIST = Info_mac.plist
+    TARGET = Puzz-le
+}
+
+#target.path=$$[QT_INSTALL_BINS]
+#INSTALLS += target
+
+# Input
+HEADERS += aboutdialog.h \
+           demo.h \
+           filedialog.h \
+           gamedialog.h \
+           imagerepository.h \
+           infobar.h \
+           menubutton.h \
+           optionsdialog.h \
+           playblock.h \
+           playground.h \
+           puzzle.h \
+           puzzlewindow.h \
+           soundrepository.h \
+           levels.dat
+SOURCES += aboutdialog.cpp \
+           demo.cpp \
+           filedialog.cpp \
+           gamedialog.cpp \
+           imagerepository.cpp \
+           infobar.cpp \
+           main.cpp \
+           menubutton.cpp \
+           optionsdialog.cpp \
+           playblock.cpp \
+           playground.cpp \
+           puzzle.cpp \
+           puzzlewindow.cpp \
+           soundrepository.cpp

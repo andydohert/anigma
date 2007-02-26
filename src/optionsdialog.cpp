@@ -33,12 +33,12 @@
 #include <qpainter.h>
 #include <qdir.h>
 #include <qfile.h>
-#include <qevent.h>
 
 int OptionsDialog::sOptions[5] = {60, 50, 40, 30, 20};
 
-OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar, bool *tl, int *gs, QWidget *parent, const char *name): QDialog(parent, name, true, Qt::WStyle_Customize | Qt::WStyle_NoBorder )
+OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar, bool *tl, int *gs, QWidget *parent): QDialog(parent,  Qt::FramelessWindowHint )
 {
+    setModal(true);
     the = th;
     ile = currLevel;
     ise = se;
@@ -54,50 +54,48 @@ OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar
         move(pr.x() + (pr.width() - width()) / 2, (pr.y() + (pr.height() - height()) / 2) + 20);
     }
 
-    OKButton = new MenuButton(0, "Save", this, true);
+    OKButton = new MenuButton("Save", this);
+    OKButton->showFrame(true);
     OKButton->setColors(QColor(0, 148, 255), QColor(0, 0, 0));
     OKButton->setCentered(true);
     connect(OKButton, SIGNAL(clicked()), this, SLOT(accept()));
-    cancelButton = new MenuButton(1, "Cancel", this, true);
+    cancelButton = new MenuButton("Cancel", this);
+    cancelButton->showFrame(true);
     cancelButton->setColors(QColor(0, 148, 255), QColor(0, 0, 0));
     cancelButton->setCentered(true);
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-
-    dButtonList = new MenuButtonList(this);;
-    dButtonList->appendMenuButton(OKButton);
-    dButtonList->appendMenuButton(cancelButton);
-
+    
     soundEffects = new QComboBox(this);
-    soundEffects->insertItem("Yes");
-    soundEffects->insertItem("No");
-    soundEffects->setCurrentItem(!(*ise));
+    soundEffects->addItem("Yes");
+    soundEffects->addItem("No");
+    soundEffects->setCurrentIndex(!(*ise));
 
     timeLimit = new QComboBox(this);
-    timeLimit->insertItem("Enabled");
-    timeLimit->insertItem("Disabled");
-    timeLimit->setCurrentItem(!(*itl));
+    timeLimit->addItem("Enabled");
+    timeLimit->addItem("Disabled");
+    timeLimit->setCurrentIndex(!(*itl));
 
 
     gameSpeed = new QComboBox(this);
-    gameSpeed->insertItem("Very Slow");
-    gameSpeed->insertItem("Slow");
-    gameSpeed->insertItem("Normal");
-    gameSpeed->insertItem("Fast");
-    gameSpeed->insertItem("Very Fast");
+    gameSpeed->addItem("Very Slow");
+    gameSpeed->addItem("Slow");
+    gameSpeed->addItem("Normal");
+    gameSpeed->addItem("Fast");
+    gameSpeed->addItem("Very Fast");
 
     int i;
     for ( i = 0;i < 5;i++ ) {
         if ( *igs == OptionsDialog::sOptions[i] )
             break;
     }
-    gameSpeed->setCurrentItem(i);
+    gameSpeed->setCurrentIndex(i);
     abortConfirmation = new QComboBox(this);
-    abortConfirmation->insertItem("Yes");
-    abortConfirmation->insertItem("No");
-    abortConfirmation->setCurrentItem(!(*iar));
+    abortConfirmation->addItem("Yes");
+    abortConfirmation->addItem("No");
+    abortConfirmation->setCurrentIndex(!(*iar));
 
     themes = new QComboBox(this);
-    QDir dir(ROOTHOME + "/pics/puzz-le/themes");
+    QDir dir(ROOTHOME + "/pics/themes");
     if ( dir.exists() )
     {
         dir.setFilter( QDir::Dirs);
@@ -108,25 +106,25 @@ OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar
             QString fName = info.fileName();
             if ( fName!="." && fName!="..")
             {
-                themes->insertItem(fName);
+                themes->addItem(fName);
                 if ( fName==*the )
                 {
-                    themes->setCurrentItem(i);
+                    themes->setCurrentIndex(i);
                 }
                 i++;
             }
         }
     }
     customLevel = new QComboBox(this);
-    customLevel->insertItem("Default");
+    customLevel->addItem("Default");
 #ifdef DEMO_VERSION
     customLevel->setEnabled(false);
 #endif
 
-    QDir cl(ROOTHOME+"/pics/puzz-le/levels");
+    QDir cl(ROOTHOME+"/pics/levels");
     if (cl.exists()) {
         if (ile->isEmpty())
-            customLevel->setCurrentItem(0);
+            customLevel->setCurrentIndex(0);
         cl.setFilter( QDir::Dirs);
         const QFileInfoList list = cl.entryInfoList();
         i=1;
@@ -134,12 +132,12 @@ OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar
         {
             QFileInfo info = list.at(i);
             QString fName = info.fileName();
-            if ( fName!="." && fName!=".." && QFile::exists(info.absFilePath()+"/levels") )
+            if ( fName!="." && fName!=".." && QFile::exists(info.absoluteFilePath()+"/levels") )
             {
-                customLevel->insertItem(fName);
+                customLevel->addItem(fName);
                 if ( fName==*ile )
                 {
-                    customLevel->setCurrentItem(i);
+                    customLevel->setCurrentIndex(i);
                 }
                 i++;
             }
@@ -180,16 +178,16 @@ void OptionsDialog::resizeEvent ( QResizeEvent * )
 
 void OptionsDialog::accept()
 {
-    *ise = !soundEffects->currentItem();
-    *iar = !abortConfirmation->currentItem();
-    *itl = !timeLimit->currentItem();
-    *igs = sOptions[gameSpeed->currentItem()];
-    QString cit = customLevel->text(customLevel->currentItem());
+    *ise = !soundEffects->currentIndex();
+    *iar = !abortConfirmation->currentIndex();
+    *itl = !timeLimit->currentIndex();
+    *igs = sOptions[gameSpeed->currentIndex()];
+    QString cit = customLevel->currentText();
     if ( cit == "Default" )
         *ile = "";
     else
         *ile = cit;
-    *the = themes->text(themes->currentItem());
+    *the = themes->currentText();
     QDialog::accept();
 }
 

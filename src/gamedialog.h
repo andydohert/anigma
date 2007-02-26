@@ -36,7 +36,7 @@
 class QTimer;
 class QLineEdit;
 class MenuButton;
-class MenuButtonList;
+class QButtonGroup;
 
 /*
  * Quck and dirty adaptation of standard modal QDialog for the game.
@@ -59,9 +59,8 @@ public:
     }
 
 protected:
-    virtual void paintEvent ( QPaintEvent * ) ;
-    virtual void keyPressEvent ( QKeyEvent * e );
-    virtual void resizeEvent ( QResizeEvent * );
+    virtual void paintEvent(QPaintEvent *) ;
+    virtual void keyPressEvent(QKeyEvent *e);
 
 private slots:
     void timeSynch();
@@ -82,7 +81,7 @@ private:
     MenuButton *leftButton;
     MenuButton *middleButton;
     MenuButton *rightButton;
-    MenuButtonList *dButtonList;
+    QButtonGroup *buttonGroup;
     QLineEdit *lEdit;
     int tCounter;
     int margin;

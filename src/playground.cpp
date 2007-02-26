@@ -1366,21 +1366,19 @@ bool Playground::savePlayground(const QString &fileName, int currPoints, const Q
 }
 
 // Load specified saved game
-// It will return false in case :
+// It will return false in case:
 // 1) Saved game file is corrupted
 // 2) Saved game file is for level text file that is NOT present on this system
-
-bool Playground::loadPlayground(const QString &fileName, int *currPoints, const char * level[])
+bool Playground::loadPlayground(const QString &fileName, int *currPoints, const char *level[])
 {
     gState = INVALID;
-    QFile f(fileName);
-
-    if ( f.exists() && f.open(QIODevice::ReadOnly) ) {
-        QString line;
-        QTextStream stream( &f );
-
+    QFile file(fileName);
+    if (file.exists() && file.open(QIODevice::ReadOnly)) {
+        QTextStream stream(&file);
         // load basic level information
-        line = stream.readLine();
+        QString line = stream.readLine();
+        if (line.isEmpty())
+            return false;
         gType = TIME_BASED;
         if ( line.at(0) == '.' ) {
             if ( line.at(1) == '1' )
@@ -1390,7 +1388,6 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
 
         if ( sscanf( line.toLatin1(), "%d-%d-%d-%d", &levelNumber, &w, &h, &timeLeft) != 4 )
             goto error;
-
 
         int savedLimit = timeLeft;
 
@@ -1405,7 +1402,7 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
             } else {
                 Puzzle::currLevelsName = line;
                 if (!loadLevel
-                        (ROOTHOME + "pics/puzz-le/levels/" +
+                        (ROOTHOME + "pics/levels/" +
                          Puzzle::currLevelsName + "/levels", levelNumber))
                     goto error;
             }
@@ -1416,9 +1413,7 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
             Puzzle::currLevelsName = "";
             loadLevel(level, levelNumber);
         }
-
         timeLeft = savedLimit;
-
 
         // load points information
         line = stream.readLine();
@@ -1435,14 +1430,12 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
 
         // load grid entries
         int x, y;
-
-        for ( y = 0;y < h;y++ ) {
-
+        for (y = 0; y < h; ++y) {
             line = stream.readLine();
-            if ( line.isEmpty() )
+            if (line.isEmpty())
                 goto error;
-            for ( x = 0;x < w;x++ ) {
-                switch ( line.at(x).toLatin1() ) {
+            for (x = 0; x < w; x++) {
+                switch (line.at(x).toLatin1()) {
                 case    '.':
                     grid[y * w + x] = Playblock::EMPTY;
                     break;
@@ -1467,17 +1460,17 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
         int slevelNumber, blevelNumber;
         QList<Playblock*> *plist;
         Playblock *block;
-        for ( x = 0;x < w;x++ ) {
+        for (x = 0; x < w; ++x) {
             line = stream.readLine();
             if ( sscanf( line.toLatin1(), "%d-%d", &slevelNumber, &blevelNumber) != 2 )
                 goto error;
 
             plist = dBlocks[x];
-            for ( y = 0;y < blevelNumber;y++ ) {
+            for (y = 0; y < blevelNumber; ++y) {
                 line = stream.readLine();
                 block = new Playblock(0, 0);
                 plist->append(block);
-                if ( !block->fromString(line) )
+                if (!block->fromString(line))
                     goto error;
                 if ( block->selected() )
                     selectedBlock = block;
@@ -1509,13 +1502,11 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
         gState = INPROGRESS;
     }
 error:
-
-    if ( f.isOpen() )
-        f.close();
+    if ( file.isOpen() )
+        file.close();
 
     return (bool) gState;
 }
-
 
 Playblock* Playground::getVBlock(int bx, int by)
 {
@@ -1539,7 +1530,7 @@ bool Playground::savedPlaygroundInfo(const QString &fileName, unsigned int *poin
 
     // load basic level information
     line = stream.readLine();
-    if ( line.at(0) == '.' ) {
+    if (!line.isEmpty() && line.at(0) == '.' ) {
         line = stream.readLine();
     }
 

@@ -30,14 +30,10 @@
 
 #include <qdialog.h>
 #include <qstring.h>
-//Added by qt3to4:
-#include <QPaintEvent>
-#include <QResizeEvent>
-
+#include <qevent.h>
 
 class QLineEdit;
 class MenuButton;
-class MenuButtonList;
 class QComboBox;
 
 /**
@@ -48,7 +44,7 @@ class OptionsDialog : public QDialog
     Q_OBJECT
 
 public:
-    OptionsDialog( QString *currLevel, QString *thm, bool *se, bool *ar, bool *tl, int *gs, QWidget *parent = 0, const char *name = 0);
+    OptionsDialog(QString *currLevel, QString *thm, bool *se, bool *ar, bool *tl, int *gs, QWidget *parent = 0);
 
 protected:
     virtual void paintEvent(QPaintEvent *) ;
@@ -72,14 +68,7 @@ private:
     QComboBox   *themes;
     MenuButton *OKButton;
     MenuButton *cancelButton;
-    MenuButtonList *dButtonList;
-
     static int sOptions[5];
 };
 
-
-
 #endif // OPTIONSDIALOG_H
-
-
-

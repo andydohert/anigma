@@ -82,10 +82,25 @@ protected:
 
 private slots:
     void synchTimeout();
-    void buttonClicked(int id);
     void loadGame(const QString & fileName);
     void fileDialogDone();
 
+    // main screen buttons
+    void playGame();
+    void showOptions();
+    void showAbout();
+    void showHistory();
+    void loadSavedGame();
+
+    // about buttons
+    void showWelcomeScreen();
+    void showDemo();
+
+    // game buttons
+    void abortGame();
+    void pauseLevel();
+    void restartLevel();
+    
 private:
     void generateMovement(int x, int y, bool keyBoardMode = false);
     void drawTitleScreen(QPainter *p);
@@ -93,9 +108,7 @@ private:
     void drawAboutScreen(QPainter *p);
     void initGame();
     void startLevel(bool shuffle = true);
-    void restartLevel();
     void outOfTime();
-    void abortGame();
     void saveGameState(const QString & fileName);
     bool loadGameState(const QString & fileName);
     void init();
@@ -111,17 +124,15 @@ private:
     QColor menuClr;
     QColor hMenuClr;
 
-    MenuButton *playGame;
-    MenuButton *optionsGame;
-    MenuButton *aboutGame;
-    MenuButton *historyGame;
-    MenuButton *loadSavedGame;
-    MenuButton *quitGame;
+    MenuButton *playGameButton;
+    MenuButton *optionsGameButton;
+    MenuButton *aboutGameButton;
+    MenuButton *historyGameButton;
+    MenuButton *loadSavedGameButton;
+    MenuButton *quitGameButton;
     MenuButtonList *mainButtonList;
 
-    MenuButton *backToWelcomeFromAbout;
-    MenuButton *playDemo;
-    MenuButtonList *aboutButtonList;
+    MenuButton *endDemo;
 
     MenuButton *backToWelcomeFromGame;
     MenuButton *restartCurrent;

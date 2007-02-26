@@ -34,16 +34,16 @@
 #include "imagerepository.h"
 #include "soundrepository.h"
 
-MenuButton::MenuButton(int id, const QString& label, QWidget* parent, bool df): QPushButton(parent)
+MenuButton::MenuButton(const QString &text, QWidget* parent): QPushButton(parent)
 {
+    setText(text);
     centered = false;
-    drawFrame = df;
-    iId = id;
-    setText(label);
+    drawFrame = false;
 
     QFont f = font();
     f.setBold(true);
     setFont(f);
+    connect(this, SIGNAL(clicked()), this, SLOT(buttonClicked()));
 }
 
 MenuButton::~MenuButton()
@@ -54,7 +54,7 @@ void MenuButton::setColors(const QColor& foreground, const QColor& background)
 {
     QPalette pl = palette();
     pl.setColor(QPalette::Background, background);
-    pl.setColor(QPalette::WindowText, foreground);
+    pl.setColor(QPalette::ButtonText, foreground);
     setPalette(pl);
 }
 
@@ -62,7 +62,7 @@ void MenuButton::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setOpacity(0.75);
-    painter.fillRect(QRect(0,0,width(), height()), colorGroup().background());
+    painter.fillRect(QRect(0,0,width(), height()), palette().color(QPalette::Background));
     painter.setOpacity(1.0);
     QFontMetrics fm = painter.fontMetrics();
     int y = (height() - fm.height()) / 2 ;
@@ -72,24 +72,31 @@ void MenuButton::paintEvent(QPaintEvent *)
     }
 
     if ( isDown() || hasFocus()) {
-        if (textFocusCache.isNull()) {
-            textFocusCache = QImage(width(), height(), QImage::Format_ARGB32);
+        //if (textFocusCache.isNull()) {
+        /*    textFocusCache = QImage(width(), height(), QImage::Format_ARGB32);
             textFocusCache.fill(0);
             QPainter t(&textFocusCache);
             t.setFont(painter.font());
-            MenuButton::drawColorizedText(text(), x, y + 4, &t, QColor(255, 255, 255), 150);
-        }
-        painter.drawImage(0, 0, textFocusCache);
+            t.setPen(painter.pen());
+            t.setBrush(painter.brush());
+            */
+            MenuButton::drawColorizedText(text(), x, y, &painter, QColor(255, 255, 255), 150);
+        //}
+        //qDebug() << t.font().key() << painter.font().key();
+        //painter.drawImage(0, 0, textFocusCache);
     }
     else {
+        /*
         if (textCache.isNull()) {
             textCache = QImage(width(), height(), QImage::Format_ARGB32);
             textCache.fill(0);
             QPainter t(&textCache);
-            t.setFont(painter.font());
-            MenuButton::drawColorizedText(text(), x, y + 4, &t, colorGroup().text(), 150);
+            t.setFont(font());
+            MenuButton::drawColorizedText(text(), x, y, &t, colorGroup().text(), 150);
         }
         painter.drawImage(0, 0, textCache);
+        */
+        MenuButton::drawColorizedText(text(), x, y, &painter, palette().color(QPalette::ButtonText), 150);
     }
 
     if ( drawFrame ) {
@@ -108,7 +115,6 @@ void MenuButton::drawColorizedText(const QString& text, int x, int y, QPainter *
 
     p->save();
 #ifdef QT4GRADIANTTEXT
-    qDebug() << "slower";
     QFontMetrics fm = p->fontMetrics();
     QLinearGradient gradient(0, fm.height()/2,
                              fm.width(text)/2, fm.height()/2);
@@ -144,31 +150,15 @@ void MenuButton::drawColorizedText(const QString& text, int x, int y, QPainter *
     p->restore();
 }
 
-MenuButtonList::MenuButtonList(QObject * parent): QObject(parent)
+void MenuButton::buttonClicked()
 {
+    Puzzle::sounds->playSound("button");
 }
 
-void MenuButtonList::appendMenuButton(MenuButton *btn)
+void MenuButtonList::addButton(QAbstractButton *btn)
 {
     Q_ASSERT(btn->parent() != 0);
     list.append(btn);
-    connect( btn, SIGNAL(clicked()), this, SLOT(buttonClicked()));
-}
-
-void MenuButtonList::removeMenuButton(MenuButton *btn)
-{
-    if ( btn ) {
-        list.removeAll(btn);
-        btn->hide();
-        disconnect(btn,SIGNAL(clicked()),this, SLOT(buttonClicked()));
-    }
-}
-
-void MenuButtonList::buttonClicked()
-{
-    MenuButton *btn = (MenuButton *)sender();
-    Puzzle::sounds->playSound("button");
-    emit clicked(btn->id());
 }
 
 void MenuButtonList::setVisible(bool show)
@@ -176,4 +166,3 @@ void MenuButtonList::setVisible(bool show)
     for (int i = 0; i < list.count(); ++i)
         list.at(i)->setVisible(show);
 }
-

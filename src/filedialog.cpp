@@ -30,56 +30,52 @@
 #include <qapplication.h>
 #include <qpalette.h>
 #include <qpainter.h>
-//Added by qt3to4:
-#include <QPaintEvent>
-#include <QResizeEvent>
-#include <Q3Frame>
-#include <QKeyEvent>
+#include <qevent.h>
+#include <qtreeview.h>
+#include <qdebug.h>
+#include <qstandarditemmodel.h>
+#include <qheaderview.h>
 #include <stdlib.h>
+
 #include "filedialog.h"
 #include "menubutton.h"
 #include "playground.h"
 #include "gamedialog.h"
 
-FileDialog::FileDialog( const QString &dir, QWidget *parent): QWidget(parent)
+FileDialog::FileDialog(const QString &dir, QWidget *parent): QWidget(parent)
 {
     QFont f = font();
     f.setBold(true);
     setFont(f);
-    setBackgroundColor(QColor(0, 0, 0));
-    dDir = dir;
+    directory = dir;
     vMargin = 24;
     hMargin = 2;
 
-// setFocusPolicy(QWidget::StrongFocus);
-
-    dButtonList = new MenuButtonList(this);;
-
-    backButton = new MenuButton(GO_BACK, "Go Back", this, true);
+    backButton = new MenuButton("Go Back", this);
+    backButton->showFrame(true);
     connect(backButton, SIGNAL(clicked()), this, SIGNAL(done()));
     backButton->setColors(QColor(0, 148, 255), QColor(0, 0, 0));
     backButton->setCentered(true);
 
-    deleteButton = new MenuButton(DELETE, "Delete", this, true);
+    deleteButton = new MenuButton("Delete", this);
+    deleteButton->showFrame(true);
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteSelected()));
     deleteButton->setColors(QColor(0, 148, 255), QColor(0, 0, 0));
     deleteButton->setCentered(true);
 
-    loadButton = new MenuButton(LOAD, "Load", this, true);
+    loadButton = new MenuButton("Load", this);
+    loadButton->showFrame(true);
     connect(loadButton, SIGNAL(clicked()), this, SLOT(load()));
     loadButton->setColors(QColor(0, 148, 255), QColor(0, 0, 0));
     loadButton->setCentered(true);
 
-    dButtonList->appendMenuButton(backButton);
-    dButtonList->appendMenuButton(deleteButton);
-    dButtonList->appendMenuButton(loadButton);
-    dButtonList->setVisible(true);
-
-    lBox = new Q3ListBox(this);
-    lBox->setFrameStyle ( Q3Frame::NoFrame ) ;
-    lBox->setFocusPolicy(Qt::NoFocus);
-
-    connect( lBox, SIGNAL(selected(Q3ListBoxItem *)), this, SLOT(listBoxSelected(Q3ListBoxItem * )));
+    treeView = new QTreeView(this);
+    connect(treeView, SIGNAL(activated(const QModelIndex &)), this, SLOT(load()));
+    treeView->setFrameShape(QFrame::NoFrame);
+    model = new QStandardItemModel(0, 2, this);
+    treeView->setModel(model);
+    treeView->setIndentation(0);
+    treeView->header()->setStretchLastSection(false);
 }
 
 void FileDialog::keyPressEvent( QKeyEvent *e )
@@ -92,125 +88,116 @@ void FileDialog::keyPressEvent( QKeyEvent *e )
         emit done();
         break;
     default:
-        qApp->sendEvent(lBox, e);
         break;
     }
 }
 
-void FileDialog::resizeEvent( QResizeEvent * )
+void FileDialog::resizeEvent(QResizeEvent *)
 {
     backButton->setGeometry(0, height() - 24, 60, 20);
     deleteButton->setGeometry((width() - backButton->width()) / 2, backButton->y(), 60, 20);
     loadButton->setGeometry(width() - backButton->width(), backButton->y(), 60, 20);
-    lBox->setGeometry(hMargin, vMargin*2 + 1, width() - (hMargin*2), height() - (vMargin*3) - 8);
+    treeView->setGeometry(hMargin, vMargin*2 + 1, width() - (hMargin*2), height() - (vMargin*3) - 8);
 }
 
-void FileDialog::paintEvent ( QPaintEvent * )
+void FileDialog::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
     p.setPen(QColor(0, 148, 255));
     p.drawLine(0, vMargin*2, width(), vMargin*2);
     p.drawLine(0, height() - vMargin - 6, width(), height() - vMargin - 6);
-    MenuButton::drawColorizedText("Name", hMargin, lBox->y() - vMargin + 4, &p, QColor(0, 148, 255), 150);
-    MenuButton::drawColorizedText("Level", width() - 40, lBox->y() - vMargin + 4, &p, QColor(0, 148, 255), 150);
+    //MenuButton::drawColorizedText("Name", treeView->x(), treeView->y() - vMargin + 4, &p, QColor(0, 148, 255), 150);
+    //int offset = treeView->x() + treeView->header()->sectionSize(0);
+    //MenuButton::drawColorizedText("Level", offset, treeView->y() - vMargin + 4, &p, QColor(0, 148, 255), 150);
+    //offset += treeView->x() + treeView->header()->sectionSize(1);
+    //MenuButton::drawColorizedText("Points", offset, treeView->y() - vMargin + 4, &p, QColor(0, 148, 255), 150);
     MenuButton::drawColorizedText("List of available saved games ...", hMargin, 2, &p, QColor(0, 148, 255), 150);
-}
-
-void FileDialog::load()
-{
-    listBoxSelected(lBox->item(lBox->currentItem()));
-}
-
-void FileDialog::deleteSelected()
-{
-    FileDialogItem *item = (FileDialogItem*)lBox->item(lBox->currentItem());
-
-    if(item) {
-        GameDialog *dlg = new GameDialog(this->parentWidget());
-        dlg->configure(0, "Delete selected game ?", false, false, 0, "Yes", QString::null, "No");
-        if(dlg->exec() == 0) {
-            QFile f(QString(getenv("HOME")) + QString("/puzz-le/") + item->fileName());
-            if(f.remove()) {
-                lBox->removeItem(lBox->currentItem());
-            }
-        }
-        delete dlg;
-    }
-
 }
 
 void FileDialog::refresh()
 {
-    QDir d(dDir);
-    lBox->clear();
+    QColor q(0, 148, 255);
+    
+    QDir d(directory);
+    
+    model->clear();
+    model->insertColumns(0, 3);
+    
+    model->setHeaderData(0, Qt::Horizontal, "Name");
+    model->setHeaderData(1, Qt::Horizontal, "Level");
+    model->setHeaderData(2, Qt::Horizontal, "Points");
+    model->setHeaderData(0, Qt::Horizontal,  Qt::black, Qt::BackgroundRole);
+    model->setHeaderData(0, Qt::Horizontal,  q, Qt::ForegroundRole);
+    model->setHeaderData(1, Qt::Horizontal,  q, Qt::ForegroundRole);
+    model->setHeaderData(2, Qt::Horizontal,  q, Qt::ForegroundRole);
+    
     if (d.exists()) {
         d.setFilter( QDir::Files | QDir::Readable | QDir::NoSymLinks ); 
         d.setSorting(QDir::Time);
-        d.setNameFilter("*.puzzle");
+        d.setNameFilters(QStringList("*.puzzle"));
         const QFileInfoList list = d.entryInfoList();
         for (int i = 0; i < list.count(); ++i)
         {
             QFileInfo info = list.at(i);
             unsigned int level;
             unsigned int points;
-            if (Playground::savedPlaygroundInfo(info.absFilePath(), &points, &level) )
+            if (Playground::savedPlaygroundInfo(info.absoluteFilePath(), &points, &level) )
             {
-                lBox->insertItem(new FileDialogItem(info.fileName(), info.baseName(),level,lBox));
+                model->insertRow(model->rowCount());
+                QModelIndex idx = model->index(model->rowCount() - 1, 0);
+                model->itemFromIndex(idx)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+                model->setData(idx, info.fileName(), 32);
+                model->setData(idx, info.baseName());
+                model->setData(idx, q, Qt::ForegroundRole);
+                idx = model->index(model->rowCount() - 1, 1);
+                model->itemFromIndex(idx)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+                model->setData(idx, QString("%1").arg(level));
+                model->setData(idx, q, Qt::ForegroundRole);
+            
+                idx = model->index(model->rowCount() - 1, 2);
+                model->itemFromIndex(idx)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+                model->setData(idx, QString("%1").arg(points));
+                model->setData(idx, q, Qt::ForegroundRole);
+            } else {
+                qDebug() << "error reading" << info.absolutePath();
             }
         }
-        if ( lBox->count() )
-            lBox->setSelected(0,true);
+    }
+    QModelIndex idx = model->index(0, 0);
+    treeView->selectionModel()->select(idx, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+    treeView->header()->setResizeMode(2, QHeaderView::ResizeToContents);
+    treeView->header()->setResizeMode(1, QHeaderView::ResizeToContents);
+    treeView->header()->setResizeMode(0, QHeaderView::Stretch);
+}
+
+void FileDialog::setVisible(bool visible)
+{
+    QWidget::setVisible(visible);
+    if (visible) {
+        treeView->setFocus();
     }
 }
 
-void FileDialog::listBoxSelected( Q3ListBoxItem *i)
+void FileDialog::load()
 {
-    if(i) {
-        FileDialogItem *item = (FileDialogItem*)i;
-        emit loadSavedGame(item->fileName());
+    QModelIndex idx = treeView->currentIndex();
+    idx = idx.sibling(idx.row(), 0);
+    if (idx.isValid())
+        emit loadSavedGame(directory + "/" + idx.data(32).toString());
+}
+
+void FileDialog::deleteSelected()
+{
+    GameDialog *dlg = new GameDialog(this->parentWidget());
+    dlg->configure(0, "Delete selected game?", false, false, 0, "Yes", QString::null, "No");
+    
+    QModelIndex idx = treeView->currentIndex();
+    idx = idx.sibling(idx.row(), 0);
+    if(dlg->exec() == 0) {
+        QFile f(directory + "/" + idx.data(32).toString());
+        if(f.remove()) {
+            model->removeRow(idx.row());
+        }
     }
+    delete dlg;
 }
-
-FileDialogItem::FileDialogItem(const QString &fileName, const QString &visibleFileName, int levelNum, Q3ListBox *lb)
-{
-    number = levelNum;
-    numOffset = 0;
-    fHeight = 0;
-
-    fName = fileName;
-    QString tmp = visibleFileName;
-    tmp.truncate(36);
-    setText(tmp);
-    setCustomHighlighting ( true );
-
-    if(lb) {
-        QFontMetrics fm(lb->font());
-        numOffset = fm.width("000") + 2;
-        fHeight = fm.height() + 6;
-    }
-}
-
-int FileDialogItem::height ( const Q3ListBox * ) const
-{
-    return fHeight;
-}
-
-int FileDialogItem::width ( const Q3ListBox *l ) const
-{
-    return l->width();
-}
-
-void FileDialogItem::paint ( QPainter *p)
-{
-    QColor q(0, 148, 255);
-    if(listBox()->isSelected(this)) {
-        QFont f = p->font();
-        f.setUnderline(true);
-        p->setFont(f);
-        q.setRgb(255, 255, 255);
-    }
-
-    MenuButton::drawColorizedText(text(), 0, 3, p, q, 150);
-    MenuButton::drawColorizedText(QString::number(number), listBox()->width() - numOffset, 3, p, q, 150);
-}
-

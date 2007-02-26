@@ -36,7 +36,7 @@
 #include <qtextstream.h>
 #include <QKeyEvent>
 #include <qdir.h>
- #include <QGradient>
+#include <QGradient>
 #include "levels.dat"
 #include "soundrepository.h"
 #include "puzzlewindow.h"
@@ -74,14 +74,21 @@ PuzzleWindow::PuzzleWindow(QWidget * parent): QMainWindow(parent)
     oy = 0;
     isPaused = false;
     dlg = new GameDialog(this);
-    aboutDialog = new AboutDialog(this);
-    fileDialog = new FileDialog(QString(getenv("HOME")) + QString("/puzz-le"), this);
+    fileDialog = new FileDialog(QString(QDir::homePath()) + QString("/.puzz-le"), this);
     play = 0;
     connect(fileDialog, SIGNAL(loadSavedGame(const QString &)), this, SLOT(loadGame(const QString &)));
     connect(fileDialog, SIGNAL(done(void)), this, SLOT(fileDialogDone(void)));
     init();
+    aboutDialog = new AboutDialog(this);
+    connect(aboutDialog, SIGNAL(showWelcomeScreen()), this, SLOT(showWelcomeScreen()));
+    connect(aboutDialog, SIGNAL(showDemo()), this, SLOT(showDemo()));
+    
     switchState(InfoBar::WELCOME);
     resize(240, 320);
+    setMinimumWidth(240);
+    setMaximumWidth(240);
+    setMinimumHeight(320);
+    setMaximumHeight(320);
 }
 
 PuzzleWindow::~PuzzleWindow()
@@ -101,18 +108,15 @@ void PuzzleWindow::switchState(InfoBar::GAME_STATE s)
     case InfoBar::WELCOME:
         timer->stop();
         mainButtonList->setVisible(true);
-        aboutButtonList->setVisible(false);
         gameButtonList->setVisible(false);
         aboutDialog->hide();
         fileDialog->hide();
-        playGame->setFocus();
+        playGameButton->setFocus();
         update();
         break;
     case InfoBar::ABOUT:
         timer->stop();
         mainButtonList->setVisible(false);
-        aboutButtonList->setVisible(true);
-        playDemo->show();
         gameButtonList->setVisible(false);
         aboutDialog->setMode(AboutDialog::ABOUT);
         aboutDialog->show();
@@ -122,8 +126,6 @@ void PuzzleWindow::switchState(InfoBar::GAME_STATE s)
     case InfoBar::HISTORY:
         timer->stop();
         mainButtonList->setVisible(false);
-        aboutButtonList->setVisible(true);
-        playDemo->hide();
         gameButtonList->setVisible(false);
         aboutDialog->setMode(AboutDialog::HISTORY);
         aboutDialog->show();
@@ -133,22 +135,19 @@ void PuzzleWindow::switchState(InfoBar::GAME_STATE s)
     case InfoBar::BROWSE:
         timer->stop();
         mainButtonList->setVisible(false);
-        aboutButtonList->setVisible(false);
         gameButtonList->setVisible(false);
         aboutDialog->hide();
         fileDialog->refresh();
         fileDialog->show();
-        fileDialog->setFocus();
         break;
     case InfoBar::GAME:
         mainButtonList->setVisible(false);
-        aboutButtonList->setVisible(false);
         gameButtonList->setVisible(true);
         aboutDialog->hide();
         fileDialog->hide();
-        setFocus();
         initGame();
         startLevel();
+        setFocus();
         break;
     case InfoBar::DEMO:
         play->currentLevel = -1;
@@ -174,15 +173,15 @@ void PuzzleWindow::keyPressEvent(QKeyEvent * e)
         switch (e->key()) {
         case Qt::Key_Escape:
             if (gameState() == InfoBar::ABOUT || gameState() == InfoBar::HISTORY)
-                buttonClicked(BACK_TO_WELCOME_FROM_ABOUT);
+                showWelcomeScreen();
             else if (gameState() == InfoBar::GAME)
-                buttonClicked(BACK_TO_WELCOME_FROM_GAME);
+                abortGame();
             break;
         case Qt::Key_F33:
             if (gameState() == InfoBar::GAME) {
-                buttonClicked(RESTART_LEVEL);
+                restartLevel();
             } else if (gameState() == InfoBar::ABOUT) {
-                buttonClicked(PLAY_DEMO);
+                showDemo();
             }
             break;
 
@@ -246,31 +245,29 @@ void PuzzleWindow::resizeEvent(QResizeEvent *)
         demo.play = play;
     }
 
-    aboutDialog->setGeometry(4, 80, width() - 8, height() - 110);
+    aboutDialog->setGeometry(4, 80, width() - 8, height() - 80);
     fileDialog->setGeometry(4, 80, width() - 8, height() - 80);
 
-    playGame->setGeometry(110, 118, 145, 25);
-    optionsGame->setGeometry(playGame->x(), playGame->y() + 23, 145, playGame->height());
-    aboutGame->setGeometry(playGame->x(), optionsGame->y() + 23, 145, playGame->height());
-    historyGame->setGeometry(playGame->x(), aboutGame->y() + 23, 145, playGame->height());
-    loadSavedGame->setGeometry(playGame->x(), historyGame->y() + 23, 145 , playGame->height());
-    quitGame->setGeometry(playGame->x(), loadSavedGame->y() + 23, 145, playGame->height());
+    playGameButton->setGeometry(110, 118, 145, 25);
+    optionsGameButton->setGeometry(playGameButton->x(), playGameButton->y() + 23, 145, playGameButton->height());
+    aboutGameButton->setGeometry(playGameButton->x(), optionsGameButton->y() + 23, 145, playGameButton->height());
+    historyGameButton->setGeometry(playGameButton->x(), aboutGameButton->y() + 23, 145, playGameButton->height());
+    loadSavedGameButton->setGeometry(playGameButton->x(), historyGameButton->y() + 23, 145 , playGameButton->height());
+    quitGameButton->setGeometry(playGameButton->x(), loadSavedGameButton->y() + 23, 145, playGameButton->height());
 
-    backToWelcomeFromAbout->setGeometry(4,
-                                        height() - playGame->height() - 4,
-                                        110, playGame->height());
-    playDemo->setGeometry(width() - 110 - 4,
-                          height() - playGame->height() - 4, 110,
-                          playGame->height());
     backToWelcomeFromGame->setGeometry(4,
-                                       height() - playGame->height() - 4,
-                                       75, playGame->height());
+                                       height() - playGameButton->height() - 4,
+                                       75, playGameButton->height());
     pauseGame->setGeometry((width() - 75) / 2,
-                           height() - playGame->height() - 4, 75,
-                           playGame->height());
+                           height() - playGameButton->height() - 4, 75,
+                           playGameButton->height());
     restartCurrent->setGeometry(width() - 75 - 4,
-                                height() - playGame->height() - 4, 75,
-                                playGame->height());
+                                height() - playGameButton->height() - 4, 75,
+                                playGameButton->height());
+                                
+    endDemo->setGeometry(8,height() - endDemo->height() - 4,
+                                        110, endDemo->height());
+    
     pix->fill();
 }
 
@@ -312,7 +309,7 @@ void PuzzleWindow::drawTitleScreen(QPainter * p)
         p->drawPixmap(10, 10, tmp);
             if (gameState() != InfoBar::BROWSE) {
             tmp = Puzzle::images->findPixmap("front_1");
-            p->drawPixmap(10, loadSavedGame->y() + loadSavedGame->height() - 40, tmp);
+            p->drawPixmap(10, loadSavedGameButton->y() + loadSavedGameButton->height() - 40, tmp);
             p->setPen(QColor(0, 135, 234));
             MenuButton::drawColorizedText("Copyright (C) 2001 Walter Rawdanik",
                                           10, 80, p, menuClr, 150);
@@ -349,8 +346,7 @@ void PuzzleWindow::drawPlayground(QPainter * p, QPainter * lp, bool drawAll)
                 // hardcoded position
                 MenuButton::drawColorizedText("Game Paused", 80, 140, p,
                                               QColor(0, 148, 255), 150);
-                MenuButton::
-                drawColorizedText("Click 'Resume' to unpause the Game",
+                MenuButton::drawColorizedText("Click 'Resume' to unpause the Game",
                                   30, 170, p, QColor(0, 148, 255),
                                   150);
 
@@ -453,144 +449,162 @@ void PuzzleWindow::init()
         timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(synchTimeout()));
     }
-    Puzzle::initSounds(ROOTHOME + "sounds/puzz-le");
+    Puzzle::initSounds("sounds");
 
     menuClr.setRgb(0, 148, 255);
     hMenuClr.setRgb(255, 255, 255);
 
     mainButtonList = new MenuButtonList(this);
-    playGame = new MenuButton(PLAY_GAME, "Play the game", this);
-    playGame->setColors(menuClr, QColor(0, 0, 0));
-    optionsGame = new MenuButton(OPTIONS_GAME, "Options", this);
-    optionsGame->setColors(menuClr, QColor(0, 0, 0));
-    aboutGame = new MenuButton(ABOUT_GAME, "Instructions", this);
-    aboutGame->setColors(menuClr, QColor(0, 0, 0));
-    historyGame = new MenuButton(HISTORY_GAME, "Changes", this);
-    historyGame->setColors(menuClr, QColor(0, 0, 0));
-    loadSavedGame = new MenuButton(LOAD_GAME, "Load saved game", this);
-    loadSavedGame->setColors(menuClr, QColor(0, 0, 0));
-    quitGame = new MenuButton(QUIT, "Quit", this);
-    quitGame->setColors(menuClr, QColor(0, 0, 0));
-    mainButtonList->appendMenuButton(playGame);
-    mainButtonList->appendMenuButton(optionsGame);
-    mainButtonList->appendMenuButton(aboutGame);
-    mainButtonList->appendMenuButton(historyGame);
-    mainButtonList->appendMenuButton(loadSavedGame);
-    mainButtonList->appendMenuButton(quitGame);
-
-    aboutButtonList = new MenuButtonList(this);
-    backToWelcomeFromAbout = new MenuButton(BACK_TO_WELCOME_FROM_ABOUT, "Go Back", this, true);
-    backToWelcomeFromAbout->setColors(menuClr, QColor(0, 0, 0));
-    backToWelcomeFromAbout->setCentered(true);
-    playDemo = new MenuButton(PLAY_DEMO, "Demo Game", this, true);
-    playDemo->setColors(menuClr, QColor(0, 0, 0));
-    playDemo->setCentered(true);
-    aboutButtonList->appendMenuButton(backToWelcomeFromAbout);
-    aboutButtonList->appendMenuButton(playDemo);
-
+    playGameButton = new MenuButton("Play the game", this);
+    playGameButton->setColors(menuClr, QColor(0, 0, 0));
+    connect(playGameButton, SIGNAL(clicked()), this, SLOT(playGame()));
+    
+    optionsGameButton = new MenuButton("Options", this);
+    optionsGameButton->setColors(menuClr, QColor(0, 0, 0));
+    connect(optionsGameButton, SIGNAL(clicked()), this, SLOT(showOptions()));
+    
+    aboutGameButton = new MenuButton("Instructions", this);
+    aboutGameButton->setColors(menuClr, QColor(0, 0, 0));
+    connect(aboutGameButton, SIGNAL(clicked()), this, SLOT(showAbout()));
+    
+    historyGameButton = new MenuButton("Changes", this);
+    historyGameButton->setColors(menuClr, QColor(0, 0, 0));
+    connect(historyGameButton, SIGNAL(clicked()), this, SLOT(showHistory()));
+    
+    loadSavedGameButton = new MenuButton("Load saved game", this);
+    loadSavedGameButton->setColors(menuClr, QColor(0, 0, 0));
+    connect(loadSavedGameButton, SIGNAL(clicked()), this, SLOT(loadSavedGame()));
+    quitGameButton = new MenuButton("Quit", this);
+    quitGameButton->setColors(menuClr, QColor(0, 0, 0));
+    connect(quitGameButton, SIGNAL(clicked()), this, SLOT(close()));
+    
+    mainButtonList->addButton(playGameButton);
+    mainButtonList->addButton(optionsGameButton);
+    mainButtonList->addButton(aboutGameButton);
+    mainButtonList->addButton(historyGameButton);
+    mainButtonList->addButton(loadSavedGameButton);
+    mainButtonList->addButton(quitGameButton);
+    
     gameButtonList = new MenuButtonList(this);
-    backToWelcomeFromGame = new MenuButton(BACK_TO_WELCOME_FROM_GAME, "Abort", this, true);
+    
+    endDemo = new MenuButton("Go Back", this);
+    endDemo->showFrame(true);
+    endDemo->hide();
+    endDemo->setFocusPolicy(Qt::NoFocus);
+    endDemo->setColors(menuClr, QColor(0, 0, 0));
+    endDemo->setCentered(true);
+    connect(endDemo, SIGNAL(clicked()), this, SLOT(showWelcomeScreen()));
+    
+    backToWelcomeFromGame = new MenuButton("Abort", this);
+    backToWelcomeFromGame->showFrame(true);
     backToWelcomeFromGame->setFocusPolicy(Qt::NoFocus);
     backToWelcomeFromGame->setColors(menuClr, QColor(0, 0, 0));
     backToWelcomeFromGame->setCentered(true);
-
-    pauseGame = new MenuButton(PAUSE_GAME, "Pause", this, true);
+    connect(backToWelcomeFromGame, SIGNAL(clicked()), this, SLOT(abortGame()));
+    
+    pauseGame = new MenuButton("Pause", this);
+    pauseGame->showFrame(true);
     pauseGame->setFocusPolicy(Qt::NoFocus);
     pauseGame->setColors(menuClr, QColor(0, 0, 0));
     pauseGame->setCentered(true);
-
-    restartCurrent = new MenuButton(RESTART_LEVEL, "Restart", this, true);
+    connect(pauseGame, SIGNAL(clicked()), this, SLOT(pauseLevel()));
+    
+    restartCurrent = new MenuButton("Restart", this);
+    restartCurrent->showFrame(true);
     restartCurrent->setFocusPolicy(Qt::NoFocus);
     restartCurrent->setColors(menuClr, QColor(0, 0, 0));
     restartCurrent->setCentered(true);
-    gameButtonList->appendMenuButton(backToWelcomeFromGame);
-    gameButtonList->appendMenuButton(pauseGame);
-    gameButtonList->appendMenuButton(restartCurrent);
-
-    connect(mainButtonList, SIGNAL(clicked(int)), this,
-            SLOT(buttonClicked(int)));
-    connect(aboutButtonList, SIGNAL(clicked(int)), this,
-            SLOT(buttonClicked(int)));
-    connect(gameButtonList, SIGNAL(clicked(int)), this,
-            SLOT(buttonClicked(int)));
+    connect(restartCurrent, SIGNAL(clicked()), this, SLOT(restartLevel()));
+    
+    gameButtonList->addButton(backToWelcomeFromGame);
+    gameButtonList->addButton(pauseGame);
+    gameButtonList->addButton(restartCurrent);
 }
 
-void PuzzleWindow::buttonClicked(int id)
+void PuzzleWindow::playGame()
 {
-    if (id == PAUSE_GAME) {
-        if (isPaused) {
-            isPaused = false;
-            pauseGame->setText("Pause");
-            restartCurrent->show();
-            backToWelcomeFromGame->show();
-            timer->start(Puzzle::timeoutValue);
-            update();
-        } else {
-            pauseGame->setText("Resume");
-            restartCurrent->hide();
-            backToWelcomeFromGame->hide();
-            timer->stop();
-            isPaused = true;
-            update();
+    if (isPaused)
+        return;
+    switchState(InfoBar::GAME);
+}
+void PuzzleWindow::showOptions()
+{
+    int gs = Puzzle::timeoutValue;
+    bool se = Puzzle::playSound;
+    bool ar = Puzzle::progressSaving;
+    bool tl = Puzzle::timeLimit;
+
+    QString cTheme = Puzzle::theme;
+    OptionsDialog *optionsDialog =
+        new OptionsDialog(&Puzzle::currLevelsName, &cTheme,
+                          &se, &ar, &tl, &gs, this);
+    if (optionsDialog->exec() == QDialog::Accepted) {
+        Puzzle::timeoutValue = gs;
+        Puzzle::playSound = se;
+        Puzzle::progressSaving = ar;
+        Puzzle::timeLimit = tl;
+        Puzzle::theme = cTheme;
+        if (!Puzzle::images->initTheme(Puzzle::theme)) {
+            Puzzle::theme = "Default";
+            Puzzle::images->initTheme(Puzzle::theme);
         }
     }
+}
 
-    if (!isPaused) {
-        switch (id) {
-        case PLAY_GAME:
-            switchState(InfoBar::GAME);
-            break;
-        case OPTIONS_GAME: {
-            int gs = Puzzle::timeoutValue;
-            bool se = Puzzle::playSound;
-            bool ar = Puzzle::progressSaving;
-            bool tl = Puzzle::timeLimit;
+void PuzzleWindow::showAbout()
+{
+    if (isPaused)
+        return;
+    switchState(InfoBar::ABOUT);
+}
 
-            QString cTheme = Puzzle::theme;
-            OptionsDialog *optionsDialog =
-                new OptionsDialog(&Puzzle::currLevelsName, &cTheme,
-                                  &se, &ar, &tl, &gs, this);
-            if (optionsDialog->exec() == QDialog::Accepted) {
-                Puzzle::timeoutValue = gs;
-                Puzzle::playSound = se;
-                Puzzle::progressSaving = ar;
-                Puzzle::timeLimit = tl;
-                Puzzle::theme = cTheme;
-                if (!Puzzle::images->initTheme(Puzzle::theme)) {
-                    Puzzle::theme = "Default";
-                    Puzzle::images->initTheme(Puzzle::theme);
-                }
-            }
-        }
-        break;
-        case HISTORY_GAME:
-            switchState(InfoBar::HISTORY);
-            break;
-        case ABOUT_GAME:
-            switchState(InfoBar::ABOUT);
-            break;
-        case BACK_TO_WELCOME_FROM_ABOUT:
-            switchState(InfoBar::WELCOME);
-            break;
-        case BACK_TO_WELCOME_FROM_GAME:
-            abortGame();
-            break;
-        case PLAY_DEMO:
-            switchState(InfoBar::DEMO);
-            break;
-        case RESTART_LEVEL:
-            restartLevel();
-            break;
-        case QUIT:
-            close();
-            break;
-        case LOAD_GAME:
-            switchState(InfoBar::BROWSE);
-            break;
-        default:
-            break;
-        }
+void PuzzleWindow::showHistory()
+{
+    if (isPaused)
+        return;
+    switchState(InfoBar::HISTORY);
+}
+
+void PuzzleWindow::loadSavedGame()
+{
+    if (isPaused)
+        return;
+    switchState(InfoBar::BROWSE);
+}
+
+void PuzzleWindow::pauseLevel()
+{
+    if (isPaused) {
+        isPaused = false;
+        pauseGame->setText("Pause");
+        restartCurrent->show();
+        backToWelcomeFromGame->show();
+        timer->start(Puzzle::timeoutValue);
+        update();
+    } else {
+        pauseGame->setText("Resume");
+        restartCurrent->hide();
+        backToWelcomeFromGame->hide();
+        timer->stop();
+        isPaused = true;
+        update();
     }
+}
+
+void PuzzleWindow::showWelcomeScreen()
+{
+    if (isPaused)
+        return;
+    endDemo->hide();
+    switchState(InfoBar::WELCOME);
+}
+
+void PuzzleWindow::showDemo()
+{
+    if (isPaused)
+        return;
+    endDemo->show();
+    switchState(InfoBar::DEMO);
 }
 
 void PuzzleWindow::initGame()
@@ -616,7 +630,7 @@ void PuzzleWindow::startLevel(bool shuffle)
             result = play->loadLevel(Puzzle::levelFileName, play->currentLevel);
         else {
             result =
-                play->loadLevel(ROOTHOME + "pics/puzz-le/levels/" +
+                play->loadLevel(ROOTHOME + "pics/levels/" +
                                 Puzzle::currLevelsName + "/levels",
                                 play->currentLevel);
         }
@@ -638,6 +652,7 @@ void PuzzleWindow::nextLevelLoaded()
     timer->start(Puzzle::timeoutValue);
     aboutDialog->hide();
     update();
+    setFocus();
 }
 
 void PuzzleWindow::gameCompleted()
@@ -692,6 +707,8 @@ void PuzzleWindow::demoCompleted()
 
 void PuzzleWindow::restartLevel()
 {
+    if (isPaused)
+        return;
     timer->stop();
     dlg->configure(pix, "Restart current level ?", false, false, 0, " Yes",
                    QString::null, "No");
@@ -732,6 +749,9 @@ void PuzzleWindow::outOfTime()
 
 void PuzzleWindow::abortGame()
 {
+    if (isPaused)
+        return;
+
     timer->stop();
     if (Puzzle::progressSaving) {
         dlg->configure(pix, "Save the current game?", false, true, 0,
@@ -763,7 +783,7 @@ void PuzzleWindow::errorMsg(const QString & error)
 
 void PuzzleWindow::saveGameState(const QString & fileName)
 {
-    QDir dir(QString(getenv("HOME")) + QString("/puzz-le"));
+    QDir dir(QString(QDir::homePath()) + QString("/.puzz-le"));
     if (!dir.exists()) {
         dir.mkdir(dir.absolutePath());
     }
@@ -776,11 +796,9 @@ void PuzzleWindow::saveGameState(const QString & fileName)
                              Puzzle::currLevelsName);
 }
 
-void PuzzleWindow::loadGame(const QString & fileName)
+void PuzzleWindow::loadGame(const QString &fileName)
 {
-    QString tmp(QString(getenv("HOME")) + QString("/puzz-le/") + fileName);
-
-    if (!loadGameState(tmp)) {
+    if (!loadGameState(fileName)) {
         errorMsg("Unable to load saved game.");
     }
 }
@@ -790,7 +808,7 @@ void PuzzleWindow::fileDialogDone()
     switchState(InfoBar::WELCOME);
 }
 
-bool PuzzleWindow::loadGameState(const QString & fileName)
+bool PuzzleWindow::loadGameState(const QString &fileName)
 {
     QString oldCurrLevelsName = Puzzle::currLevelsName;
     int currPoints = 0;
@@ -801,10 +819,9 @@ bool PuzzleWindow::loadGameState(const QString & fileName)
         infoBar->setState(InfoBar::GAME);
         play->currentLevel = play->number();
         mainButtonList->setVisible(false);
-        aboutButtonList->setVisible(false);
         gameButtonList->setVisible(true);
         demo.clearRecording();
-        ox = (width() - play->width() * Puzzle::blockPixelSize) / 2;
+        nextLevelLoaded();
         update();
         if (Puzzle::currLevelsName != oldCurrLevelsName) {
             QString tmp;

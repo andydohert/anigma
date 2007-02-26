@@ -29,6 +29,7 @@
 
 #include <qtimer.h>
 #include <qfontmetrics.h>
+#include <qbuttongroup.h>
 #include <qpainter.h>
 #include <qimage.h>
 #include <qlineedit.h>
@@ -48,7 +49,7 @@ GameDialog::GameDialog( QWidget *parent): QDialog(parent, Qt::FramelessWindowHin
     leftButton = 0;
     rightButton = 0;
     middleButton = 0;
-    dButtonList = 0;
+    buttonGroup = 0;
     lEdit = 0;
 
     QFont f = font();
@@ -59,17 +60,12 @@ GameDialog::GameDialog( QWidget *parent): QDialog(parent, Qt::FramelessWindowHin
     connect( timer, SIGNAL(timeout()), this, SLOT(timeSynch()));
 }
 
-void GameDialog::paintEvent ( QPaintEvent * )
+void GameDialog::paintEvent(QPaintEvent *)
 {
     updateFireworks();
 }
 
-void GameDialog::resizeEvent(QResizeEvent *)
-{
-    tinted = QPixmap(width(), height());
-}
-
-void GameDialog::keyPressEvent ( QKeyEvent * e )
+void GameDialog::keyPressEvent(QKeyEvent *e)
 {
     switch ( e->key() ) {
     case    Qt::Key_Return:
@@ -161,6 +157,7 @@ void GameDialog::updateFireworks()
         topPos -= 10;
     }
 
+    /*
     if (textLightCache.isNull()) {
         textLightCache = QImage(width(), height(), QImage::Format_ARGB32);
         textDarkCache = QImage(width(), height(), QImage::Format_ARGB32);
@@ -175,7 +172,11 @@ void GameDialog::updateFireworks()
     }
     p.drawImage(0, 0, textLightCache);
     p.drawImage(0, 0, textDarkCache);
-
+    */
+    
+    MenuButton::drawColorizedText(dText, (width() - textWidth) / 2 + 1, topPos + 1, &p, QColor(0, 0, 0), 150);
+    MenuButton::drawColorizedText(dText, (width() - textWidth) / 2, topPos, &p, QColor(255, 255, 255), 180);
+    
     p.setPen(QColor(0, 148, 255));
     p.drawRect(0, 0, width()-1, height()-1);
 }
@@ -190,17 +191,9 @@ void GameDialog::show()
 
 void GameDialog::hide()
 {
-    delete leftButton;
-    delete rightButton;
-    delete middleButton;
-    delete dButtonList;
     if ( lEdit )
         reqText = lEdit->text();
     delete lEdit;
-    leftButton = 0;
-    rightButton = 0;
-    middleButton = 0;
-    dButtonList = 0;
     lEdit = 0;
     if ( doFancy )
         timer->stop();
@@ -211,6 +204,15 @@ void GameDialog::configure(QPixmap *background , const QString &text, bool fancy
         bool requester, int timeout, const QString &ls,
                            const QString &ms, const QString &rs )
 {
+    if (leftButton) leftButton->deleteLater();
+    if (rightButton) rightButton->deleteLater();
+    if (middleButton) middleButton->deleteLater();
+    if (buttonGroup) buttonGroup->deleteLater();
+    leftButton = 0;
+    rightButton = 0;
+    middleButton = 0;
+    buttonGroup = 0;
+    
     reqText.truncate(0);
     dText = text;
     doFancy = fancy;
@@ -248,7 +250,7 @@ void GameDialog::configure(QPixmap *background , const QString &text, bool fancy
         }
     }
 
-    if ( requester ) {
+    if (requester) {
         QString fileName;
 
         if ( !Puzzle::levelFileName.isEmpty() )
@@ -266,34 +268,35 @@ void GameDialog::configure(QPixmap *background , const QString &text, bool fancy
         lEdit = new QLineEdit(this);
         lEdit->setMaxLength (36);
         lEdit->setGeometry((width() - 160) / 2, (height() - 20) / 2, 160, 20);
-
         lEdit->setText(fileName);
-
         lEdit->setSelection (0, 20);
         lEdit->setFocus();
     }
 
     if ( !ls.isNull() || !rs.isNull() ) {
-        dButtonList = new MenuButtonList(this);;
+        buttonGroup = new QButtonGroup(this);
         if ( !ls.isNull() ) {
-            leftButton = new MenuButton(0, ls, this, true);
+            leftButton = new MenuButton(ls, this);
+            leftButton->showFrame(true);
             leftButton->setColors(QColor(0, 148, 255), QColor(0, 0, 0));
             leftButton->setGeometry(120, 280, 60, 20);
-            dButtonList->appendMenuButton(leftButton);
+            buttonGroup->addButton(leftButton, 0);
             leftButton->setCentered(true);
         }
         if ( !ms.isNull() ) {
-            middleButton = new MenuButton(1, ms, this, true);
+            middleButton = new MenuButton(ms, this);
+            middleButton->showFrame(true);
             middleButton->setColors(QColor(0, 148, 255), QColor(0, 0, 0));
             middleButton->setGeometry(120, 280, 60, 20);
-            dButtonList->appendMenuButton(middleButton);
+            buttonGroup->addButton(middleButton, 1);
             middleButton->setCentered(true);
         }
         if ( !rs.isNull() ) {
-            rightButton = new MenuButton(2, rs, this, true);
+            rightButton = new MenuButton(rs, this);
+            rightButton->showFrame(true);
             rightButton->setColors(QColor(0, 148, 255), QColor(0, 0, 0));
             rightButton->setGeometry(120, 280, 60, 20);
-            dButtonList->appendMenuButton(rightButton);
+            buttonGroup->addButton(rightButton, 2);
             rightButton->setCentered(true);
         }
     }
@@ -317,9 +320,8 @@ void GameDialog::configure(QPixmap *background , const QString &text, bool fancy
         }
     }
 
-    if ( dButtonList ) {
-        dButtonList->setVisible(true);
-        connect(dButtonList, SIGNAL(clicked(int)), this, SLOT(buttonClicked(int)));
+    if ( buttonGroup ) {
+        connect(buttonGroup, SIGNAL(buttonClicked(int)), this, SLOT(buttonClicked(int)));
     }
 
     if ( background && parentWidget() ) {
@@ -330,10 +332,10 @@ void GameDialog::configure(QPixmap *background , const QString &text, bool fancy
     }
 }
 
-void GameDialog::buttonClicked(int b)
+void GameDialog::buttonClicked(int id)
 {
     hide();
-    done(b);
+    done(id);
 }
 
 // Make the source image only half as bright
@@ -344,12 +346,12 @@ void GameDialog::createTintedBackground(QPixmap *back)
     QPainter p(&tinted);
     p.drawPixmap(QPoint(0, 0), *back, QRect(x()-r.x(), y()-r.y(), width(), height()));
     p.end();
-    QImage img = tinted.convertToImage();     // this one is slow like hell !!!!
+    QImage img = tinted.toImage();     // this one is slow like hell !!!!
     img = img.convertToFormat(QImage::Format_RGB32);
     QRgb *pixel = (QRgb*)img.bits();
     QRgb *pixel2 = pixel + (img.width() * img.height());
     while ( pixel != pixel2 ) {
         *pixel++ = qRgb(qRed(*pixel) >> 1, qGreen(*pixel) >> 1, qBlue(*pixel) >> 1);
     }
-    tinted.convertFromImage(img);
+    tinted = QPixmap::fromImage(img);
 }

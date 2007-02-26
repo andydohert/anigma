@@ -91,14 +91,10 @@ void Puzzle::initVariables(int &argc, char **argv)
     int intVal;
     float floatVal;
 
-    int wsize;
-    bool bendian;
-
-    qSysInfo(&wsize, &bendian);
-    if (bendian)
+    if (QSysInfo::ByteOrder == QSysInfo::BigEndian)
         isBigEndian = true;
 
-    Puzzle::demoFileName = ROOTHOME + "/pics/puzz-le/ldemos/Level_01.demo";
+    Puzzle::demoFileName = ROOTHOME + "/pics/ldemos/Level_01.demo";
 
     Puzzle::demoLoop = true;
     QSettings cfg("Puzz_le");
@@ -184,4 +180,3 @@ void Puzzle::initVariables(int &argc, char **argv)
         }
     }
 }
-

@@ -30,41 +30,43 @@
 #include <qpainter.h>
 #include <qevent.h>
 #include <QFrame>
+#include <QScrollBar>
+#include <qtextedit.h>
 #include "menubutton.h"
 #include "imagerepository.h"
 #include "puzzle.h"
+#include <qurl.h>
+#include <qdebug.h>
 
 static const char *historyData[] =
     {
-        "",
         "Changes:",
-        "",
-        "*** VERSION 2.1.0 **************",
-        "- Ported to Qt 4",
-        "  Code cleanups and bug fixes.",
-        "",
-        "*** VERSION 2.0.0 **************",
-        "- added ability to create additional sets of",
-        "   colored blocks ( themes.)",
-        "- new themes ( Flags and Letters)",
-        "- 400 new levels courtesy of Vexed",
-        "   project ( ported to Puzz-le level",
-        "   format by Alexander Paersch )",
-        "- minor bug fixes ..",
-        "",
-        "*** VERSION 1.0.3 **************",
-        "- added option to enable/disable time limit",
-        "- added ability to pause game",
-        "- minor bug fixes ..",
+        "<p>",
+        "*** VERSION 2.1.0 **************<br>",
+        "- Ported to Qt 4<br>",
+        "  Code cleanups and bug fixes.<br>",
+        "<p>",
+        "*** VERSION 2.0.0 **************<br>",
+        "- added ability to create additional sets of<br>",
+        "   colored blocks ( themes.)<br>",
+        "- new themes ( Flags and Letters)<br>",
+        "- 400 new levels courtesy of Vexed<br>",
+        "   project ( ported to Puzz-le level<br>",
+        "   format by Alexander Paersch )<br>",
+        "- minor bug fixes ..<br>",
+        "<p>",
+        "*** VERSION 1.0.3 **************<br>",
+        "- added option to enable/disable time limit<br>",
+        "- added ability to pause game<br>",
+        "- minor bug fixes ..<br>",
         "",
         "END"
     };
 
 static const char *infoData[] =
     {
-        "",
         "Puzz-le is an arcade puzzler.",
-        "",
+        "<P>",
         "Your task is to eliminate all of",
         "the colored blocks by putting them",
         "together.",
@@ -75,85 +77,86 @@ static const char *infoData[] =
         "either a time limit (time:000) or a limited",
         "number of moves (mov:00) you are allowed ",
         "to make.",
-        "",
+        "<P>",
         "Some of the objects you will encounter",
-        "are:",
-        "|B   -  colored blocks",
-        "|E   -  elevators",
-        "|F   -  fire pits",
-        "|D   -  damaged platforms",
-        "|T   -  trap doors",
-        "",
+        "are:<br>",
+        "<img src=\"yellow.png\">  &nbsp;   colored blocks<br>",
+        "<img src=\"wall.png\"> &nbsp;    elevators<br>",
+        "<img src=\"fire.png\">  &nbsp;     fire pits<br>",
+        "<img src=\"broken.png\">   &nbsp;    damaged platforms<br>",
+        "<img src=\"trap.png\">    &nbsp;  trap doors",
+        "<P>",
         "To pick up object, click on it.",
         "The cursor around the block turns white",
         "while you are carrying an object.",
-        "",
+        "<P>",
         "Once you have picked up a block,",
         "you can move it horizontally.",
         "When you touch two or more similar",
         "blocks together, they will disappear.",
-        "",
+        "<P>",
         "Tap on the Demo Game button to watch ",
         "computer solving each of the 50 available",
         "levels.",
 #ifdef DEMO_VERSION
         "",
-        "",
+        "<P>",
         "This is a demo version that contains",
         "a sample of 8 levels. The full version",
         "of the game contains all 50 levels",
 #endif
-        "",
+        "<P>",
         "Have fun and good luck !",
         "",
         "END"
     };
 
-class AboutDialogItem: public Q3ListBoxItem
-{
-public:
-    AboutDialogItem(const QString & textLine, Q3ListBox * lb);
-
-    virtual int height(const Q3ListBox *) const;
-    virtual int width(const Q3ListBox *) const;
-
-protected:
-    virtual void paint(QPainter *);
-
-private:
-    int fHeight;
-};
-
-AboutDialog::AboutDialog(QWidget * parent): QWidget(parent)
+AboutDialog::AboutDialog(QWidget * parent): QWidget(parent), loadedImages(false)
 {
     QFont f = font();
     f.setBold(true);
     setFont(f);
 
     textEdit = new QTextEdit(this);
-    textEdit->setBackgroundColor(QColor(0, 0, 0));
-    
-    lBox = new Q3ListBox(this);
-    
-    //lBox->hide();
-    textEdit->hide();
-    lBox->setFrameStyle(QFrame::NoFrame);
-    lBox->setFocusPolicy(Qt::NoFocus);
-    lBox->setHScrollBarMode(Q3ScrollView::AlwaysOff);
-
-    setBackgroundColor(QColor(0, 0, 0));
+    textEdit->setReadOnly(true);
+    textEdit->setFocusPolicy(Qt::NoFocus);
+    textEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     textEdit->setFrameStyle(QFrame::NoFrame);
-    textEdit->setTextColor(QColor(255, 255, 255));
+    textEdit->setTextColor(Qt::white);
+    textEdit->setWordWrapMode(QTextOption::WrapAnywhere);
+    textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
+    QPalette pal = textEdit->palette();
+    QColor blue(0, 148, 255);
+    pal.setColor(QPalette::Text, blue);
+    textEdit->setPalette(pal);
+
+    QColor menuClr(0, 148, 255);
+    
+    backButton = new MenuButton("Go Back", this);
+    backButton->showFrame(true);
+    backButton->setColors(menuClr, QColor(0, 0, 0));
+    backButton->setCentered(true);
+    connect(backButton, SIGNAL(clicked()), this, SIGNAL(showWelcomeScreen()));
+    
+    demoButton = new MenuButton("Demo Game", this);
+    demoButton->showFrame(true);
+    demoButton->setColors(menuClr, QColor(0, 0, 0));
+    demoButton->setCentered(true);
+    connect(demoButton, SIGNAL(clicked()), this, SIGNAL(showDemo()));
+    
+    
     setMode(ABOUT);
+
+
 }
 
 void AboutDialog::setMode(MODE m)
 {
-    lBox->clear();
     QString all;
-    QString tmp;
+
     int i = 0;
     while (true) {
+        QString tmp;
         if (m == ABOUT)
             tmp = infoData[i];
         else
@@ -162,89 +165,47 @@ void AboutDialog::setMode(MODE m)
             break;
         all += tmp;
         all += '\n';
-        lBox->insertItem(new AboutDialogItem(tmp, lBox));
         i++;
     }
-    textEdit->setPlainText(all);
+    
+    ImageRepository *ir = Puzzle::images;
+    if (ir && !loadedImages) {
+        loadedImages = true;
+        textEdit->document()->addResource(QTextDocument::ImageResource, QUrl("yellow.png") ,
+         ir->findPixmap(ImageRepository::YELLOW));
+        textEdit->document()->addResource(QTextDocument::ImageResource, QUrl("wall.png") ,
+         ir->findPixmap(ImageRepository::WALL));
+        textEdit->document()->addResource(QTextDocument::ImageResource, QUrl("fire.png") ,
+         ir->findPixmap(ImageRepository::FIRE).copy(0,0,Puzzle::blockPixelSize, Puzzle::blockPixelSize));
+        textEdit->document()->addResource(QTextDocument::ImageResource, QUrl("broken.png") ,
+         ir->findPixmap(ImageRepository::BROKEN_WALL).copy(0,0,Puzzle::blockPixelSize, Puzzle::blockPixelSize));
+        
+        QPixmap left = ir->findPixmap(ImageRepository::TRAP_LEFT);
+        QPixmap right = ir->findPixmap(ImageRepository::TRAP_RIGHT);
+        QPainter p(&left);
+        p.drawPixmap(0, 0, right);
+        textEdit->document()->addResource(QTextDocument::ImageResource, QUrl("trap.png") ,
+         left);
+    }
+    textEdit->setHtml(all);
 }
 
 void AboutDialog::resizeEvent(QResizeEvent *)
 {
-    textEdit->setGeometry(0, 1, width(), height() - 2);
-    lBox->setGeometry(0, 1, width(), height() - 2);
+    textEdit->setGeometry(0, 1, width(), height() - backButton->height() - 9);
+    textEdit->setLineWrapColumnOrWidth(width() - textEdit->horizontalScrollBar()->width());  
+    
+    backButton->setGeometry(4,height() - backButton->height() - 4,
+                                        110, backButton->height());
+    demoButton->setGeometry(width() - 110 - 4,
+                          height() - backButton->height() - 4, 110,
+                          backButton->height());
 }
 
 void AboutDialog::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
-
     p.setPen(QColor(0, 148, 255));
     p.drawLine(0, 0, width(), 0);
-    p.drawLine(0, height() - 1, width(), height() - 1);
-}
-
-AboutDialogItem::AboutDialogItem(const QString & textLine, Q3ListBox * lb)
-{
-    fHeight = 0;
-    setText(textLine);
-    setCustomHighlighting(true);
-
-    if (lb) {
-        if (!textLine.isEmpty() && textLine.at(0) == '|')
-            fHeight = Puzzle::blockPixelSize + 4;
-        else {
-            QFontMetrics fm(lb->font());
-            fHeight = fm.height() + 6;
-        }
-    }
-}
-
-int AboutDialogItem::height(const Q3ListBox *) const
-{
-    return fHeight;
-}
-
-int AboutDialogItem::width(const Q3ListBox * l) const
-{
-    return l->width();
-}
-
-void AboutDialogItem::paint(QPainter * p)
-{
-    QColor q(0, 148, 255);
-    QString txt = text();
-
-    if (!txt.isEmpty() && txt.at(0) == '|') {
-        ImageRepository::IMAGE_NAMES iname = ImageRepository::YELLOW;
-        switch (txt.at(1).latin1()) {
-        case 'B':
-            iname = ImageRepository::YELLOW;
-            break;
-        case 'E':
-            iname = ImageRepository::WALL;
-            break;
-        case 'F':
-            iname = ImageRepository::FIRE;
-            break;
-        case 'D':
-            iname = ImageRepository::BROKEN_WALL;
-            break;
-        case 'T':
-            iname = ImageRepository::TRAP_LEFT;
-            break;
-        }
-        QPixmap pix = Puzzle::images->findPixmap(iname);
-        p->drawPixmap(0, 2, pix, 0, 0, Puzzle::blockPixelSize, Puzzle::blockPixelSize);
-        if (txt.at(1) == 'T') {
-            pix =
-                Puzzle::images->
-                findPixmap(ImageRepository::TRAP_RIGHT);
-            if (p)
-                p->drawPixmap(0, 2, pix, 0, 0, Puzzle::blockPixelSize,
-                              Puzzle::blockPixelSize);
-        }
-        MenuButton::drawColorizedText(txt.remove(0, 2), Puzzle::blockPixelSize + 2, 3, p, q, 150);
-    } else {
-        MenuButton::drawColorizedText(text(), 0, 3, p, q, 150);
-    }
+    p.drawLine(0, height() - backButton->height() - 8, width(), height() - backButton->height() - 8);
 }
