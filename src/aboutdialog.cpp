@@ -32,84 +32,77 @@
 #include <QFrame>
 #include <QScrollBar>
 #include <qtextedit.h>
-#include "menubutton.h"
-#include "imagerepository.h"
-#include "puzzle.h"
 #include <qurl.h>
 #include <qdebug.h>
 
-static const char *historyData[] =
-    {
-        "Changes:",
-        "<p>",
-        "*** VERSION 2.1.0 **************<br>",
-        "- Ported to Qt 4<br>",
-        "  Code cleanups and bug fixes.<br>",
-        "<p>",
-        "*** VERSION 2.0.0 **************<br>",
-        "- added ability to create additional sets of<br>",
-        "   colored blocks ( themes.)<br>",
-        "- new themes ( Flags and Letters)<br>",
-        "- 400 new levels courtesy of Vexed<br>",
-        "   project ( ported to Puzz-le level<br>",
-        "   format by Alexander Paersch )<br>",
-        "- minor bug fixes ..<br>",
-        "<p>",
-        "*** VERSION 1.0.3 **************<br>",
-        "- added option to enable/disable time limit<br>",
-        "- added ability to pause game<br>",
-        "- minor bug fixes ..<br>",
-        "",
-        "END"
-    };
+#include "menubutton.h"
+#include "imagerepository.h"
+#include "puzzle.h"
 
-static const char *infoData[] =
-    {
-        "Puzz-le is an arcade puzzler.",
-        "<P>",
-        "Your task is to eliminate all of",
-        "the colored blocks by putting them",
-        "together.",
-        "It is relatively easy with two blocks,",
-        "but can be quite tricky with three",
-        "or more.",
-        "Depending on the levels pack, there is ",
-        "either a time limit (time:000) or a limited",
-        "number of moves (mov:00) you are allowed ",
-        "to make.",
-        "<P>",
-        "Some of the objects you will encounter",
-        "are:<br>",
-        "<img src=\"yellow.png\">  &nbsp;   colored blocks<br>",
-        "<img src=\"wall.png\"> &nbsp;    elevators<br>",
-        "<img src=\"fire.png\">  &nbsp;     fire pits<br>",
-        "<img src=\"broken.png\">   &nbsp;    damaged platforms<br>",
-        "<img src=\"trap.png\">    &nbsp;  trap doors",
-        "<P>",
-        "To pick up object, click on it.",
-        "The cursor around the block turns white",
-        "while you are carrying an object.",
-        "<P>",
-        "Once you have picked up a block,",
-        "you can move it horizontally.",
-        "When you touch two or more similar",
-        "blocks together, they will disappear.",
-        "<P>",
-        "Tap on the Demo Game button to watch ",
-        "computer solving each of the 50 available",
-        "levels.",
+const char *historyData =
+        "Changes:"
+        "<p>"
+        "*** VERSION 2.1.0 **************<br>"
+        "- Ported to Qt 4<br>"
+        "  Code cleanups and bug fixes.<br>"
+        "<p>"
+        "*** VERSION 2.0.0 **************<br>"
+        "- added ability to create additional sets of<br>"
+        "   colored blocks ( themes.)<br>"
+        "- new themes ( Flags and Letters)<br>"
+        "- 400 new levels courtesy of Vexed<br>"
+        "   project ( ported to Puzz-le level<br>"
+        "   format by Alexander Paersch )<br>"
+        "- minor bug fixes ..<br>"
+        "<p>"
+        "*** VERSION 1.0.3 **************<br>"
+        "- added option to enable/disable time limit<br>"
+        "- added ability to pause game<br>"
+        "- minor bug fixes ..<br>";
+
+const char *infoData =
+        "Puzz-le is an arcade puzzler."
+        "<P>"
+        "Your task is to eliminate all of"
+        "the colored blocks by putting them"
+        "together."
+        "It is relatively easy with two blocks,"
+        "but can be quite tricky with three"
+        "or more."
+        "Depending on the levels pack, there is "
+        "either a time limit (time:000) or a limited"
+        "number of moves (mov:00) you are allowed "
+        "to make."
+        "<P>"
+        "Some of the objects you will encounter"
+        "are:<br>"
+        "<img src=\"yellow.png\">  &nbsp;   colored blocks<br>"
+        "<img src=\"wall.png\"> &nbsp;    elevators<br>"
+        "<img src=\"fire.png\">  &nbsp;     fire pits<br>"
+        "<img src=\"broken.png\">   &nbsp;    damaged platforms<br>"
+        "<img src=\"trap.png\">    &nbsp;  trap doors"
+        "<P>"
+        "To pick up object, click on it."
+        "The cursor around the block turns white"
+        "while you are carrying an object."
+        "<P>"
+        "Once you have picked up a block,"
+        "you can move it horizontally."
+        "When you touch two or more similar"
+        "blocks together, they will disappear."
+        "<P>"
+        "Tap on the Demo Game button to watch "
+        "computer solving each of the 50 available"
+        "levels."
 #ifdef DEMO_VERSION
-        "",
-        "<P>",
-        "This is a demo version that contains",
-        "a sample of 8 levels. The full version",
-        "of the game contains all 50 levels",
+        ""
+        "<P>"
+        "This is a demo version that contains"
+        "a sample of 8 levels. The full version"
+        "of the game contains all 50 levels"
 #endif
-        "<P>",
-        "Have fun and good luck !",
-        "",
-        "END"
-    };
+        "<P>"
+        "Have fun and good luck !";
 
 AboutDialog::AboutDialog(QWidget * parent): QWidget(parent), loadedImages(false)
 {
@@ -126,7 +119,6 @@ AboutDialog::AboutDialog(QWidget * parent): QWidget(parent), loadedImages(false)
     pal.setColor(QPalette::Text, blue);
     textEdit->setPalette(pal);
 
-    QColor menuClr(0, 148, 255);
     backButton = new MenuButton("Go Back", this);
     backButton->showFrame(true);
     backButton->setCentered(true);
@@ -142,18 +134,10 @@ void AboutDialog::setMode(MODE m)
 {
     QString all;
 
-    int i = 0;
-    while (true) {
-        QString tmp;
-        if (m == ABOUT)
-            tmp = infoData[i];
-        else
-            tmp = historyData[i];
-        if (tmp == "END")
-            break;
-        all += tmp;
-        all += '\n';
-        i++;
+    if (m != ABOUT)
+        all = historyData;
+    else {
+        all = infoData;
     }
 
     ImageRepository *ir = Puzzle::images;

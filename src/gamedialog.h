@@ -29,9 +29,6 @@
 #define GAMEDIALOG_H
 
 #include <qdialog.h>
-#include <qstring.h>
-#include <qpixmap.h>
-#include <qevent.h>
 
 class QTimer;
 class QLineEdit;

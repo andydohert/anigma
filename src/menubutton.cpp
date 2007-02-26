@@ -30,6 +30,7 @@
 #include <qpixmap.h>
 #include <qdebug.h>
 #include <QLinearGradient>
+#include <qapplication.h>
 #include "puzzle.h"
 #include "imagerepository.h"
 #include "soundrepository.h"
@@ -48,7 +49,7 @@ void MenuButton::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setOpacity(0.75);
-    painter.fillRect(QRect(0,0,width(), height()), palette().color(QPalette::Background));
+    painter.fillRect(QRect(0,0,width(), height()), Qt::black);
     painter.setOpacity(1.0);
     QFontMetrics fm = painter.fontMetrics();
     int y = (height() - fm.height()) / 2 ;
@@ -66,7 +67,7 @@ void MenuButton::paintEvent(QPaintEvent *)
             t.setPen(painter.pen());
             t.setBrush(painter.brush());
             */
-            MenuButton::drawColorizedText(text(), x, y, &painter, QColor(255, 255, 255), 150);
+            MenuButton::drawColorizedText(text(), x, y, &painter, Qt::white, 150);
         //}
         //qDebug() << t.font().key() << painter.font().key();
         //painter.drawImage(0, 0, textFocusCache);
@@ -82,14 +83,14 @@ void MenuButton::paintEvent(QPaintEvent *)
         }
         painter.drawImage(0, 0, textCache);
         */
-        MenuButton::drawColorizedText(text(), x, y, &painter, palette().color(QPalette::ButtonText), 150);
+        MenuButton::drawColorizedText(text(), x, y, &painter, QApplication::palette().color(QPalette::ButtonText), 150);
     }
 
     if ( drawFrame ) {
         if ( !isDown() )
             painter.setPen(QColor(0, 96, 165));
         else
-            painter.setPen(QColor(255, 255, 255));
+            painter.setPen(Qt::white);
         painter.drawRect(0, 0, width() - 1, height() - 1);
     }
 }

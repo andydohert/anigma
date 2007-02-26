@@ -29,12 +29,8 @@
 #define FILEDIALOG_H
 
 #include <qwidget.h>
-#include <qstring.h>
-#include <qpixmap.h>
-#include <qevent.h>
 
 class MenuButton;
-class Playground;
 class QStandardItemModel;
 class QTreeView;
 
@@ -58,8 +54,8 @@ public slots:
 
 
 protected:
-    virtual void paintEvent(QPaintEvent *) ;
-    virtual void keyPressEvent(QKeyEvent * e);
+    virtual void paintEvent(QPaintEvent *);
+    virtual void keyPressEvent(QKeyEvent *);
     virtual void resizeEvent(QResizeEvent *);
 
 private slots:

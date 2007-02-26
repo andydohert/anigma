@@ -37,13 +37,13 @@
 #include <qevent.h>
 #include <qpixmap.h>
 #include <qdebug.h>
-#include <stdlib.h>
 
 #include "menubutton.h"
 #include "puzzle.h"
 
 GameDialog::GameDialog( QWidget *parent): QDialog(parent, Qt::FramelessWindowHint )
 {
+    setPalette(parent->palette());
     setModal(true);
     margin = 16;
     leftButton = 0;

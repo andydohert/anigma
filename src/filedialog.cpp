@@ -25,19 +25,16 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "filedialog.h"
+
 #include <qdir.h>
-#include <qfontmetrics.h>
-#include <qapplication.h>
-#include <qpalette.h>
 #include <qpainter.h>
 #include <qevent.h>
 #include <qtreeview.h>
 #include <qdebug.h>
 #include <qstandarditemmodel.h>
 #include <qheaderview.h>
-#include <stdlib.h>
 
-#include "filedialog.h"
 #include "menubutton.h"
 #include "playground.h"
 #include "gamedialog.h"

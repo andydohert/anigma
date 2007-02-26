@@ -25,8 +25,9 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "puzzlewindow.h"
+
 #include <qsettings.h>
-#include <qapplication.h>
 #include <qpainter.h>
 #include <qdatetime.h>
 #include <qtimer.h>
@@ -37,9 +38,11 @@
 #include <QKeyEvent>
 #include <qdir.h>
 #include <QGradient>
+#include <qdebug.h>
+#include <time.h>
+
 #include "levels.dat"
 #include "soundrepository.h"
-#include "puzzlewindow.h"
 #include "imagerepository.h"
 #include "aboutdialog.h"
 #include "filedialog.h"
@@ -47,9 +50,7 @@
 #include "menubutton.h"
 #include "gamedialog.h"
 #include "optionsdialog.h"
-#include <qdebug.h>
-#include <stdlib.h>
-#include <time.h>
+#include <qapplication.h>
 
 PuzzleWindow::PuzzleWindow(QWidget * parent): QMainWindow(parent)
 {
@@ -58,15 +59,16 @@ PuzzleWindow::PuzzleWindow(QWidget * parent): QMainWindow(parent)
     infoBar->hide();
 
     srand(time(NULL));
-    blue = QColor(0, 148, 255);
     setFont(QFont("Helvetica", 10, QFont::Bold));
 
     QPalette pal = palette();
+    blue = QColor(0, 148, 255);
     pal.setColor(QPalette::Base, Qt::black);
     pal.setColor(QPalette::Background, Qt::black);
+    pal.setColor(QPalette::Button, Qt::black);
     pal.setColor(QPalette::ButtonText, blue);
     pal.setColor(QPalette::WindowText, blue);
-    setPalette(pal);
+    QApplication::setPalette(pal);
 
     setWindowTitle("Puzz-le");
     timer = 0;

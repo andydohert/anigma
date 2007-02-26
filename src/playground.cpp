@@ -27,12 +27,9 @@
 
 #include "playground.h"
 
-#include <qstring.h>
 #include <qpainter.h>
-#include <qbitmap.h>
 #include <qfile.h>
 #include <qtextstream.h>
-#include <stdlib.h>
 #include <qdebug.h>
 
 #include "imagerepository.h"

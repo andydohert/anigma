@@ -26,6 +26,7 @@
 */
 
 #include "optionsdialog.h"
+
 #include "menubutton.h"
 #include "imagerepository.h"
 #include "puzzle.h"

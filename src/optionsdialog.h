@@ -29,8 +29,6 @@
 #define OPTIONSDIALOG_H
 
 #include <qdialog.h>
-#include <qstring.h>
-#include <qevent.h>
 
 class QLineEdit;
 class MenuButton;

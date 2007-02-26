@@ -29,7 +29,6 @@
 #define DEMO_H
 
 #include <qobject.h>
-#include <qstring.h>
 #include <qpoint.h>
 
 class DemoMove
@@ -86,4 +85,3 @@ private:
 };
 
 #endif
-

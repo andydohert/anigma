@@ -32,11 +32,8 @@
 #include <qlist.h>
 #include <qbitarray.h>
 #include <qpoint.h>
-#include <qpixmap.h>
-#include <qvector.h>
-#include <math.h>
+#include <qimage.h>
 
-#include "puzzle.h"
 #include "playblock.h"
 
 class QPainter;

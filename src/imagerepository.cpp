@@ -31,7 +31,6 @@
 #include <qdebug.h>
 #include <qpixmap.h>
 #include <qbitmap.h>
-#include <stdlib.h>
 
 #include "puzzle.h"
 
