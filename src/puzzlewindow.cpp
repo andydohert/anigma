@@ -58,13 +58,13 @@ PuzzleWindow::PuzzleWindow(QWidget * parent): QMainWindow(parent)
     infoBar->hide();
 
     srand(time(NULL));
-    QColor black(0, 0, 0);
-    QColor blue(0, 148, 255);
+    blue = QColor(0, 148, 255);
     setFont(QFont("Helvetica", 10, QFont::Bold));
 
     QPalette pal = palette();
-    pal.setColor(QPalette::Base, black);
-    pal.setColor(QPalette::Background, black);
+    pal.setColor(QPalette::Base, Qt::black);
+    pal.setColor(QPalette::Background, Qt::black);
+    pal.setColor(QPalette::ButtonText, blue);
     pal.setColor(QPalette::WindowText, blue);
     setPalette(pal);
 
@@ -82,7 +82,7 @@ PuzzleWindow::PuzzleWindow(QWidget * parent): QMainWindow(parent)
     aboutDialog = new AboutDialog(this);
     connect(aboutDialog, SIGNAL(showWelcomeScreen()), this, SLOT(showWelcomeScreen()));
     connect(aboutDialog, SIGNAL(showDemo()), this, SLOT(showDemo()));
-    
+
     switchState(InfoBar::WELCOME);
     resize(240, 320);
     setMinimumWidth(240);
@@ -264,10 +264,9 @@ void PuzzleWindow::resizeEvent(QResizeEvent *)
     restartCurrent->setGeometry(width() - 75 - 4,
                                 height() - playGameButton->height() - 4, 75,
                                 playGameButton->height());
-                                
     endDemo->setGeometry(8,height() - endDemo->height() - 4,
                                         110, endDemo->height());
-    
+
     pix->fill();
 }
 
@@ -312,11 +311,11 @@ void PuzzleWindow::drawTitleScreen(QPainter * p)
             p->drawPixmap(10, loadSavedGameButton->y() + loadSavedGameButton->height() - 40, tmp);
             p->setPen(QColor(0, 135, 234));
             MenuButton::drawColorizedText("Copyright (C) 2001 Walter Rawdanik",
-                                          10, 80, p, menuClr, 150);
+                                          10, 80, p, blue, 150);
             MenuButton::drawColorizedText("Copyright (C) 2005 Benjamin Meyer", 10,
-                                          95, p, menuClr, 150);
+                                          95, p, blue, 150);
             MenuButton::drawColorizedText("ver: " + Puzzle::gameVersion, 174,
-                                          278, p, menuClr, 150);
+                                          278, p, blue, 150);
         }
     }
 }
@@ -449,73 +448,49 @@ void PuzzleWindow::init()
         timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(synchTimeout()));
     }
-    Puzzle::initSounds("sounds");
-
-    menuClr.setRgb(0, 148, 255);
-    hMenuClr.setRgb(255, 255, 255);
+    Puzzle::initSounds(":/sounds");
 
     mainButtonList = new MenuButtonList(this);
     playGameButton = new MenuButton("Play the game", this);
-    playGameButton->setColors(menuClr, QColor(0, 0, 0));
     connect(playGameButton, SIGNAL(clicked()), this, SLOT(playGame()));
-    
     optionsGameButton = new MenuButton("Options", this);
-    optionsGameButton->setColors(menuClr, QColor(0, 0, 0));
     connect(optionsGameButton, SIGNAL(clicked()), this, SLOT(showOptions()));
-    
     aboutGameButton = new MenuButton("Instructions", this);
-    aboutGameButton->setColors(menuClr, QColor(0, 0, 0));
     connect(aboutGameButton, SIGNAL(clicked()), this, SLOT(showAbout()));
-    
     historyGameButton = new MenuButton("Changes", this);
-    historyGameButton->setColors(menuClr, QColor(0, 0, 0));
     connect(historyGameButton, SIGNAL(clicked()), this, SLOT(showHistory()));
-    
     loadSavedGameButton = new MenuButton("Load saved game", this);
-    loadSavedGameButton->setColors(menuClr, QColor(0, 0, 0));
     connect(loadSavedGameButton, SIGNAL(clicked()), this, SLOT(loadSavedGame()));
     quitGameButton = new MenuButton("Quit", this);
-    quitGameButton->setColors(menuClr, QColor(0, 0, 0));
     connect(quitGameButton, SIGNAL(clicked()), this, SLOT(close()));
-    
     mainButtonList->addButton(playGameButton);
     mainButtonList->addButton(optionsGameButton);
     mainButtonList->addButton(aboutGameButton);
     mainButtonList->addButton(historyGameButton);
     mainButtonList->addButton(loadSavedGameButton);
     mainButtonList->addButton(quitGameButton);
-    
     gameButtonList = new MenuButtonList(this);
-    
     endDemo = new MenuButton("Go Back", this);
     endDemo->showFrame(true);
     endDemo->hide();
     endDemo->setFocusPolicy(Qt::NoFocus);
-    endDemo->setColors(menuClr, QColor(0, 0, 0));
     endDemo->setCentered(true);
     connect(endDemo, SIGNAL(clicked()), this, SLOT(showWelcomeScreen()));
-    
     backToWelcomeFromGame = new MenuButton("Abort", this);
     backToWelcomeFromGame->showFrame(true);
     backToWelcomeFromGame->setFocusPolicy(Qt::NoFocus);
-    backToWelcomeFromGame->setColors(menuClr, QColor(0, 0, 0));
     backToWelcomeFromGame->setCentered(true);
     connect(backToWelcomeFromGame, SIGNAL(clicked()), this, SLOT(abortGame()));
-    
     pauseGame = new MenuButton("Pause", this);
     pauseGame->showFrame(true);
     pauseGame->setFocusPolicy(Qt::NoFocus);
-    pauseGame->setColors(menuClr, QColor(0, 0, 0));
     pauseGame->setCentered(true);
     connect(pauseGame, SIGNAL(clicked()), this, SLOT(pauseLevel()));
-    
     restartCurrent = new MenuButton("Restart", this);
     restartCurrent->showFrame(true);
     restartCurrent->setFocusPolicy(Qt::NoFocus);
-    restartCurrent->setColors(menuClr, QColor(0, 0, 0));
     restartCurrent->setCentered(true);
     connect(restartCurrent, SIGNAL(clicked()), this, SLOT(restartLevel()));
-    
     gameButtonList->addButton(backToWelcomeFromGame);
     gameButtonList->addButton(pauseGame);
     gameButtonList->addButton(restartCurrent);

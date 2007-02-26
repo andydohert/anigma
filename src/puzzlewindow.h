@@ -121,8 +121,7 @@ private:
     void nextLevelLoaded();
 
     QTimer *timer;
-    QColor menuClr;
-    QColor hMenuClr;
+    QColor blue;
 
     MenuButton *playGameButton;
     MenuButton *optionsGameButton;

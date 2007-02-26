@@ -28,7 +28,7 @@
 #ifndef PUZZLE_H
 #define PUZZLE_H
 
-#define ROOTHOME (QDir::currentPath())
+#define ROOTHOME QString(":")
 
 #include <qstring.h>
 

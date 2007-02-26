@@ -56,15 +56,12 @@ OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar
 
     OKButton = new MenuButton("Save", this);
     OKButton->showFrame(true);
-    OKButton->setColors(QColor(0, 148, 255), QColor(0, 0, 0));
     OKButton->setCentered(true);
     connect(OKButton, SIGNAL(clicked()), this, SLOT(accept()));
     cancelButton = new MenuButton("Cancel", this);
     cancelButton->showFrame(true);
-    cancelButton->setColors(QColor(0, 148, 255), QColor(0, 0, 0));
     cancelButton->setCentered(true);
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-    
     soundEffects = new QComboBox(this);
     soundEffects->addItem("Yes");
     soundEffects->addItem("No");

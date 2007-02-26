@@ -42,7 +42,6 @@ DemoMove::DemoMove(int x, int y, int t): ix(x), iy(y), it(t)
 void Demo::loadDemo(const QString &fileName)
 {
     demoList.clear();
-    
     QFile file(fileName);
     if (!file.exists() || !file.open(QIODevice::ReadOnly)) {
         qWarning() << "can't load demo" << fileName;
@@ -51,7 +50,6 @@ void Demo::loadDemo(const QString &fileName)
 
     QTextStream ts(&file);
     QString line;
-    
     int dx, dy, dt;
     int totalNumberOfLines = ts.readLine().toInt();
     demoLevel = ts.readLine().toInt();
@@ -61,7 +59,6 @@ void Demo::loadDemo(const QString &fileName)
         sscanf(line.toLatin1(), "%d %d %d ", &dx, &dy, &dt);
         demoList.append(DemoMove(dx, dy, dt));
     }
-    
     if (totalNumberOfLines != demoList.count()) {
         qWarning() << "error reading demo" << fileName;
     }
@@ -139,3 +136,4 @@ bool Demo::timeout(int tick)
     }
     return update;
 }
+

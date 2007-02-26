@@ -44,9 +44,6 @@
 
 FileDialog::FileDialog(const QString &dir, QWidget *parent): QWidget(parent)
 {
-    QFont f = font();
-    f.setBold(true);
-    setFont(f);
     directory = dir;
     vMargin = 24;
     hMargin = 2;
@@ -54,19 +51,16 @@ FileDialog::FileDialog(const QString &dir, QWidget *parent): QWidget(parent)
     backButton = new MenuButton("Go Back", this);
     backButton->showFrame(true);
     connect(backButton, SIGNAL(clicked()), this, SIGNAL(done()));
-    backButton->setColors(QColor(0, 148, 255), QColor(0, 0, 0));
     backButton->setCentered(true);
 
     deleteButton = new MenuButton("Delete", this);
     deleteButton->showFrame(true);
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteSelected()));
-    deleteButton->setColors(QColor(0, 148, 255), QColor(0, 0, 0));
     deleteButton->setCentered(true);
 
     loadButton = new MenuButton("Load", this);
     loadButton->showFrame(true);
     connect(loadButton, SIGNAL(clicked()), this, SLOT(load()));
-    loadButton->setColors(QColor(0, 148, 255), QColor(0, 0, 0));
     loadButton->setCentered(true);
 
     treeView = new QTreeView(this);
@@ -117,22 +111,22 @@ void FileDialog::paintEvent(QPaintEvent *)
 void FileDialog::refresh()
 {
     QColor q(0, 148, 255);
-    
     QDir d(directory);
-    
     model->clear();
     model->insertColumns(0, 3);
-    
+
     model->setHeaderData(0, Qt::Horizontal, "Name");
     model->setHeaderData(1, Qt::Horizontal, "Level");
     model->setHeaderData(2, Qt::Horizontal, "Points");
-    model->setHeaderData(0, Qt::Horizontal,  Qt::black, Qt::BackgroundRole);
     model->setHeaderData(0, Qt::Horizontal,  q, Qt::ForegroundRole);
     model->setHeaderData(1, Qt::Horizontal,  q, Qt::ForegroundRole);
     model->setHeaderData(2, Qt::Horizontal,  q, Qt::ForegroundRole);
-    
+    model->setHeaderData(0, Qt::Horizontal,  Qt::black, Qt::BackgroundRole);
+    model->setHeaderData(1, Qt::Horizontal,  Qt::black, Qt::BackgroundRole);
+    model->setHeaderData(2, Qt::Horizontal,  Qt::black, Qt::BackgroundRole);
+
     if (d.exists()) {
-        d.setFilter( QDir::Files | QDir::Readable | QDir::NoSymLinks ); 
+        d.setFilter( QDir::Files | QDir::Readable | QDir::NoSymLinks );
         d.setSorting(QDir::Time);
         d.setNameFilters(QStringList("*.puzzle"));
         const QFileInfoList list = d.entryInfoList();
@@ -153,7 +147,6 @@ void FileDialog::refresh()
                 model->itemFromIndex(idx)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
                 model->setData(idx, QString("%1").arg(level));
                 model->setData(idx, q, Qt::ForegroundRole);
-            
                 idx = model->index(model->rowCount() - 1, 2);
                 model->itemFromIndex(idx)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
                 model->setData(idx, QString("%1").arg(points));
@@ -190,7 +183,6 @@ void FileDialog::deleteSelected()
 {
     GameDialog *dlg = new GameDialog(this->parentWidget());
     dlg->configure(0, "Delete selected game?", false, false, 0, "Yes", QString::null, "No");
-    
     QModelIndex idx = treeView->currentIndex();
     idx = idx.sibling(idx.row(), 0);
     if(dlg->exec() == 0) {
@@ -201,3 +193,4 @@ void FileDialog::deleteSelected()
     }
     delete dlg;
 }
+

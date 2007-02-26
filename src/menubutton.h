@@ -30,10 +30,8 @@
 
 #include <qpushbutton.h>
 
-class QTimer;
-
 /**
- * Quck and dirty class for custom painted buttons.
+ * Quick and dirty class for custom painted buttons.
  */
 class MenuButton : public QPushButton
 {
@@ -42,8 +40,6 @@ class MenuButton : public QPushButton
 public:
     MenuButton(const QString &text, QWidget *parent = 0);
     ~MenuButton();
-
-    void setColors(const QColor& foreground, const QColor& background);
     static void drawColorizedText(const QString& text, int x, int y, QPainter *p, const QColor& clr, int min = 0);
 
     void showFrame(bool draw)
@@ -55,11 +51,6 @@ public:
         centered = f;
         update();
     }
-    inline bool isCentered() const
-    {
-        return centered;
-    }
-
     void paintEvent(QPaintEvent *);
 
 private slots:

@@ -72,7 +72,7 @@ ImageRepository::ImageRepository()
 
 void ImageRepository::addImage(const QString &name)
 {
-    QImage img("graphics/" + name + ".png");
+    QImage img(ROOTHOME + "/pics/graphics/" + name + ".png");
     if (img.isNull())
         qWarning() << "missing image file:" << name;
     if (img.depth() < 32)
@@ -94,7 +94,7 @@ QPixmap ImageRepository::findPixmap(IMAGE_NAMES id) const
 
 bool ImageRepository::initTheme(const QString &theme)
 {
-    QDir directory("pics/themes/" + theme);
+    QDir directory(ROOTHOME + "/pics/themes/" + theme);
     if (theme.isEmpty() || !directory.exists()) {
         qWarning() << "error loading theme" << theme;
         return false;

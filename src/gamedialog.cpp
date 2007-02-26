@@ -52,10 +52,6 @@ GameDialog::GameDialog( QWidget *parent): QDialog(parent, Qt::FramelessWindowHin
     buttonGroup = 0;
     lEdit = 0;
 
-    QFont f = font();
-    f.setBold(true);
-    setFont(f);
-
     timer = new QTimer(this);
     connect( timer, SIGNAL(timeout()), this, SLOT(timeSynch()));
 }
@@ -278,7 +274,6 @@ void GameDialog::configure(QPixmap *background , const QString &text, bool fancy
         if ( !ls.isNull() ) {
             leftButton = new MenuButton(ls, this);
             leftButton->showFrame(true);
-            leftButton->setColors(QColor(0, 148, 255), QColor(0, 0, 0));
             leftButton->setGeometry(120, 280, 60, 20);
             buttonGroup->addButton(leftButton, 0);
             leftButton->setCentered(true);
@@ -286,7 +281,6 @@ void GameDialog::configure(QPixmap *background , const QString &text, bool fancy
         if ( !ms.isNull() ) {
             middleButton = new MenuButton(ms, this);
             middleButton->showFrame(true);
-            middleButton->setColors(QColor(0, 148, 255), QColor(0, 0, 0));
             middleButton->setGeometry(120, 280, 60, 20);
             buttonGroup->addButton(middleButton, 1);
             middleButton->setCentered(true);
@@ -294,7 +288,6 @@ void GameDialog::configure(QPixmap *background , const QString &text, bool fancy
         if ( !rs.isNull() ) {
             rightButton = new MenuButton(rs, this);
             rightButton->showFrame(true);
-            rightButton->setColors(QColor(0, 148, 255), QColor(0, 0, 0));
             rightButton->setGeometry(120, 280, 60, 20);
             buttonGroup->addButton(rightButton, 2);
             rightButton->setCentered(true);

@@ -34,28 +34,14 @@
 #include "imagerepository.h"
 #include "soundrepository.h"
 
-MenuButton::MenuButton(const QString &text, QWidget* parent): QPushButton(parent)
+MenuButton::MenuButton(const QString &text, QWidget* parent) : QPushButton(text, parent),
+    centered(false), drawFrame(false)
 {
-    setText(text);
-    centered = false;
-    drawFrame = false;
-
-    QFont f = font();
-    f.setBold(true);
-    setFont(f);
     connect(this, SIGNAL(clicked()), this, SLOT(buttonClicked()));
 }
 
 MenuButton::~MenuButton()
 {
-}
-
-void MenuButton::setColors(const QColor& foreground, const QColor& background)
-{
-    QPalette pl = palette();
-    pl.setColor(QPalette::Background, background);
-    pl.setColor(QPalette::ButtonText, foreground);
-    setPalette(pl);
 }
 
 void MenuButton::paintEvent(QPaintEvent *)

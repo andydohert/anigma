@@ -113,10 +113,6 @@ static const char *infoData[] =
 
 AboutDialog::AboutDialog(QWidget * parent): QWidget(parent), loadedImages(false)
 {
-    QFont f = font();
-    f.setBold(true);
-    setFont(f);
-
     textEdit = new QTextEdit(this);
     textEdit->setReadOnly(true);
     textEdit->setFocusPolicy(Qt::NoFocus);
@@ -131,23 +127,15 @@ AboutDialog::AboutDialog(QWidget * parent): QWidget(parent), loadedImages(false)
     textEdit->setPalette(pal);
 
     QColor menuClr(0, 148, 255);
-    
     backButton = new MenuButton("Go Back", this);
     backButton->showFrame(true);
-    backButton->setColors(menuClr, QColor(0, 0, 0));
     backButton->setCentered(true);
     connect(backButton, SIGNAL(clicked()), this, SIGNAL(showWelcomeScreen()));
-    
     demoButton = new MenuButton("Demo Game", this);
     demoButton->showFrame(true);
-    demoButton->setColors(menuClr, QColor(0, 0, 0));
     demoButton->setCentered(true);
     connect(demoButton, SIGNAL(clicked()), this, SIGNAL(showDemo()));
-    
-    
     setMode(ABOUT);
-
-
 }
 
 void AboutDialog::setMode(MODE m)
@@ -167,7 +155,7 @@ void AboutDialog::setMode(MODE m)
         all += '\n';
         i++;
     }
-    
+
     ImageRepository *ir = Puzzle::images;
     if (ir && !loadedImages) {
         loadedImages = true;
@@ -179,7 +167,6 @@ void AboutDialog::setMode(MODE m)
          ir->findPixmap(ImageRepository::FIRE).copy(0,0,Puzzle::blockPixelSize, Puzzle::blockPixelSize));
         textEdit->document()->addResource(QTextDocument::ImageResource, QUrl("broken.png") ,
          ir->findPixmap(ImageRepository::BROKEN_WALL).copy(0,0,Puzzle::blockPixelSize, Puzzle::blockPixelSize));
-        
         QPixmap left = ir->findPixmap(ImageRepository::TRAP_LEFT);
         QPixmap right = ir->findPixmap(ImageRepository::TRAP_RIGHT);
         QPainter p(&left);
@@ -193,8 +180,7 @@ void AboutDialog::setMode(MODE m)
 void AboutDialog::resizeEvent(QResizeEvent *)
 {
     textEdit->setGeometry(0, 1, width(), height() - backButton->height() - 9);
-    textEdit->setLineWrapColumnOrWidth(width() - textEdit->horizontalScrollBar()->width());  
-    
+    textEdit->setLineWrapColumnOrWidth(width() - textEdit->horizontalScrollBar()->width());
     backButton->setGeometry(4,height() - backButton->height() - 4,
                                         110, backButton->height());
     demoButton->setGeometry(width() - 110 - 4,

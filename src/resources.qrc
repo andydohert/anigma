@@ -3,15 +3,15 @@
     <file>../sounds/button.dav</file>
     <file>../sounds/delete.dav</file>
 
-    <file>../graphics/background.png</file>
-    <file>../graphics/broken_wall.png</file>
-    <file>../graphics/fire.png</file>
-    <file>../graphics/freezing_animation.png</file>
-    <file>../graphics/front_1.png</file>
-    <file>../graphics/front_title.png</file>
-    <file>../graphics/trap_left.png</file>
-    <file>../graphics/trap_right.png</file>
-    <file>../graphics/wall.png</file>
+    <file>../pics/graphics/background.png</file>
+    <file>../pics/graphics/broken_wall.png</file>
+    <file>../pics/graphics/fire.png</file>
+    <file>../pics/graphics/freezing_animation.png</file>
+    <file>../pics/graphics/front_1.png</file>
+    <file>../pics/graphics/front_title.png</file>
+    <file>../pics/graphics/trap_left.png</file>
+    <file>../pics/graphics/trap_right.png</file>
+    <file>../pics/graphics/wall.png</file>
 
     <file>../pics/ldemos/Level_01.demo</file>
     <file>../pics/ldemos/Level_02.demo</file>
