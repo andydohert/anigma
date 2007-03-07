@@ -28,7 +28,7 @@ unix:QMAKE_POST_LINK=strip $(TARGET)
 
 INSTALLS += sound
 
-unix && !mac {
+!mac:unix {
     target.path=/usr/bin
     INSTALLS += target
 }
