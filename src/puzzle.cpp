@@ -69,7 +69,7 @@ QString Puzzle::gameVersion = "2.1.0";
 bool Puzzle::initImages()
 {
     Puzzle::images = new ImageRepository();
-    qApp->setWindowIcon(QIcon(images->findPixmap("front_1")));
+    qApp->setWindowIcon(QIcon(images->findPixmap("puzz-le")));
     bool result = Puzzle::images->initTheme(Puzzle::theme);
     if (!result) {
         Puzzle::theme = "Default";

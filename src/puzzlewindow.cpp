@@ -86,11 +86,11 @@ PuzzleWindow::PuzzleWindow(QWidget * parent): QMainWindow(parent)
     connect(aboutDialog, SIGNAL(showDemo()), this, SLOT(showDemo()));
 
     switchState(InfoBar::WELCOME);
-    resize(240, 320);
+    resize(240, 300);
     setMinimumWidth(240);
     setMaximumWidth(240);
-    setMinimumHeight(320);
-    setMaximumHeight(320);
+    setMinimumHeight(300);
+    setMaximumHeight(300);
 }
 
 PuzzleWindow::~PuzzleWindow()
@@ -450,8 +450,11 @@ void PuzzleWindow::init()
         timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(synchTimeout()));
     }
-    Puzzle::initSounds(":/sounds");
-
+#ifdef Q_OS_MAC
+    Puzzle::initSounds("sounds");
+#else
+    Puzzle::initSounds("/usr/share/puzzle/sounds");
+#endif
     mainButtonList = new MenuButtonList(this);
     playGameButton = new MenuButton("Play the game", this);
     connect(playGameButton, SIGNAL(clicked()), this, SLOT(playGame()));

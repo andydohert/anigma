@@ -2,26 +2,36 @@ TEMPLATE = app
 TARGET = puzz-le
 DEPENDPATH += .
 INCLUDEPATH += .
-DESTDIR         = ../
+DESTDIR = ../
 OBJECTS_DIR = build
 MOC_DIR = build
 UI_DIR = build
 
-CONFIG		+= qt warn_on debug
-#CONFIG		+= qt warn_on release
-#DEFINES		= DEMO_VERSION
-#QT +=  qt3support
+#CONFIG		+= qt warn_on debug
+CONFIG		+= qt warn_on release
+#DEFINES	= DEMO_VERSION
 
 RESOURCES     = resources.qrc
 
+sound.files = ../sounds/*
+sound.path = /usr/share/puzzle/sounds
+
 mac {
-    ICON = puzz-le.icns
+    ICON = puzzle.icns
     QMAKE_INFO_PLIST = Info_mac.plist
     TARGET = Puzz-le
+    sound.path = ../Puzz-le.app/Contents/MacOS/sounds/
 }
 
-#target.path=$$[QT_INSTALL_BINS]
-#INSTALLS += target
+
+unix:QMAKE_POST_LINK=strip $(TARGET)
+
+INSTALLS += sound
+
+unix && !mac {
+    target.path=/usr/bin
+    INSTALLS += target
+}
 
 # Input
 HEADERS += aboutdialog.h \

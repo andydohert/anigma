@@ -67,6 +67,7 @@ ImageRepository::ImageRepository()
     addImage("background");
     addImage("front_title");
     addImage("freezing_animation");
+    addImage("puzz-le");
 }
 
 void ImageRepository::addImage(const QString &name)
