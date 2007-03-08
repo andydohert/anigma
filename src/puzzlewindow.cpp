@@ -113,11 +113,13 @@ void PuzzleWindow::switchState(InfoBar::GAME_STATE s)
         gameButtonList->setVisible(false);
         aboutDialog->hide();
         fileDialog->hide();
+        infoBar->hide();
         playGameButton->setFocus();
         update();
         break;
     case InfoBar::ABOUT:
         timer->stop();
+        infoBar->hide();
         mainButtonList->setVisible(false);
         gameButtonList->setVisible(false);
         aboutDialog->setMode(AboutDialog::ABOUT);
@@ -127,6 +129,7 @@ void PuzzleWindow::switchState(InfoBar::GAME_STATE s)
         break;
     case InfoBar::HISTORY:
         timer->stop();
+        infoBar->hide();
         mainButtonList->setVisible(false);
         gameButtonList->setVisible(false);
         aboutDialog->setMode(AboutDialog::HISTORY);
@@ -136,6 +139,7 @@ void PuzzleWindow::switchState(InfoBar::GAME_STATE s)
         break;
     case InfoBar::BROWSE:
         timer->stop();
+        infoBar->hide();
         mainButtonList->setVisible(false);
         gameButtonList->setVisible(false);
         aboutDialog->hide();
@@ -148,10 +152,12 @@ void PuzzleWindow::switchState(InfoBar::GAME_STATE s)
         aboutDialog->hide();
         fileDialog->hide();
         initGame();
+        infoBar->show();
         startLevel();
         setFocus();
         break;
     case InfoBar::DEMO:
+        infoBar->show();
         play->currentLevel = -1;
         if (!demo.initDemo()) {
             errorMsg("Unable to play demo !");
@@ -277,20 +283,17 @@ void PuzzleWindow::paintEvent(QPaintEvent *event)
     QPainter p(this);
     QPainter lp(pix);
     switch (gameState()) {
+    case InfoBar::DEMO:
+    case InfoBar::GAME:
+        drawPlayground(&p, &lp, true);
+        break;
     case InfoBar::WELCOME:
     case InfoBar::BROWSE:
-        infoBar->hide();
         pix->fill(QColor(0, 0, 0));
         drawTitleScreen(&lp);
         break;
-    case InfoBar::GAME:
-    case InfoBar::DEMO:
-        infoBar->show();
-        drawPlayground(&p, &lp, true);
-        break;
     case InfoBar::ABOUT:
     case InfoBar::HISTORY:
-        infoBar->hide();
         pix->fill(QColor(0, 0, 0));
         drawAboutScreen(&lp);
         break;
