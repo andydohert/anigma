@@ -64,9 +64,8 @@ public:
 
     void recalculatePos(int nx, int ny);
     void recalculatePos();
-    QPixmap createBlendedImage(const QPixmap &tile, const QPixmap &back, int ox, int oy) const;
-    static QImage& blend(QImage& src, QImage& dst, float opacity);
-
+    QPixmap createBlendedImage(const QPixmap &tile) const;
+    
     inline bool attached() const
     {
         return iat;
