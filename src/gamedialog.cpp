@@ -201,11 +201,7 @@ void GameDialog::configure(const QString &text, bool fancy,
                            const QString &ms, const QString &rs )
 {
     QWidget *par = parentWidget();
-    if (parentWidget()) {
-        QPixmap background = QPixmap::grabWidget(par, QRect(0, 0, par->width(), par->height()));
-        createTintedBackground(background);
-    }
-
+    
     if (leftButton) leftButton->deleteLater();
     if (rightButton) rightButton->deleteLater();
     if (middleButton) middleButton->deleteLater();
@@ -322,6 +318,13 @@ void GameDialog::configure(const QString &text, bool fancy,
     if (buttonGroup) {
         connect(buttonGroup, SIGNAL(buttonClicked(int)), this, SLOT(buttonClicked(int)));
     }
+    
+    Q_ASSERT(par);
+    if (parentWidget()) {
+        QPixmap background = QPixmap::grabWidget(par, QRect(0, 0, par->width(), par->height()));
+        createTintedBackground(background);
+        repaint();
+    }
 }
 
 void GameDialog::buttonClicked(int id)
@@ -337,9 +340,8 @@ void GameDialog::createTintedBackground(const QPixmap &back)
     tinted.fill(Qt::transparent);
     QPainter p(&tinted);
     QRect r = parentWidget()->geometry();
-    QRect source(x()-r.x(), y()-r.y(), width(), height());
+    QRect source(x() - r.x(), y() - r.y(), width(), height());
     QRectF target(0.0, 0.0, tinted.width(), tinted.height());
     p.setOpacity(0.75);
     p.drawPixmap(target, back, source);
 }
-

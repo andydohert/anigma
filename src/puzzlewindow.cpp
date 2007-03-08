@@ -56,6 +56,7 @@ class Board : public QWidget {
 public:
     Board(QWidget * parent) : QWidget(parent), play(0), isPaused(false) {}
     Playground *play;
+    InfoBar *infoBar;
     bool isPaused;
 protected:
     void paintEvent(QPaintEvent * e);
@@ -92,6 +93,7 @@ PuzzleWindow::PuzzleWindow(QWidget * parent): QMainWindow(parent)
     connect(aboutDialog, SIGNAL(showDemo()), this, SLOT(showDemo()));
 
     board = new Board(this);
+    board->infoBar = infoBar;
 
     switchState(InfoBar::WELCOME);
     resize(240, 300);
@@ -315,10 +317,8 @@ void Board::paintEvent(QPaintEvent *event)
 
     } else {
         play->paintPlayground(&p, 0, 0, true);
-        /*
-        if (play->isInfoChange() || drawAll) {
+        if (play->isInfoChange())
             infoBar->update();
-        }*/
     }
 }
 
@@ -329,12 +329,12 @@ void PuzzleWindow::paintEvent(QPaintEvent *event)
     case InfoBar::GAME:
     case InfoBar::DEMO: {
         QPixmap tmp = Puzzle::images->findPixmap(ImageRepository::BACKGROUND);
-        QPainter p(this);
         p.drawPixmap(0, 0, tmp);
         break;
     }
     case InfoBar::WELCOME:
     case InfoBar::BROWSE:
+        p.fillRect(QRect(0, 0,width(), height()), Qt::black);
         drawTitleScreen(&p);
         break;
     case InfoBar::ABOUT:
@@ -723,7 +723,6 @@ void PuzzleWindow::abortGame()
     if (Puzzle::progressSaving) {
         dlg->configure("Save the current game?", false, true, 0,
                        "Yes", "No", "Cancel");
-        dlg->show();
         switch (dlg->exec()) {
         case 0:
             saveGameState(dlg->requesterText());
