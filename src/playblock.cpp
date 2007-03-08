@@ -39,12 +39,12 @@ Playblock::Playblock(int bx, int by, int x1, int y1, int x2, int y2, GAME_BLOCK 
 {
     ix = cx * Puzzle::blockPixelSize;
     iy = cy * Puzzle::blockPixelSize;
-    if ( type == MOVING_STONE ) {
-        if ( by == y2 )
+    if (type == MOVING_STONE) {
+        if (by == y2 )
             iDir = 1;
         else
             iDir = 0;
-    } else if ( type == TRAP_STONE ) {
+    } else if (type == TRAP_STONE) {
         iaf = 4;
     }
 }
@@ -59,7 +59,7 @@ QString Playblock::toString() const
 
 bool Playblock::fromString(const QString &s)
 {
-    if ( sscanf( s.toLatin1(), "%d-%d-%d-%d-%f-%f-%d-%d-%d-%d-%d-%d-%f-%f-%d-%d-%d-%d",
+    if (sscanf( s.toLatin1(), "%d-%d-%d-%d-%f-%f-%d-%d-%d-%d-%d-%d-%f-%f-%d-%d-%d-%d",
                  (int*)&itype, &iSel, &iGrab, &iaf, &ix, &iy, &cx, &cy, &ix1, &iy1, &ix2, &iy2, &iay, &iax, &iat, &cnt, &iUpd, &iDir) == 18 )
         return true;
     else
@@ -93,11 +93,11 @@ QPixmap Playblock::createBlendedImage(const QPixmap &tile) const
 
 void Playblock::paint(QPainter *p, int ox, int oy) const
 {
-    if (p && Puzzle::images && p->isActive() ) {
+    if (p && Puzzle::images && p->isActive()) {
         QString tmp;
         int sx = 0;
-        if ( itype != TRAP_STONE ) {
-            switch ( itype ) {
+        if (itype != TRAP_STONE) {
+            switch ( itype) {
             case WHITE:
                 tmp = "white";
                 break;
@@ -143,29 +143,29 @@ void Playblock::paint(QPainter *p, int ox, int oy) const
             }
             QPixmap pix;
 
-            if ( !tmp.isEmpty() ) {
-                //if ( iGrab || (itype<STONE && cnt>0 && (cnt&1)) )
-                if ( iGrab ) {
+            if (!tmp.isEmpty()) {
+                //if (iGrab || (itype<STONE && cnt>0 && (cnt&1)) )
+                if (iGrab) {
                     tmp.append("h");
                 }
                 pix = Puzzle::images->findPixmap(tmp);
             }
-            if ( cnt && (itype < STONE || itype > TRANSITIONAL)) {
+            if (cnt && (itype < STONE || itype > TRANSITIONAL)) {
                 QPixmap apix = createBlendedImage(pix);
-                p->drawPixmap(ix + ox, iy + oy, apix, sx, 0, Puzzle::blockPixelSize, Puzzle::blockPixelSize);
+                p->drawPixmap((int)ix + ox, (int)iy + oy, apix, sx, 0, Puzzle::blockPixelSize, Puzzle::blockPixelSize);
             } else {
-                p->drawPixmap(ix + ox, iy + oy, pix, sx, 0, Puzzle::blockPixelSize, Puzzle::blockPixelSize);
+                p->drawPixmap((int)ix + ox, (int)iy + oy, pix, sx, 0, Puzzle::blockPixelSize, Puzzle::blockPixelSize);
             }
-            //p->drawPixmap((int)ix+ox,(int)iy+oy,*pix,sx,0,Puzzle::blockPixelSize,Puzzle::blockPixelSize);
-            if ( itype == FIRE_STONE && iay ) {
+            //p->drawPixmap((int)ix + ox,(int)iy + oy,*pix, sx, 0, Puzzle::blockPixelSize, Puzzle::blockPixelSize);
+            if (itype == FIRE_STONE && iay) {
                 pix = Puzzle::images->findPixmap(ImageRepository::FREEZING_ANIMATION);
-                p->drawPixmap(ix + ox, iy + oy, pix, (80 - (iay*Puzzle::blockPixelSize)), 0, Puzzle::blockPixelSize, Puzzle::blockPixelSize);
+                p->drawPixmap((int)ix + ox, (int)iy + oy, pix, (int)(80 - (iay*Puzzle::blockPixelSize)), 0, Puzzle::blockPixelSize, Puzzle::blockPixelSize);
             }
         } else {
             QPixmap pix = Puzzle::images->findPixmap(ImageRepository::TRAP_LEFT);
-            p->drawPixmap(ix + ox, iy + oy, pix, iaf, 0, (Puzzle::blockPixelSize - iaf), Puzzle::blockPixelSize);
+            p->drawPixmap((int)ix + ox, (int)iy + oy, pix, iaf, 0, (Puzzle::blockPixelSize - iaf), Puzzle::blockPixelSize);
             pix = Puzzle::images->findPixmap(ImageRepository::TRAP_RIGHT);
-            p->drawPixmap(ix + ox + iaf, iy + oy, pix, 0, 0, (Puzzle::blockPixelSize - iaf), Puzzle::blockPixelSize);
+            p->drawPixmap((int)ix + ox + iaf, (int)iy + oy, pix, 0, 0, (Puzzle::blockPixelSize - iaf), Puzzle::blockPixelSize);
         }
     }
 }

@@ -14,3 +14,5 @@ It's main game loop is being called from puzzlewindow.cpp which has at regular i
 Shortcomings
 ------------
 There is definately too much code for in the playground.cpp class. This stuff could easily be optimized as far as code size is concerned.  There is a still problem with DEMO games not going into to sleep when focus is switched to another application.
+
+Currently every time the timer goes out it repaints the entire game board.  This could be optimized away to only paint sections when they change and the timer would update things.

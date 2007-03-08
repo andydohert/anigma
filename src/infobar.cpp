@@ -69,7 +69,7 @@ void InfoBar::paintEvent(QPaintEvent *) {
     p.setPen(QPen(gradient, 5));
     QFont font("Helvetica", 16, QFont::Bold);
     int length = width() * 2;
-    while(length > width()) {
+    while (length > width()) {
         font.setPointSize(font.pointSize() - 1);
         QFontMetrics fm(font);
         length = fm.width(msg);

@@ -179,12 +179,12 @@ void FileDialog::load()
 void FileDialog::deleteSelected()
 {
     GameDialog *dlg = new GameDialog(this->parentWidget());
-    dlg->configure(0, "Delete selected game?", false, false, 0, "Yes", QString::null, "No");
+    dlg->configure("Delete selected game?", false, false, 0, "Yes", QString::null, "No");
     QModelIndex idx = treeView->currentIndex();
     idx = idx.sibling(idx.row(), 0);
-    if(dlg->exec() == 0) {
+    if (dlg->exec() == 0) {
         QFile f(directory + "/" + idx.data(32).toString());
-        if(f.remove()) {
+        if (f.remove()) {
             model->removeRow(idx.row());
         }
     }

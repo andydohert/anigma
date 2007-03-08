@@ -52,6 +52,15 @@
 #include "optionsdialog.h"
 #include <qapplication.h>
 
+class Board : public QWidget {
+public:
+    Board(QWidget * parent) : QWidget(parent), play(0), isPaused(false) {}
+    Playground *play;
+    bool isPaused;
+protected:
+    void paintEvent(QPaintEvent * e);
+};
+
 PuzzleWindow::PuzzleWindow(QWidget * parent): QMainWindow(parent)
 {
     infoBar = new InfoBar(this);
@@ -72,9 +81,6 @@ PuzzleWindow::PuzzleWindow(QWidget * parent): QMainWindow(parent)
 
     setWindowTitle("Puzz-le");
     timer = 0;
-    ox = 0;
-    oy = 0;
-    isPaused = false;
     dlg = new GameDialog(this);
     fileDialog = new FileDialog(QString(QDir::homePath()) + QString("/.puzz-le"), this);
     play = 0;
@@ -84,6 +90,8 @@ PuzzleWindow::PuzzleWindow(QWidget * parent): QMainWindow(parent)
     aboutDialog = new AboutDialog(this);
     connect(aboutDialog, SIGNAL(showWelcomeScreen()), this, SLOT(showWelcomeScreen()));
     connect(aboutDialog, SIGNAL(showDemo()), this, SLOT(showDemo()));
+
+    board = new Board(this);
 
     switchState(InfoBar::WELCOME);
     resize(240, 300);
@@ -96,7 +104,6 @@ PuzzleWindow::PuzzleWindow(QWidget * parent): QMainWindow(parent)
 PuzzleWindow::~PuzzleWindow()
 {
     timer->stop();
-    delete pix;
     delete Puzzle::sounds;
     delete Puzzle::images;
     delete play;
@@ -113,6 +120,7 @@ void PuzzleWindow::switchState(InfoBar::GAME_STATE s)
         gameButtonList->setVisible(false);
         aboutDialog->hide();
         fileDialog->hide();
+        board->hide();
         infoBar->hide();
         playGameButton->setFocus();
         update();
@@ -125,6 +133,8 @@ void PuzzleWindow::switchState(InfoBar::GAME_STATE s)
         aboutDialog->setMode(AboutDialog::ABOUT);
         aboutDialog->show();
         fileDialog->hide();
+        infoBar->hide();
+        board->hide();
         update();
         break;
     case InfoBar::HISTORY:
@@ -135,6 +145,8 @@ void PuzzleWindow::switchState(InfoBar::GAME_STATE s)
         aboutDialog->setMode(AboutDialog::HISTORY);
         aboutDialog->show();
         fileDialog->hide();
+        board->hide();
+        infoBar->hide();
         update();
         break;
     case InfoBar::BROWSE:
@@ -144,13 +156,17 @@ void PuzzleWindow::switchState(InfoBar::GAME_STATE s)
         gameButtonList->setVisible(false);
         aboutDialog->hide();
         fileDialog->refresh();
+        infoBar->hide();
         fileDialog->show();
+        board->hide();
         break;
     case InfoBar::GAME:
         mainButtonList->setVisible(false);
         gameButtonList->setVisible(true);
         aboutDialog->hide();
         fileDialog->hide();
+        infoBar->show();
+        board->show();
         initGame();
         infoBar->show();
         startLevel();
@@ -158,6 +174,7 @@ void PuzzleWindow::switchState(InfoBar::GAME_STATE s)
         break;
     case InfoBar::DEMO:
         infoBar->show();
+        board->show();
         play->currentLevel = -1;
         if (!demo.initDemo()) {
             errorMsg("Unable to play demo !");
@@ -177,7 +194,7 @@ void PuzzleWindow::switchState(InfoBar::GAME_STATE s)
 // Just forward it to coresponding handler for button press ...
 void PuzzleWindow::keyPressEvent(QKeyEvent * e)
 {
-    if (!isPaused) {
+    if (!board->isPaused) {
         switch (e->key()) {
         case Qt::Key_Escape:
             if (gameState() == InfoBar::ABOUT || gameState() == InfoBar::HISTORY)
@@ -200,7 +217,7 @@ void PuzzleWindow::keyPressEvent(QKeyEvent * e)
         case Qt::Key_Right:
             if (gameState() == InfoBar::GAME) {
                 QPoint p = play->selectedPositon(e->key());
-                generateMovement(p.x() + ox, p.y() + oy, true);
+                generateMovement(p.x() + board->x(), p.y() + board->y(), true);
             }
             break;
         default:
@@ -214,7 +231,7 @@ void PuzzleWindow::keyPressEvent(QKeyEvent * e)
 
 void PuzzleWindow::mousePressEvent(QMouseEvent * e)
 {
-    if (gameState() == InfoBar::GAME && !isPaused) {
+    if (gameState() == InfoBar::GAME && !board->isPaused) {
         generateMovement(e->x(), e->y());
     }
 }
@@ -222,8 +239,8 @@ void PuzzleWindow::mousePressEvent(QMouseEvent * e)
 void PuzzleWindow::generateMovement(int x, int y, bool keyBoardMode)
 {
     if (Puzzle::recordGames)
-        demo.recordDemo(DemoMove(x - ox, y - oy, play->tickValue()));
-    if (play->setSelected(x - ox, y - oy, keyBoardMode)) {
+        demo.recordDemo(DemoMove(x - board->x(), y - board->y(), play->tickValue()));
+    if (play->setSelected(x - board->x(), y - board->y(), keyBoardMode)) {
         update();
     }
 }
@@ -249,6 +266,7 @@ void PuzzleWindow::resizeEvent(QResizeEvent *)
         initImages();
         Puzzle::images->shuffleTheme();
         play = new Playground();
+        board->play = play;
         infoBar->play = play;
         demo.play = play;
     }
@@ -274,35 +292,58 @@ void PuzzleWindow::resizeEvent(QResizeEvent *)
                                 playGameButton->height());
     endDemo->setGeometry(8,height() - endDemo->height() - 4,
                                         110, endDemo->height());
+}
 
-    pix->fill();
+// Update screen using background pixmap (which is in turn updated by Playground::painPlayground() handler )
+// repainting only stripes which are marked dirty (1) in QBitArray returned by Playground::painPlayground() handler.
+// If neccesary update score line ( level #, time and score)
+void Board::paintEvent(QPaintEvent *event)
+{
+    Q_UNUSED(event);
+    if (!Puzzle::images || play->gameState() == Playground::INVALID)
+        return;
+
+    QPainter p(this);
+    if (isPaused) {
+        p.fillRect(0, 0, width(), height(), QColor(0, 0, 0));
+        QPixmap tmp = Puzzle::images->findPixmap("front_title");
+        p.drawPixmap(18, 36, tmp);
+        // hardcoded position
+        MenuButton::drawColorizedText("Game Paused", 80, 140, &p, QColor(0, 148, 255), 150);
+        MenuButton::drawColorizedText("Click 'Resume' to unpause the Game",
+                          30, 170, &p, QColor(0, 148, 255), 150);
+
+    } else {
+        play->paintPlayground(&p, 0, 0, true);
+        /*
+        if (play->isInfoChange() || drawAll) {
+            infoBar->update();
+        }*/
+    }
 }
 
 void PuzzleWindow::paintEvent(QPaintEvent *event)
 {
     QPainter p(this);
-    QPainter lp(pix);
     switch (gameState()) {
-    case InfoBar::DEMO:
     case InfoBar::GAME:
-        drawPlayground(&p, &lp, true);
+    case InfoBar::DEMO: {
+        QPixmap tmp = Puzzle::images->findPixmap(ImageRepository::BACKGROUND);
+        QPainter p(this);
+        p.drawPixmap(0, 0, tmp);
         break;
+    }
     case InfoBar::WELCOME:
     case InfoBar::BROWSE:
-        pix->fill(QColor(0, 0, 0));
-        drawTitleScreen(&lp);
+        drawTitleScreen(&p);
         break;
     case InfoBar::ABOUT:
     case InfoBar::HISTORY:
-        pix->fill(QColor(0, 0, 0));
-        drawAboutScreen(&lp);
+        drawAboutScreen(&p);
         break;
     default:
         break;
     }
-
-    if (gameState() != InfoBar::GAME && gameState() != InfoBar::DEMO)
-        p.drawPixmap(0, 0, *pix);
     QMainWindow::paintEvent(event);
 }
 
@@ -325,63 +366,6 @@ void PuzzleWindow::drawTitleScreen(QPainter * p)
     }
 }
 
-// Update screen using background pixmap (which is in turn updated by Playground::painPlayground() handler )
-// repainting only stripes which are marked dirty (1) in QBitArray returned by Playground::painPlayground() handler.
-// If neccesary update score line ( level #, time and score)
-void PuzzleWindow::drawPlayground(QPainter * p, QPainter * lp, bool drawAll)
-{
-    if (Puzzle::images) {
-        if (play->gameState() != Playground::INVALID) {
-            bool deleteP = false;
-            bool deleteLP = false;
-            if (!p) {
-                p = new QPainter(this);
-                deleteP = true;
-            }
-            if (!lp) {
-                lp = new QPainter(pix);
-                deleteLP = true;
-            }
-            if (isPaused) {
-                p->fillRect(0, 0, pix->width(), pix->height(),
-                            QColor(0, 0, 0));
-                QPixmap tmp = Puzzle::images->findPixmap("front_title");
-                p->drawPixmap(18, 36, tmp);
-                // hardcoded position
-                MenuButton::drawColorizedText("Game Paused", 80, 140, p,
-                                              QColor(0, 148, 255), 150);
-                MenuButton::drawColorizedText("Click 'Resume' to unpause the Game",
-                                  30, 170, p, QColor(0, 148, 255),
-                                  150);
-
-            } else {
-                QBitArray *stripes = play->paintPlayground(lp, ox, oy, drawAll);
-                unsigned int i;
-                if (drawAll) {
-                    p->drawPixmap(0, 0, *pix);
-                } else {
-                    for (i = 0; i < (uint) stripes->size(); ++i) {
-                        if (stripes->at(i)) {
-                            p->drawPixmap(i * Puzzle::blockPixelSize + ox, oy, *pix,
-                                          i * Puzzle::blockPixelSize + ox, oy,
-                                          Puzzle::blockPixelSize,
-                                          play->height() * Puzzle::blockPixelSize);
-                        }
-                    }
-                }
-                stripes->fill(false);
-                if (play->isInfoChange() || drawAll) {
-                    infoBar->update();
-                }
-            }
-            if (deleteP)
-                delete p;
-            if (deleteLP)
-                delete lp;
-        }
-    }
-}
-
 void PuzzleWindow::drawAboutScreen(QPainter * p)
 {
     if (Puzzle::images) {
@@ -398,15 +382,15 @@ void PuzzleWindow::synchTimeout()
 {
     if (gameState() == InfoBar::DEMO) {
         if (demo.timeout(play->tickValue()))
-            update();
+            board->update();
         if (play->update())
-            update();
+            board->update();
         if (play->gameState() == Playground::OVER) {
             demoCompleted();
         }
     } else {
         if (gameState() == InfoBar::GAME && play->update()) {
-            update();
+            board->update();
             if (play->gameState() == Playground::OVER) {
                 if (Puzzle::recordGames) {
                     demo.saveDemo();
@@ -443,8 +427,6 @@ void PuzzleWindow::synchTimeout()
 void PuzzleWindow::initImages()
 {
     Puzzle::initImages();
-    pix = new QPixmap(width(), height());
-    pix->fill();
 }
 
 void PuzzleWindow::init()
@@ -506,7 +488,7 @@ void PuzzleWindow::init()
 
 void PuzzleWindow::playGame()
 {
-    if (isPaused)
+    if (board->isPaused)
         return;
     switchState(InfoBar::GAME);
 }
@@ -536,29 +518,29 @@ void PuzzleWindow::showOptions()
 
 void PuzzleWindow::showAbout()
 {
-    if (isPaused)
+    if (board->isPaused)
         return;
     switchState(InfoBar::ABOUT);
 }
 
 void PuzzleWindow::showHistory()
 {
-    if (isPaused)
+    if (board->isPaused)
         return;
     switchState(InfoBar::HISTORY);
 }
 
 void PuzzleWindow::loadSavedGame()
 {
-    if (isPaused)
+    if (board->isPaused)
         return;
     switchState(InfoBar::BROWSE);
 }
 
 void PuzzleWindow::pauseLevel()
 {
-    if (isPaused) {
-        isPaused = false;
+    if (board->isPaused) {
+        board->isPaused = false;
         pauseGame->setText("Pause");
         restartCurrent->show();
         backToWelcomeFromGame->show();
@@ -569,14 +551,14 @@ void PuzzleWindow::pauseLevel()
         restartCurrent->hide();
         backToWelcomeFromGame->hide();
         timer->stop();
-        isPaused = true;
+        board->isPaused = true;
         update();
     }
 }
 
 void PuzzleWindow::showWelcomeScreen()
 {
-    if (isPaused)
+    if (board->isPaused)
         return;
     endDemo->hide();
     switchState(InfoBar::WELCOME);
@@ -584,7 +566,7 @@ void PuzzleWindow::showWelcomeScreen()
 
 void PuzzleWindow::showDemo()
 {
-    if (isPaused)
+    if (board->isPaused)
         return;
     endDemo->show();
     switchState(InfoBar::DEMO);
@@ -628,9 +610,11 @@ void PuzzleWindow::startLevel(bool shuffle)
 
 void PuzzleWindow::nextLevelLoaded()
 {
-    ox = (width() - play->width() * Puzzle::blockPixelSize) / 2;
-    oy = ((height() - play->height() * Puzzle::blockPixelSize) / 2);
+    int ox = (width() - play->width() * Puzzle::blockPixelSize) / 2;
+    int oy = ((height() - play->height() * Puzzle::blockPixelSize) / 2);
     oy = qMax(oy, infoBar->height());
+    board->setGeometry(ox, oy, play->width() * Puzzle::blockPixelSize,
+                               play->height() * Puzzle::blockPixelSize);
     play->setGameState(Playground::INPROGRESS);
     timer->start(Puzzle::timeoutValue);
     aboutDialog->hide();
@@ -641,7 +625,7 @@ void PuzzleWindow::nextLevelLoaded()
 void PuzzleWindow::gameCompleted()
 {
     timer->stop();
-    dlg->configure(pix, "* Game Completed *", true, false, 0, " OK");
+    dlg->configure("* Game Completed *", true, false, 0, " OK");
     dlg->show();
     dlg->exec();
     switchState(InfoBar::WELCOME);
@@ -651,7 +635,7 @@ void PuzzleWindow::levelCompleted()
 {
     QString tmp;
     tmp.sprintf("* Level %d completed *", play->currentLevel);
-    dlg->configure(pix, tmp, true, false, 1800);
+    dlg->configure(tmp, true, false, 1800);
     dlg->show();
     dlg->exec();
 }
@@ -662,7 +646,7 @@ void PuzzleWindow::demoCompleted()
     if (Puzzle::demoLoop) {
         QString tmp;
         tmp.sprintf("* Demo Level %d completed *", play->currentLevel);
-        dlg->configure(pix, tmp, true, false, 1800);
+        dlg->configure(tmp, true, false, 1800);
         dlg->show();
         dlg->exec();
 
@@ -681,7 +665,7 @@ void PuzzleWindow::demoCompleted()
             nextLevelLoaded();
         }
     } else {
-        dlg->configure(pix, "* Demo Completed *", true, false, 0, " OK");
+        dlg->configure("* Demo Completed *", true, false, 0, " OK");
         dlg->show();
         dlg->exec();
         switchState(InfoBar::ABOUT);
@@ -690,10 +674,10 @@ void PuzzleWindow::demoCompleted()
 
 void PuzzleWindow::restartLevel()
 {
-    if (isPaused)
+    if (board->isPaused)
         return;
     timer->stop();
-    dlg->configure(pix, "Restart current level ?", false, false, 0, " Yes",
+    dlg->configure("Restart current level ?", false, false, 0, " Yes",
                    QString::null, "No");
     if (dlg->exec() == 0) {
         play->clearPoints();
@@ -715,7 +699,7 @@ void PuzzleWindow::outOfTime()
     else
         text = "Sorry - Out of Moves !";
 
-    dlg->configure(pix, text, false, false, 0, "Again", QString::null,
+    dlg->configure(text, false, false, 0, "Again", QString::null,
                    "Quit");
     if (dlg->exec() == 0) {
         play->clearPoints();
@@ -732,12 +716,12 @@ void PuzzleWindow::outOfTime()
 
 void PuzzleWindow::abortGame()
 {
-    if (isPaused)
+    if (board->isPaused)
         return;
 
     timer->stop();
     if (Puzzle::progressSaving) {
-        dlg->configure(pix, "Save the current game?", false, true, 0,
+        dlg->configure("Save the current game?", false, true, 0,
                        "Yes", "No", "Cancel");
         dlg->show();
         switch (dlg->exec()) {
@@ -760,7 +744,7 @@ void PuzzleWindow::abortGame()
 
 void PuzzleWindow::errorMsg(const QString & error)
 {
-    dlg->configure(0, error, false, false, 0, " OK");
+    dlg->configure(error, false, false, 0, " OK");
     dlg->exec();
 }
 
@@ -813,7 +797,7 @@ bool PuzzleWindow::loadGameState(const QString &fileName)
                             Puzzle::currLevelsName.toLatin1().constData());
             else
                 tmp.sprintf("Switching to default levels set.");
-            dlg->configure(pix, tmp, true, false, 1800);
+            dlg->configure(tmp, true, false, 1800);
             dlg->show();
             dlg->exec();
         }

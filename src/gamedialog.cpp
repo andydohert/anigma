@@ -63,7 +63,7 @@ void GameDialog::paintEvent(QPaintEvent *)
 
 void GameDialog::keyPressEvent(QKeyEvent *e)
 {
-    switch ( e->key() ) {
+    switch ( e->key()) {
     case    Qt::Key_Return:
         done(0);
         break;
@@ -75,8 +75,8 @@ void GameDialog::keyPressEvent(QKeyEvent *e)
 
 void GameDialog::timeSynch()
 {
-    if ( tCounter != -1 ) {
-        if ( tCounter == 0 ) {
+    if (tCounter != -1) {
+        if (tCounter == 0) {
             accept();
         } else {
             update();
@@ -88,19 +88,17 @@ void GameDialog::timeSynch()
 void GameDialog::updateFireworks()
 {
     QPainter p(this);
-    int i, j;
-    int index;
     p.drawPixmap(0, 0, tinted);
-    if ( doFancy ) {
-        for ( i = 0;i < NUM_FW;i++ ) {
-            if ( fireWorks[i] == 0 ) {
+    if (doFancy) {
+        for (int i = 0;i < NUM_FW;i++) {
+            if (fireWorks[i] == 0) {
                 fireWorks[i] = 1;
 
                 int x = (rand() / (RAND_MAX / (width() - 40) + 1)) + 20;
                 int y = (rand() / (RAND_MAX / (height() - 40) + 1)) + 20;
 
-                for ( j = 0; j < NUM_FP; j++ ) {
-                    index = i * NUM_FP + j;
+                for (int j = 0; j < NUM_FP; j++) {
+                    int index = i * NUM_FP + j;
                     xc[index] = x;
                     yc[index] = y;
 
@@ -113,9 +111,9 @@ void GameDialog::updateFireworks()
             qreal fround = 0.5;
             qreal adv = 0.1;
 
-            for ( j = 0;j < NUM_FP;j++ ) {
-                index = i * NUM_FP + j;
-                switch ( i ) {
+            for (int j = 0; j < NUM_FP; j++) {
+                int index = i * NUM_FP + j;
+                switch ( i) {
                 case 0:
                     p.setPen(QColor(255, fcount[i]*3, fcount[i]*3));
                     break;
@@ -127,14 +125,16 @@ void GameDialog::updateFireworks()
                     break;
                 }
 
-                p.drawLine((xc[index] + fround), (yc[index] + fround),
-                            ((xc[index] - xa[index]) + fround), ((yc[index] - ya[index]) - fround));
+                p.drawLine((int)(xc[index] + fround),
+                           (int)(yc[index] + fround),
+                           (int)((xc[index] - xa[index]) + fround),
+                           (int)((yc[index] - ya[index]) - fround));
                 xc[index] += xa[index];
                 yc[index] += ya[index];
                 ya[index] = ya[index] + adv;
             }
             fcount[i]--;
-            if ( fcount[i] <= 0 ) {
+            if (fcount[i] <= 0) {
                 fcount[i] = (rand() / (RAND_MAX / 54)) + 32;
                 fireWorks[i] = 0;
             }
@@ -144,12 +144,12 @@ void GameDialog::updateFireworks()
     p.setFont(font());
 
     int topPos;
-    if ( leftButton || rightButton )
+    if (leftButton || rightButton )
         topPos = margin * 2 ;
     else
         topPos = margin * 3;
 
-    if ( lEdit ) {
+    if (lEdit) {
         topPos -= 10;
     }
 
@@ -169,10 +169,10 @@ void GameDialog::updateFireworks()
     p.drawImage(0, 0, textLightCache);
     p.drawImage(0, 0, textDarkCache);
     */
-    
+
     MenuButton::drawColorizedText(dText, (width() - textWidth) / 2 + 1, topPos + 1, &p, QColor(0, 0, 0), 150);
     MenuButton::drawColorizedText(dText, (width() - textWidth) / 2, topPos, &p, QColor(255, 255, 255), 180);
-    
+
     p.setPen(QColor(0, 148, 255));
     p.drawRect(0, 0, width()-1, height()-1);
 }
@@ -187,19 +187,25 @@ void GameDialog::show()
 
 void GameDialog::hide()
 {
-    if ( lEdit )
+    if (lEdit )
         reqText = lEdit->text();
     delete lEdit;
     lEdit = 0;
-    if ( doFancy )
+    if (doFancy )
         timer->stop();
     QDialog::hide();
 }
 
-void GameDialog::configure(QPixmap *background , const QString &text, bool fancy,
+void GameDialog::configure(const QString &text, bool fancy,
         bool requester, int timeout, const QString &ls,
                            const QString &ms, const QString &rs )
 {
+    QWidget *par = parentWidget();
+    if (parentWidget()) {
+        QPixmap background = QPixmap::grabWidget(par, QRect(0, 0, par->width(), par->height()));
+        createTintedBackground(background);
+    }
+
     if (leftButton) leftButton->deleteLater();
     if (rightButton) rightButton->deleteLater();
     if (middleButton) middleButton->deleteLater();
@@ -208,12 +214,12 @@ void GameDialog::configure(QPixmap *background , const QString &text, bool fancy
     rightButton = 0;
     middleButton = 0;
     buttonGroup = 0;
-    
+
     reqText.truncate(0);
     dText = text;
     doFancy = fancy;
     tCounter = timeout / 33;
-    if ( !tCounter )
+    if (!tCounter )
         tCounter = -1;
 
     QFontMetrics fm(this->font());
@@ -222,23 +228,23 @@ void GameDialog::configure(QPixmap *background , const QString &text, bool fancy
 
     // don't bother with parent widget, just hardcode the size ( otherwise if on screen keyboard is present our dialog gets too small)
 
-    //if(parentWidget())
+    //if (parentWidget())
     // setqrealSize(parentWidget()->width()-10,parentWidget()->height()/3);
     //else
     setFixedSize(220, 110);
 
-    if ( parentWidget() ) {
+    if (parentWidget()) {
         QRect pr = parentWidget()->frameGeometry ();
         move(pr.x() + (pr.width() - width()) / 2, (pr.y() + (pr.height() - height()) / 2) - 10);
     }
 
-    if ( fancy ) {
+    if (fancy) {
         int i;
-        for ( i = 0;i < NUM_FW;i++ ) {
+        for ( i = 0;i < NUM_FW;i++) {
             fireWorks[i] = 0;
             fcount[i] = (rand() % 53) + 32;
         }
-        for ( i = 0;i < NUM_FP;i++ ) {
+        for ( i = 0;i < NUM_FP;i++) {
             xc[i] = -1;
             yc[i] = 0;
             xa[i] = 0;
@@ -249,10 +255,10 @@ void GameDialog::configure(QPixmap *background , const QString &text, bool fancy
     if (requester) {
         QString fileName;
 
-        if ( !Puzzle::levelFileName.isEmpty() )
+        if (!Puzzle::levelFileName.isEmpty() )
             fileName.append(Puzzle::levelFileName);
         else {
-            if(!Puzzle::currLevelsName.isEmpty())
+            if (!Puzzle::currLevelsName.isEmpty())
                 fileName.append(Puzzle::currLevelsName);
             else
                 fileName.append("Default");
@@ -269,23 +275,23 @@ void GameDialog::configure(QPixmap *background , const QString &text, bool fancy
         lEdit->setFocus();
     }
 
-    if ( !ls.isNull() || !rs.isNull() ) {
+    if (!ls.isNull() || !rs.isNull()) {
         buttonGroup = new QButtonGroup(this);
-        if ( !ls.isNull() ) {
+        if (!ls.isNull()) {
             leftButton = new MenuButton(ls, this);
             leftButton->showFrame(true);
             leftButton->setGeometry(120, 280, 60, 20);
             buttonGroup->addButton(leftButton, 0);
             leftButton->setCentered(true);
         }
-        if ( !ms.isNull() ) {
+        if (!ms.isNull()) {
             middleButton = new MenuButton(ms, this);
             middleButton->showFrame(true);
             middleButton->setGeometry(120, 280, 60, 20);
             buttonGroup->addButton(middleButton, 1);
             middleButton->setCentered(true);
         }
-        if ( !rs.isNull() ) {
+        if (!rs.isNull()) {
             rightButton = new MenuButton(rs, this);
             rightButton->showFrame(true);
             rightButton->setGeometry(120, 280, 60, 20);
@@ -293,35 +299,28 @@ void GameDialog::configure(QPixmap *background , const QString &text, bool fancy
             rightButton->setCentered(true);
         }
     }
-    if ( leftButton ) {
-        if ( rightButton || middleButton ) {
+    if (leftButton) {
+        if (rightButton || middleButton) {
             leftButton->move(margin, height() - leftButton->height() - margin);
         } else {
             leftButton->move(((width() - leftButton->width()) / 2), height() - leftButton->height() - margin);
         }
     }
-    if ( middleButton ) {
+    if (middleButton) {
 
         middleButton->move(((width() - middleButton->width()) / 2), height() - middleButton->height() - margin);
 
     }
-    if ( rightButton || middleButton ) {
-        if ( leftButton ) {
+    if (rightButton || middleButton) {
+        if (leftButton) {
             rightButton->move(width() - rightButton->width() - margin, height() - rightButton->height() - margin);
         } else {
             rightButton->move(((width() - rightButton->width()) / 2), height() - rightButton->height() - margin);
         }
     }
 
-    if ( buttonGroup ) {
+    if (buttonGroup) {
         connect(buttonGroup, SIGNAL(buttonClicked(int)), this, SLOT(buttonClicked(int)));
-    }
-
-    if ( background && parentWidget() ) {
-        doTinted = true;
-        createTintedBackground(background);
-    } else {
-        doTinted = false;
     }
 }
 
@@ -332,19 +331,15 @@ void GameDialog::buttonClicked(int id)
 }
 
 // Make the source image only half as bright
-void GameDialog::createTintedBackground(QPixmap *back)
+void GameDialog::createTintedBackground(const QPixmap &back)
 {
-    QRect r = parentWidget()->geometry();
     tinted = QPixmap(width(), height());
+    tinted.fill(Qt::transparent);
     QPainter p(&tinted);
-    p.drawPixmap(QPoint(0, 0), *back, QRect(x()-r.x(), y()-r.y(), width(), height()));
-    p.end();
-    QImage img = tinted.toImage();     // this one is slow like hell !!!!
-    img = img.convertToFormat(QImage::Format_RGB32);
-    QRgb *pixel = (QRgb*)img.bits();
-    QRgb *pixel2 = pixel + (img.width() * img.height());
-    while ( pixel != pixel2 ) {
-        *pixel++ = qRgb(qRed(*pixel) >> 1, qGreen(*pixel) >> 1, qBlue(*pixel) >> 1);
-    }
-    tinted = QPixmap::fromImage(img);
+    QRect r = parentWidget()->geometry();
+    QRect source(x()-r.x(), y()-r.y(), width(), height());
+    QRectF target(0.0, 0.0, tinted.width(), tinted.height());
+    p.setOpacity(0.75);
+    p.drawPixmap(target, back, source);
 }
+

@@ -41,6 +41,7 @@ class QBitmap;
 class GameDialog;
 class AboutDialog;
 class FileDialog;
+class Board;
 
 class PuzzleWindow: public QMainWindow
 {
@@ -100,7 +101,7 @@ private slots:
     void abortGame();
     void pauseLevel();
     void restartLevel();
-    
+
 private:
     void generateMovement(int x, int y, bool keyBoardMode = false);
     void drawTitleScreen(QPainter *p);
@@ -138,14 +139,10 @@ private:
     MenuButton *pauseGame;
     MenuButtonList *gameButtonList;
 
-    InfoBar *infoBar;
-
     // Title Screen Variables
-    QPixmap *pix;
     Playground *play;
-    int ox;
-    int oy;
-    bool isPaused;
+    InfoBar *infoBar;
+    Board *board;
     GameDialog *dlg;
     AboutDialog *aboutDialog;
     FileDialog *fileDialog;

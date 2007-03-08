@@ -73,19 +73,19 @@ bool Playground::loadLevel(const char * level[], unsigned int levelNumberber)
 {
     gState = INVALID;
     gType = TIME_BASED;
-    if ( level ) {
+    if (level) {
         numLevels = 0;
-        if ( sscanf( level[0], "%d", &numLevels) == 1 ) {
+        if (sscanf( level[0], "%d", &numLevels) == 1) {
             int counter = 1;
-            for (int i = 0; i < numLevels;i++ ) {
-                if ( !parseLevelHeader(level[counter]) ) {
+            for (int i = 0; i < numLevels;i++) {
+                if (!parseLevelHeader(level[counter])) {
                     break;
                 }
-                if ( levelNumber == levelNumberber ) {
+                if (levelNumber == levelNumberber) {
                     counter++;
                     initGrid(w, h);
-                    for (int j = 0;j < h;j++ ) {
-                        if ( !parseLevelLine(level[counter+j], j) ) {
+                    for (int j = 0;j < h;j++) {
+                        if (!parseLevelLine(level[counter + j], j)) {
                             return (bool)gState;
                         }
                     }
@@ -105,30 +105,30 @@ bool Playground::loadLevel(const QString & fileName, unsigned int levelNumberber
 {
     gState = INVALID;
     QFile f(fileName);
-    if ( f.exists() && f.open(QIODevice::ReadOnly) ) {
+    if (f.exists() && f.open(QIODevice::ReadOnly)) {
         QTextStream stream( &f );
         QString line;
         int counter = 1;
 
         line = stream.readLine();
         gType = TIME_BASED;
-        if ( line.at(0) == '.' ) {
-            if ( line.at(1) == '1' )
+        if (line.at(0) == '.') {
+            if (line.at(1) == '1' )
                 gType = MOVES_BASED;
             line = stream.readLine();
         }
         sscanf( line.toLatin1(), "%d", &numLevels);
-        while ( !stream.atEnd() ) {
+        while ( !stream.atEnd()) {
             line = stream.readLine();
             counter--;
-            if ( !counter ) {
-                if ( !parseLevelHeader(line.toLatin1()) ) {
+            if (!counter) {
+                if (!parseLevelHeader(line.toLatin1())) {
                     break;
                 }
-                if ( levelNumber == levelNumberber ) {
+                if (levelNumber == levelNumberber) {
                     initGrid(w, h);
-                    for (int j = 0;j < h;j++ ) {
-                        if ( !parseLevelLine(stream.readLine().toLatin1(), j) ) {
+                    for (int j = 0;j < h;j++) {
+                        if (!parseLevelLine(stream.readLine().toLatin1(), j)) {
                             return (bool)gState;
                         }
                     }
@@ -168,7 +168,7 @@ void Playground::initGrid(int w, int h)
 
 void Playground::parseAttachedBlocks()
 {
-    if ( gState != INVALID ) {
+    if (gState != INVALID) {
         bool wasAttached;
         int lastY = 0;
         QList<Playblock*> *plist;
@@ -178,12 +178,12 @@ void Playground::parseAttachedBlocks()
             wasAttached = false;
             for (int j = 0; j < plist->count(); ++j) {
                 Playblock *block = plist->at(j);
-                if ( block->type() == Playblock::MOVING_STONE ) {
+                if (block->type() == Playblock::MOVING_STONE) {
                     block->setAttached(true);
                     lastY = block->y();
                 } else {
-                    if ( wasAttached ) {
-                        if ( lastY == block->y() + Puzzle::blockPixelSize ) {
+                    if (wasAttached) {
+                        if (lastY == block->y() + Puzzle::blockPixelSize) {
                             block->setAttached(true);
                             lastY = block->y();
                         }
@@ -198,7 +198,7 @@ void Playground::parseAttachedBlocks()
 
 bool Playground::parseLevelHeader(const char *line)
 {
-    if ( !line || sscanf( line, "%d-%d-%d-%d", &levelNumber, &w, &h, &timeLeft ) < 4 )
+    if (!line || sscanf( line, "%d-%d-%d-%d", &levelNumber, &w, &h, &timeLeft ) < 4 )
         return false;
     else
         return true;
@@ -215,13 +215,13 @@ bool Playground::parseLevelLine(const char *line, int cl)
     int ex;
     int ey;
 
-    if ( tmp.isEmpty() )
+    if (tmp.isEmpty() )
         return false;
 
     Playblock::GAME_BLOCK type = Playblock::EMPTY;
-    while ( offset < tmp.length() ) {
+    while ( offset < tmp.length()) {
         block = 0;
-        switch ( tmp.at(offset).toLatin1() ) {
+        switch ( tmp.at(offset).toLatin1()) {
         case 'H':
         case 'h':
             type = Playblock::WHITE;
@@ -274,16 +274,16 @@ bool Playground::parseLevelLine(const char *line, int cl)
         case 'm':
             offset++;
             tc = tmp.mid(offset, 2);
-            if ( sscanf( tc.toLatin1(), "%d", &ex) != 1 ) {
+            if (sscanf( tc.toLatin1(), "%d", &ex) != 1) {
                 return false;
             }
             offset += 2;
             tc = tmp.mid(offset, 2);
-            if ( sscanf( tc.toLatin1(), "%d", &ey) != 1 ) {
+            if (sscanf( tc.toLatin1(), "%d", &ey) != 1) {
                 return false;
             }
             block = new Playblock(count, cl, count, cl, ex, ey, Playblock::MOVING_STONE);
-            if ( block->y1() > block->y2() ) {
+            if (block->y1() > block->y2()) {
                 int tmp = block->y1();
                 block->setStartPos(block->x1(), block->y2());
                 block->setEndPos(block->x1(), tmp);
@@ -296,9 +296,9 @@ bool Playground::parseLevelLine(const char *line, int cl)
             break;
         }
 
-        switch ( type ) {
+        switch ( type) {
         case    Playblock::STONE:
-            grid[count+(cl*w)] = Playblock::STONE;
+            grid[count + (cl * w)] = Playblock::STONE;
             break;
         case    Playblock::MOVING_STONE:
             dBlocks[count]->append(block);  // already allocated so we just assign
@@ -314,10 +314,10 @@ bool Playground::parseLevelLine(const char *line, int cl)
         case    Playblock::BROKEN_STONE:
             block = new Playblock(count, cl, count, cl, 0, 0, type);
             dBlocks[count]->append(block);
-            if ( type < Playblock::STONE || type > Playblock::TRANSITIONAL)
+            if (type < Playblock::STONE || type > Playblock::TRANSITIONAL)
                 totalNumBlocks++;
-            if ( type == Playblock::BROKEN_STONE )
-                grid[count+(cl*w)] = Playblock::BROKEN_STONE;
+            if (type == Playblock::BROKEN_STONE )
+                grid[count + (cl * w)] = Playblock::BROKEN_STONE;
             break;
         case    Playblock::FIRE_STONE:
         case    Playblock::TRAP_STONE:
@@ -325,13 +325,13 @@ bool Playground::parseLevelLine(const char *line, int cl)
             sBlocks.append(block);
             break;
         default:
-            grid[count+(cl*w)] = Playblock::EMPTY;
+            grid[count + (cl * w)] = Playblock::EMPTY;
             break;
         }
         offset++;
         count++;
     }
-    if ( count < w )
+    if (count < w )
         return false;
     return true;
 }
@@ -339,36 +339,33 @@ bool Playground::parseLevelLine(const char *line, int cl)
 // Update playground repainting only stripes which are marked dirty (1)
 QBitArray * Playground::paintPlayground(QPainter *p, int ox, int oy, bool drawAll)
 {
-    if ( p && p->isActive() && Puzzle::images ) {
+    if (p && p->isActive() && Puzzle::images) {
         // First update background image for all dirty stripes
         QPixmap tmp;
         int selX = 0;
         int selY = 0;
-        if ( selectedBlock && selectedBlock->type() == Playblock::STONE ) {
+        if (selectedBlock && selectedBlock->type() == Playblock::STONE) {
             selX = selectedBlock->bx();
             selY = selectedBlock->by();
         }
-        if ( drawAll ) {
+        if (drawAll) {
             stripes.fill(true);
-            tmp = Puzzle::images->findPixmap(ImageRepository::BACKGROUND);
-            p->drawPixmap(0, 0, tmp);
-            for (int i = 0;i < w;i++ ) {
-                for (int j = 0;j < h;j++ ) {
-                    if ( isStone(i, j) ) {
+            for (int i = 0;i < w;i++) {
+                for (int j = 0;j < h;j++) {
+                    if (isStone(i, j)) {
                         stone->recalculatePos(i, j);
                         stone->paint(p, ox, oy);
                     }
                 }
             }
         } else {
-            for (int i = 0;i < stripes.size();i++ ) {
-                if ( stripes.at(i) ) {
+            for (int i = 0;i < stripes.size();i++) {
+                if (stripes.at(i)) {
                     tmp = Puzzle::images->findPixmap(ImageRepository::BACKGROUND);
                     p->drawPixmap(i*Puzzle::blockPixelSize + ox, oy, tmp, i*Puzzle::blockPixelSize + ox, oy,
                                       Puzzle::blockPixelSize, h*Puzzle::blockPixelSize);
-                    
-                    for (int j = 0;j < h;j++ ) {
-                        if ( isStone(i, j) ) {
+                    for (int j = 0;j < h;j++) {
+                        if (isStone(i, j)) {
                             stone->recalculatePos(i, j);
                             stone->paint(p, ox, oy);
                         }
@@ -376,7 +373,7 @@ QBitArray * Playground::paintPlayground(QPainter *p, int ox, int oy, bool drawAl
                 }
             }
         }
-        if ( selectedBlock && selectedBlock->type() == Playblock::STONE ) {
+        if (selectedBlock && selectedBlock->type() == Playblock::STONE) {
             selectedBlock->recalculatePos(selX, selY);
         }
 
@@ -384,7 +381,7 @@ QBitArray * Playground::paintPlayground(QPainter *p, int ox, int oy, bool drawAl
         Playblock *block;
         QList<Playblock*> *plist;
         for (int i = 0; i < dBlocks.count(); ++i) {
-            if ( stripes.at(i) ) {
+            if (stripes.at(i)) {
                 plist = dBlocks[i];
                 for (int j = 0; j < plist->count(); ++j) {
                     plist->at(j)->paint(p, ox, oy);
@@ -394,8 +391,8 @@ QBitArray * Playground::paintPlayground(QPainter *p, int ox, int oy, bool drawAl
         }
 
         //Finally paint selection rectangle
-        if ( selectedBlock && stripes.at(selectedBlock->bx()) ) {
-            if ( selectedBlock->grabbed() )
+        if (selectedBlock && stripes.at(selectedBlock->bx())) {
+            if (selectedBlock->grabbed() )
                 p->setPen(QColor(255, 255, 255));
             else
                 p->setPen(QColor(255, 0, 0));
@@ -418,7 +415,7 @@ QBitArray * Playground::paintPlayground(QPainter *p, int ox, int oy, bool drawAl
         }
         for (int j = 0; j < sBlocks.count(); ++j) {
             block = sBlocks[j];
-            if ( stripes.at(block->bx()) ) {
+            if (stripes.at(block->bx())) {
                 block->paint(p, ox, oy);
             }
         }
@@ -434,7 +431,7 @@ QPoint Playground::selectedPositon(int pd)
     int offx = 1;
     int offy = 1;
 
-    switch ( pd ) {
+    switch ( pd) {
     case    Qt::Key_Up:
         offy -= Puzzle::blockPixelSize;
         break;
@@ -451,7 +448,7 @@ QPoint Playground::selectedPositon(int pd)
         break;
     }
 
-    if ( selectedBlock ) {
+    if (selectedBlock) {
         p.setX(selectedBlock->x() + offx);
         p.setY(selectedBlock->y() + offy);
     }
@@ -460,7 +457,7 @@ QPoint Playground::selectedPositon(int pd)
 
 bool Playground::setSelected(int px, int py, bool keyBoardMode)
 {
-    if ( deletionCounter || gState != INPROGRESS )
+    if (deletionCounter || gState != INPROGRESS )
         return false;
 
     stripes.fill(false);
@@ -479,7 +476,7 @@ bool Playground::setSelected(int px, int py, bool keyBoardMode)
                 break;
             }
         }
-        if ( !block ) {
+        if (!block) {
             if (isEmpty(bc.x(), bc.y()) )
                 block = empty;
             else
@@ -487,8 +484,8 @@ bool Playground::setSelected(int px, int py, bool keyBoardMode)
         }
 
         // handle attempt to select already selected block
-        if (selectedBlock && (bc.x() == selectedBlock->bx() && bc.y() == selectedBlock->by()) ) {
-            if ( block && (block->type() < Playblock::STONE  || block->type() > Playblock::TRANSITIONAL)) {
+        if (selectedBlock && (bc.x() == selectedBlock->bx() && bc.y() == selectedBlock->by())) {
+            if (block && (block->type() < Playblock::STONE  || block->type() > Playblock::TRANSITIONAL)) {
                 block->setGrabbed(!block->grabbed());
                 stripes.setBit(selectedBlock->bx());
                 selectedBlock = block;
@@ -498,28 +495,28 @@ bool Playground::setSelected(int px, int py, bool keyBoardMode)
         }
 
         // we have already selected and grabbed block so we try to move it
-        if ( selectedBlock && selectedBlock->grabbed()
+        if (selectedBlock && selectedBlock->grabbed()
                 && (selectedBlock->type() < Playblock::STONE || selectedBlock->type() > Playblock::TRANSITIONAL)
                 && (block->type() >= Playblock::STONE && block->type() < Playblock::WHITE)) {
-            if ( selectedBlock->attached() || selectedBlock->accelY() == 0 ) {
+            if (selectedBlock->attached() || selectedBlock->accelY() == 0) {
                 int destStripe;
-                if ( bc.x() < selectedBlock->bx() )
+                if (bc.x() < selectedBlock->bx() )
                     destStripe = selectedBlock->bx() - 1;
-                else if ( bc.x() > selectedBlock->bx() )
+                else if (bc.x() > selectedBlock->bx() )
                     destStripe = selectedBlock->bx() + 1;
                 else {
                     return false;
                 }
 
                 result = moveBlock(selectedBlock->bx(), destStripe, selectedBlock);
-                if ( result ) {
+                if (result) {
                     //Puzzle::sounds->playSound("move");
-                    if ( Puzzle::timeLimit && gType == MOVES_BASED ) {
+                    if (Puzzle::timeLimit && gType == MOVES_BASED) {
                         timeLeft--;
                         updateInfoBar = true;
                     }
                 }
-                if ( clearBlocks() )
+                if (clearBlocks() )
                     deletionCounter = Puzzle::deletionDelay;
                 return result;
             }
@@ -531,7 +528,7 @@ bool Playground::setSelected(int px, int py, bool keyBoardMode)
         if (block) {
             clearSelected();
             block->setSelected(true);
-            if ( (block->type() < Playblock::STONE
+            if ((block->type() < Playblock::STONE
                     || block->type() > Playblock::TRANSITIONAL) && !keyBoardMode )
                 block->setGrabbed(true);
             else {
@@ -549,11 +546,11 @@ bool Playground::setSelected(int px, int py, bool keyBoardMode)
 void Playground::handleAnimation()
 {
     stripes.fill(true);
-    for (int i = 0;i < dBlocks.count();i++ ) {
+    for (int i = 0;i < dBlocks.count();i++) {
         QList<Playblock*> *plist = dBlocks[i];
         for (int j = 0; j < plist->count(); ++j) {
             Playblock *block = (*plist)[j];
-            if ( initTicks ) {
+            if (initTicks) {
                 block->updatePos();
             } else {
                 block->recalculatePos(block->bx(), block->by());
@@ -563,14 +560,14 @@ void Playground::handleAnimation()
             }
         }
     }
-    if ( initTicks )
+    if (initTicks )
         initTicks--;
 }
 
 bool Playground::update()
 {
-    if ( gState != INPROGRESS ) {
-        if ( gState == ANIMATE ) {
+    if (gState != INPROGRESS) {
+        if (gState == ANIMATE) {
             handleAnimation();
             return true;
         }
@@ -583,7 +580,7 @@ bool Playground::update()
         handleDeletion();
         for (int i = 0; i < sBlocks.count(); ++i) {
             Playblock *block = sBlocks.at(i);
-            switch ( block->type() ) {
+            switch ( block->type()) {
             case    Playblock::FIRE_STONE:
                 handleFireBlock(block->bx(), block);
                 break;
@@ -591,37 +588,37 @@ bool Playground::update()
                 break;
             }
         }
-        for (int i = 0;i < stripes.size();i++ ) {
-            if ( stripes.testBit(i) ) {
+        for (int i = 0;i < stripes.size();i++) {
+            if (stripes.testBit(i)) {
                 result = true;
                 break;
             }
         }
     } else {
-        if ( Puzzle::timeLimit ) {
-            if ( gType == TIME_BASED ) {
-                if ( beat )
+        if (Puzzle::timeLimit) {
+            if (gType == TIME_BASED) {
+                if (beat )
                     beat--;
                 else {
                     beat = 33;
                     timeLeft--;
                     updateInfoBar = true;
                 }
-                if ( !timeLeft ) {
+                if (!timeLeft) {
                     gState = OVER;
                 }
 
             }
 
         }
-        for (int i = 0;i < dBlocks.count();i++ ) {
+        for (int i = 0;i < dBlocks.count();i++) {
             handleStripe(i);
         }
         for (int i = 0; i < sBlocks.count(); ++i) {
             Playblock *block = sBlocks.at(i);
-            switch ( block->type() ) {
+            switch ( block->type()) {
             case    Playblock::FIRE_STONE:
-                if ( handleFireBlock(block->bx(), block) )
+                if (handleFireBlock(block->bx(), block) )
                     deletionCounter = Puzzle::deletionDelay;
                 break;
             case    Playblock::TRAP_STONE:
@@ -631,24 +628,24 @@ bool Playground::update()
                 break;
             }
         }
-        for (int i = 0;i < stripes.size();i++ ) {
-            if ( stripes.testBit(i) || needsClearCheck ) {
+        for (int i = 0;i < stripes.size();i++) {
+            if (stripes.testBit(i) || needsClearCheck) {
                 result = true;
-                if ( clearBlocks() )
+                if (clearBlocks() )
                     deletionCounter = Puzzle::deletionDelay;
                 break;
             }
         }
     }
 
-    if (Puzzle::timeLimit && gType == MOVES_BASED && !timeLeft && !result ) {
+    if (Puzzle::timeLimit && gType == MOVES_BASED && !timeLeft && !result) {
         gState = OVER;
         updateInfoBar = true;
     }
 
     needsClearCheck = false;
 
-    if ( updateInfoBar )
+    if (updateInfoBar )
         result = true;
     return result;
 }
@@ -664,13 +661,13 @@ void Playground::handleDeletion()
         wasDeleted = false;
         for (int j = 0; j < plist->count(); ++j) {
             Playblock *block = plist->at(j);
-            if ( (block->type() < Playblock::STONE || block->type() > Playblock::TRANSITIONAL)
-                 && block->counter() ) {
+            if ((block->type() < Playblock::STONE || block->type() > Playblock::TRANSITIONAL)
+                 && block->counter()) {
                 block->setCounter(deletionCounter);
                 levelPoints += Puzzle::blockBonus / Puzzle::deletionDelay; // won't work if deletionDelay > blockBonus (make it float)
-                if ( !block->counter() ) {
+                if (!block->counter()) {
                     wasDeleted = true;
-                    if ( selectedBlock == block ) {
+                    if (selectedBlock == block) {
                         selectedBlock = 0;
                         selectedBlock = empty;
                         empty->setSelected(true);
@@ -694,14 +691,14 @@ void Playground::handleDeletion()
             totalNumBlocks--;
         }
         tmpList.clear();
-        if ( wasDeleted ) {
+        if (wasDeleted) {
             qSort(plist->begin(), plist->end(), Playblock::lessThan);
         }
     }
-    if ( !totalNumBlocks ) {
+    if (!totalNumBlocks) {
         gState = OVER;
         gameWon = true;
-        if ( Puzzle::timeLimit )
+        if (Puzzle::timeLimit )
             levelPoints += Puzzle::timeBonus * timeLeft;
     }
 }
@@ -730,7 +727,7 @@ void Playground::handleStripe(int stripeNum)
                     else
                         handleMovingBlockUp(stripeNum, block);
                 }
-            } else if ( block->accelY() < 0 ) {
+            } else if (block->accelY() < 0) {
                 handleMovingBlockUp(stripeNum, block);
             }
         }
@@ -740,7 +737,7 @@ void Playground::handleStripe(int stripeNum)
     for (int i = plist->count() - 1; i >= 0; --i) {
         Playblock *block = plist->at(i);
         if (!block->updated()) {
-            switch ( block->type() ) {
+            switch ( block->type()) {
             case Playblock::MOVING_STONE:
                 handleMovingBlockDown(stripeNum, block);
                 break;
@@ -774,7 +771,7 @@ bool Playground::handleBrokenBlock(int stripeNum, Playblock *block)
                 if (block->frame() == 5) {
                     if (selectedBlock == block)
                         selectedBlock = 0;
-                    grid[stripeNum+(block->by()*w)] = Playblock::EMPTY;
+                    grid[stripeNum + (block->by() * w)] = Playblock::EMPTY;
                     Playblock *removing = plist->takeAt(plist->indexOf(block));
                     delete removing;
                     return true;
@@ -819,10 +816,10 @@ bool Playground::handleBlock(int stripeNum, Playblock *block)
                     block->setAccelY(next->accelY());
                 } else {
                     block->setAccelY(0);
-                    if ( !justSet )
+                    if (!justSet )
                         needsClearCheck = true;
                 }
-                if ( !justSet ) {
+                if (!justSet) {
                     //if (next->type() >= Playblock::STONE && next->type() < Playblock::WHITE)
                     //    Puzzle::sounds->playSound("wall_hit");
                     //else
@@ -853,24 +850,24 @@ void Playground::handleTrapBlock(int stripeNum, Playblock *block)
     plist = dBlocks.at(stripeNum);
     Playblock *cb;
 
-    if ( isEmpty(block->bx(), block->by()) ) {
+    if (isEmpty(block->bx(), block->by())) {
         for (int i = 0; i < plist->count(); ++i) {
             cb = plist->at(i);
-            if ( cb->by() == block->by() ) {
-                grid[block->by()*w+block->bx()] = Playblock::TRANSITIONAL;
+            if (cb->by() == block->by()) {
+                grid[block->by() * w + block->bx()] = Playblock::TRANSITIONAL;
                 block->setCounter(3);
                 break;
             }
         }
     } else {
-        if ( !block->frame() ) {
-            grid[block->by()*w+block->bx()] = Playblock::STONE;
+        if (!block->frame()) {
+            grid[block->by() * w + block->bx()] = Playblock::STONE;
             Playblock *removing = sBlocks.takeAt(sBlocks.indexOf(block));
             delete removing;
             stripes.setBit(stripeNum);
             return;
         }
-        if ( block->counter() ) {
+        if (block->counter()) {
             block->setCounter(block->counter() - 1);
         } else {
             block->setFrame(block->frame() - 1);
@@ -886,12 +883,12 @@ bool Playground::handleFireBlock(int stripeNum, Playblock *block)
     QList<Playblock*> *plist;
     plist = dBlocks.at(stripeNum);
     Playblock *cb;
-    if ( isEmpty(block->bx(), block->by()) ) {
+    if (isEmpty(block->bx(), block->by())) {
         for (int i = 0; i < plist->count(); ++i) {
             cb = plist->at(i);
-            if ( cb->by() == block->by() ) {
+            if (cb->by() == block->by()) {
                 cb->setCounter(Puzzle::deletionDelay);
-                grid[block->by()*w+block->bx()] = Playblock::TRANSITIONAL;
+                grid[block->by() * w + block->bx()] = Playblock::TRANSITIONAL;
                 cb->setGrabbed(false);
                 block->setAccelY(6);
                 cleared = true;
@@ -900,23 +897,23 @@ bool Playground::handleFireBlock(int stripeNum, Playblock *block)
             }
         }
     } else {
-        if ( block->accelY() == 1 ) {
-            grid[block->by()*w+block->bx()] = Playblock::STONE;
+        if (block->accelY() == 1) {
+            grid[block->by() * w + block->bx()] = Playblock::STONE;
             Playblock *removing = sBlocks.takeAt(sBlocks.indexOf(block));
             delete removing;
             stripes.setBit(stripeNum);
             return false;
         }
     }
-    if ( block->accelY() && !deletionCounter ) {
+    if (block->accelY() && !deletionCounter) {
         block->setAccelY(block->accelY() - 1);
         block->setCounter(0);
     }
-    if ( block->counter() ) {
+    if (block->counter()) {
         block->setCounter(block->counter() - 1);
     } else {
         block->setFrame(block->frame() + 1);
-        if ( block->frame() == 10 ) {
+        if (block->frame() == 10) {
             block->setFrame(0);
         }
         block->setCounter(2);
@@ -930,27 +927,27 @@ void Playground::handleMovingBlockDown( int stripeNum, Playblock *block)
     QList<Playblock*> *plist = dBlocks[stripeNum];
     Playblock *last;
     block->setLastDirection(0);
-    if ( block->by() <= block->y2() ) {
-        if ( !block->accelY() ) {
+    if (block->by() <= block->y2()) {
+        if (!block->accelY()) {
             applyAcceleration(stripeNum, block, Puzzle::movingAccel);
         }
         for (int i = plist->indexOf(block); i < plist->count(); ++i) {
             last = plist->at(i);
-            if ( !last->attached() || (last->type() == Playblock::MOVING_STONE && last != block) ) {
+            if (!last->attached() || (last->type() == Playblock::MOVING_STONE && last != block)) {
                 break;
             }
 
             last->setUpdated(true);
             int oldY = block->y();
             last->updatePos();
-            if ( isEmptyByPixel(last->x(), last->y() + Puzzle::blockPixelSize - 1) ) {
+            if (isEmptyByPixel(last->x(), last->y() + Puzzle::blockPixelSize - 1)) {
                 int index = plist->indexOf(last);
                 Playblock *next = 0;
                 if (index > 0)
                     next = plist->at(index - 1);
-                if ( next && last->y() + Puzzle::blockPixelSize > next->y() ) {
+                if (next && last->y() + Puzzle::blockPixelSize > next->y()) {
                     last->setY(next->y() - Puzzle::blockPixelSize);
-                    if ( oldY == last->y() )
+                    if (oldY == last->y() )
                         last->setAccelY(0);
                 }
                 last->recalculatePos();
@@ -959,11 +956,11 @@ void Playground::handleMovingBlockDown( int stripeNum, Playblock *block)
                 applyAcceleration(stripeNum, block, 0, true);
             }
         }
-        if ( block->type() == Playblock::MOVING_STONE && isMovingLimit(block) ) {
+        if (block->type() == Playblock::MOVING_STONE && isMovingLimit(block)) {
             applyAcceleration(stripeNum, block, 0);
         }
     }
-    if ( !block->accelY() ) {
+    if (!block->accelY()) {
         block->setCounter(Puzzle::movingDelay);
     }
 
@@ -976,7 +973,7 @@ void Playground::handleMovingBlockUp(int stripeNum, Playblock *block)
     QList<Playblock*> *plist = dBlocks[stripeNum];
     Playblock *last;
     block->setLastDirection(1);
-     
+
     if (block->by() >= block->y1()) {
          last = applyAcceleration(stripeNum, block, Puzzle::movingAccel * -1);
          int i = plist->indexOf(last);
@@ -991,12 +988,12 @@ void Playground::handleMovingBlockUp(int stripeNum, Playblock *block)
                  Playblock *next = 0;
                  if (index + 1 < plist->count())
                         next = plist->at(index + 1);
-                 if ( next )
+                 if (next )
                  {
                      if (next->y() + Puzzle::blockPixelSize > last->y())
                      {
-                         last->setY(next->y()+Puzzle::blockPixelSize);           
-                         if ( oldY==last->y() && ((next->attached() && next->accelY()==0) || next->type()==Playblock::BROKEN_STONE) )
+                         last->setY(next->y() + Puzzle::blockPixelSize);
+                         if (oldY==last->y() && ((next->attached() && next->accelY()==0) || next->type()==Playblock::BROKEN_STONE) )
                              last->setAccelY(0);
                      }
                  }
@@ -1005,7 +1002,6 @@ void Playground::handleMovingBlockUp(int stripeNum, Playblock *block)
                  last->recalculatePos(last->bx(),last->by());
                  last->setAccelY(0);
              }
-             
              if (last == block)
                  break;
              else
@@ -1013,13 +1009,13 @@ void Playground::handleMovingBlockUp(int stripeNum, Playblock *block)
                  --i;
                  last = plist->at(i);
              }
-         }               
+         }
          if (block->type() == Playblock::MOVING_STONE && isMovingLimit(block))
          {
              applyAcceleration(stripeNum,block,0,true); 
          }
      }
-     if ( !block->accelY() )
+     if (!block->accelY() )
      {
          block->setCounter(Puzzle::movingDelay);
      }
@@ -1061,15 +1057,15 @@ bool Playground::isMovingLimit(Playblock *block)
     bool result = false;
 
     QRect r;
-    if ( block->accelY() > 0 ) {
+    if (block->accelY() > 0) {
         r = pixelCoordinatesAt(block->bx(), block->y2());
-        if ( block->y() >= r.y() ) {
+        if (block->y() >= r.y()) {
             block->setY(r.y());
             result = true;
         }
     } else {
         r = pixelCoordinatesAt(block->bx(), block->y1());
-        if ( block->y() <= r.y() ) {
+        if (block->y() <= r.y()) {
             block->setY(r.y());
             block->recalculatePos();
             result = true;
@@ -1084,7 +1080,7 @@ void  Playground::detachBlocks(int stripeNum, Playblock *block)
     QList<Playblock*> *plist = dBlocks[stripeNum];
 
     for (int i = plist->indexOf(block); i < plist->count(); ++i) {
-        if ( !plist->at(i)->attached() || plist->at(i)->type() == Playblock::MOVING_STONE ) {
+        if (!plist->at(i)->attached() || plist->at(i)->type() == Playblock::MOVING_STONE) {
             break;
         }
         plist->at(i)->setAttached(false);
@@ -1102,12 +1098,12 @@ Playblock* Playground::applyAcceleration(int stripeNum, Playblock *block, float 
         QList<Playblock*> *plist = dBlocks[stripeNum];
         for (int i = plist->indexOf(block); i>= 0 && i < plist->count(); ++i) {
             if (!plist->at(i)->attached() ||
-                (plist->at(i)->type() == Playblock::MOVING_STONE && plist->at(i) != block) ) {
+                (plist->at(i)->type() == Playblock::MOVING_STONE && plist->at(i) != block)) {
                 break;
             }
             last = plist->at(i);
             last->setAccelY(ac);
-            if ( normalize ) {
+            if (normalize) {
                 last->recalculatePos(last->bx(), cy);
                 cy--;
             }
@@ -1120,7 +1116,7 @@ Playblock* Playground::applyAcceleration(int stripeNum, Playblock *block, float 
 bool Playground::clearSelected()
 {
     bool result = false;
-    if ( gState != INVALID && selectedBlock ) {
+    if (gState != INVALID && selectedBlock) {
         selectedBlock->setSelected(false);
         selectedBlock->setGrabbed(false);
         stripes.setBit(selectedBlock->bx());
@@ -1137,7 +1133,7 @@ bool Playground::clearSelected()
 // Return true if move was successful.
 bool Playground::moveBlock(int srcStripe, int destStripe, Playblock *block)
 {
-    if ( destStripe < w && destStripe >= 0 ) {
+    if (destStripe < w && destStripe >= 0) {
         QList<Playblock *> *dlist = dBlocks[destStripe];
         QList<Playblock *> *slist = dBlocks[srcStripe];
 
@@ -1147,28 +1143,28 @@ bool Playground::moveBlock(int srcStripe, int destStripe, Playblock *block)
         int addOffset = 0;
 
         bool needToSnap = false;
-        if ( !isEmptyByPixel(nx, ny) )
+        if (!isEmptyByPixel(nx, ny) )
             needToSnap = true;
 
-        if ( !isEmptyByPixel(nx, ny + (Puzzle::blockPixelSize / 2)) )
+        if (!isEmptyByPixel(nx, ny + (Puzzle::blockPixelSize / 2)) )
             return false;
-        if ( needToSnap )
+        if (needToSnap )
             addOffset = 1;
 
-        if ( !isEmptyByPixel(nx, ny + Puzzle::blockPixelSize - (Puzzle::blockPixelSize / 2)) ) {
+        if (!isEmptyByPixel(nx, ny + Puzzle::blockPixelSize - (Puzzle::blockPixelSize / 2))) {
             return false;
         }
-        if ( !isEmptyByPixel(nx, ny + Puzzle::blockPixelSize) ) {
+        if (!isEmptyByPixel(nx, ny + Puzzle::blockPixelSize)) {
             needToSnap = true;
         }
 
         for (int i = 0; i < dlist->count(); ++i) {
-            if ( dlist->at(i)->isPointInside(ny) || dlist->at(i)->isPointInside(ny + Puzzle::blockPixelSize - 1) ) {
-                if ( !(dlist->at(i)->type() == Playblock::BROKEN_STONE && needToSnap) )
+            if (dlist->at(i)->isPointInside(ny) || dlist->at(i)->isPointInside(ny + Puzzle::blockPixelSize - 1)) {
+                if (!(dlist->at(i)->type() == Playblock::BROKEN_STONE && needToSnap) )
                     return false;
             }
         }
-        if ( block->attached() ) {
+        if (block->attached()) {
             detachBlocks(srcStripe, block);
         }
         slist->takeAt(slist->indexOf(block));
@@ -1177,12 +1173,12 @@ bool Playground::moveBlock(int srcStripe, int destStripe, Playblock *block)
         stripes.setBit(srcStripe);
         stripes.setBit(destStripe);
         block->setX(nx);
-        if ( needToSnap )
+        if (needToSnap )
             block->recalculatePos(destStripe, block->by() + addOffset);
         else
             block->setCurrentBlockPos(destStripe, block->by());
         qSort(dlist->begin(), dlist->end(), Playblock::lessThan);
-        if ( isEmpty(block->bx(), block->by() + 1) ) {
+        if (isEmpty(block->bx(), block->by() + 1)) {
             block->setAccelY(Puzzle::fallAccel);
         }
         return true;
@@ -1205,8 +1201,8 @@ bool Playground::clearBlocks()
         QList<Playblock*> *plist = dBlocks[i];
         for (int j = 0; j < plist->count(); ++j) {
             Playblock *block = plist->at(j);
-            if ( (block->type() < Playblock::STONE || block->type() > Playblock::TRANSITIONAL)
-                    && (block->attached() || block->accelY() == 0) && isBlockStatic(block) ) {
+            if ((block->type() < Playblock::STONE || block->type() > Playblock::TRANSITIONAL)
+                    && (block->attached() || block->accelY() == 0) && isBlockStatic(block)) {
                 vBlocks[block->bx() + block->by() * w] = block;
                 blocksCounted++;
             }
@@ -1215,11 +1211,10 @@ bool Playground::clearBlocks()
 
     for (int i = 0; i < h; ++i) {
         for (int j = 0;j < w; ++j) {
-            Playblock *block = 0;
-            block  = getVBlock(j, i);
-            if ( block && block->type() != Playblock::EMPTY ) {
+            Playblock *block = getVBlock(j, i);
+            if (block && block->type() != Playblock::EMPTY) {
                 Playblock *next = getVBlock(j + 1, i);
-                if ( next && block->type() == next->type() ) {
+                if (next && block->type() == next->type()) {
                     block->setCounter(Puzzle::deletionDelay);
                     next->setCounter(Puzzle::deletionDelay);
                     block->setGrabbed(false);
@@ -1227,7 +1222,7 @@ bool Playground::clearBlocks()
                     cleared = true;
                 }
                 next = getVBlock(j, i + 1);
-                if ( next && block->type() == next->type() ) {
+                if (next && block->type() == next->type()) {
                     block->setCounter(Puzzle::deletionDelay);
                     next->setCounter(Puzzle::deletionDelay);
                     block->setGrabbed(false);
@@ -1235,13 +1230,13 @@ bool Playground::clearBlocks()
                     cleared = true;
                 }
                 blocksCounted--;
-                if ( !blocksCounted )
+                if (!blocksCounted)
                     break;
             }
         }
     }
 
-    if ( cleared )
+    if (cleared )
         Puzzle::sounds->playSound("delete");
 
     return cleared;
@@ -1250,7 +1245,7 @@ bool Playground::clearBlocks()
 void Playground::setGameState(GAME_STATE s)
 {
     gState = s;
-    if (s == INPROGRESS ) {
+    if (s == INPROGRESS) {
         tick = 0;
         gState = ANIMATE;
         needsClearCheck = true;
@@ -1262,11 +1257,11 @@ void Playground::setGameState(GAME_STATE s)
 
         int aStart = rand() / (RAND_MAX / 12 + 1); // middle should happen three times as often as any other position
 
-        for (int i = 0;i < dBlocks.count();i++ ) {
+        for (int i = 0;i < dBlocks.count();i++) {
             plist = dBlocks.at(i);
             for (int j = 0; j < plist->count(); ++j) {
                 Playblock *block = (*plist)[j];
-                switch ( aStart ) {
+                switch ( aStart) {
                 case    0:  // bottom right corner
                     sx = (w - 1) * Puzzle::blockPixelSize;
                     sy = (h - 1) * Puzzle::blockPixelSize;
@@ -1304,9 +1299,9 @@ bool Playground::savePlayground(const QString &fileName, int currPoints, const Q
 {
     QFile file(fileName);
     bool result = false;
-    if ( file.open(QIODevice::WriteOnly | QIODevice::Truncate) ) {
+    if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         QTextStream ts(&file);
-        if ( gType == MOVES_BASED ) {
+        if (gType == MOVES_BASED) {
             ts << ".1\n";
         }
         ts << levelNumber << "-" << w << "-" << h << "-" << timeLeft << "\n";      // level levelNumberber, width, height, time left
@@ -1315,9 +1310,9 @@ bool Playground::savePlayground(const QString &fileName, int currPoints, const Q
         ts << levelPoints << "\n";
         ts << "\n";
         int x, y;
-        for (y = 0;y < h;y++ ) {
-            for ( x = 0;x < w;x++ ) {
-                switch ( grid.at(y*w + x) ) {
+        for (y = 0;y < h;y++) {
+            for ( x = 0;x < w;x++) {
+                switch ( grid.at(y * w + x)) {
                 case    Playblock::TRANSITIONAL:
                     ts << "t";
                     break;
@@ -1339,7 +1334,7 @@ bool Playground::savePlayground(const QString &fileName, int currPoints, const Q
         ts << "\n";
 
         QList<Playblock*> *plist;
-        for (int x = 0;x < dBlocks.count();x++ ) {
+        for (int x = 0;x < dBlocks.count();x++) {
             plist = dBlocks[x];
             ts << x << "-" << plist->count() << "\n";
             for (int i = 0; i < plist->count(); ++i) {
@@ -1377,24 +1372,24 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
         if (line.isEmpty())
             return false;
         gType = TIME_BASED;
-        if ( line.at(0) == '.' ) {
-            if ( line.at(1) == '1' )
+        if (line.at(0) == '.') {
+            if (line.at(1) == '1' )
                 gType = MOVES_BASED;
             line = stream.readLine();
         }
 
-        if ( sscanf( line.toLatin1(), "%d-%d-%d-%d", &levelNumber, &w, &h, &timeLeft) != 4 )
+        if (sscanf( line.toLatin1(), "%d-%d-%d-%d", &levelNumber, &w, &h, &timeLeft) != 4 )
             goto error;
 
         int savedLimit = timeLeft;
 
         // load level file name
         line = stream.readLine();
-        if ( !line.isEmpty() ) {
+        if (!line.isEmpty()) {
 #ifndef DEMO_VERSION
-            if ( QFile::exists(line) )                             // see if this is full file path or just level set name
+            if (QFile::exists(line) )                             // see if this is full file path or just level set name
             {
-                if ( !loadLevel(line, levelNumber) )
+                if (!loadLevel(line, levelNumber) )
                     goto error;
             } else {
                 Puzzle::currLevelsName = line;
@@ -1415,12 +1410,12 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
         // load points information
         line = stream.readLine();
         initGrid(w, h);
-        if ( currPoints ) {
-            if ( sscanf( line.toLatin1(), "%d", currPoints) != 1 )
+        if (currPoints) {
+            if (sscanf( line.toLatin1(), "%d", currPoints) != 1 )
                 goto error;
         }
         line = stream.readLine();
-        if ( sscanf( line.toLatin1(), "%d", &levelPoints) != 1 )
+        if (sscanf( line.toLatin1(), "%d", &levelPoints) != 1 )
             goto error;
 
         line = stream.readLine();
@@ -1459,7 +1454,7 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
         Playblock *block;
         for (x = 0; x < w; ++x) {
             line = stream.readLine();
-            if ( sscanf( line.toLatin1(), "%d-%d", &slevelNumber, &blevelNumber) != 2 )
+            if (sscanf( line.toLatin1(), "%d-%d", &slevelNumber, &blevelNumber) != 2 )
                 goto error;
 
             plist = dBlocks[x];
@@ -1469,7 +1464,7 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
                 plist->append(block);
                 if (!block->fromString(line))
                     goto error;
-                if ( block->selected() )
+                if (block->selected() )
                     selectedBlock = block;
             }
         }
@@ -1478,14 +1473,14 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
 
         // load special blocks
         line = stream.readLine();
-        if ( sscanf( line.toLatin1(), "%d", &blevelNumber) != 1 )
+        if (sscanf( line.toLatin1(), "%d", &blevelNumber) != 1 )
             goto error;
 
-        for ( y = 0;y < blevelNumber;y++ ) {
+        for ( y = 0;y < blevelNumber;y++) {
             line = stream.readLine();
             block = new Playblock(0, 0);
             sBlocks.append(block);
-            if ( !block->fromString(line) )
+            if (!block->fromString(line) )
                 goto error;
         }
 
@@ -1493,13 +1488,13 @@ bool Playground::loadPlayground(const QString &fileName, int *currPoints, const 
 
         // load Playblock class variables
         line = stream.readLine();
-        if ( sscanf( line.toLatin1(), "%d-%d-%d", &deletionCounter, &beat, &totalNumBlocks) != 3 )
+        if (sscanf( line.toLatin1(), "%d-%d-%d", &deletionCounter, &beat, &totalNumBlocks) != 3 )
             goto error;
 
         gState = INPROGRESS;
     }
 error:
-    if ( file.isOpen() )
+    if (file.isOpen() )
         file.close();
 
     return (bool) gState;
@@ -1507,8 +1502,8 @@ error:
 
 Playblock* Playground::getVBlock(int bx, int by)
 {
-    if ( bx < w && by < h )
-        return vBlocks.at(bx + by*w);
+    if (bx < w && by < h )
+        return vBlocks.at(bx + by * w);
     else
         return 0;
 }
@@ -1520,18 +1515,18 @@ bool Playground::savedPlaygroundInfo(const QString &fileName, unsigned int *poin
     QFile f(fileName);
     if (!f.exists() || !f.open(QIODevice::ReadOnly))
         return false;
-    
+
     int wd, hg, tm, pt;
     QString line;
     QTextStream stream( &f );
 
     // load basic level information
     line = stream.readLine();
-    if (!line.isEmpty() && line.at(0) == '.' ) {
+    if (!line.isEmpty() && line.at(0) == '.') {
         line = stream.readLine();
     }
 
-    if ( sscanf( line.toLatin1(), "%d-%d-%d-%d", level, &wd, &hg, &tm) != 4 )
+    if (sscanf( line.toLatin1(), "%d-%d-%d-%d", level, &wd, &hg, &tm) != 4 )
         return false;
     // skip level file name
     line = stream.readLine();
@@ -1539,12 +1534,12 @@ bool Playground::savedPlaygroundInfo(const QString &fileName, unsigned int *poin
     // get points information
     line = stream.readLine();
 
-    if ( sscanf( line.toLatin1(), "%d", &pt) != 1 )
+    if (sscanf( line.toLatin1(), "%d", &pt) != 1 )
         return false;
 
     *points = pt;
     line = stream.readLine();
-    if ( sscanf( line.toLatin1(), "%d", &pt) != 1 )
+    if (sscanf( line.toLatin1(), "%d", &pt) != 1 )
         return false;
     (*points) += pt;
     return true;

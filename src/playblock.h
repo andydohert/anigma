@@ -166,7 +166,7 @@ public:
 
     inline bool isPointInside(int y) const
     {
-        if(y >= iy && y < iy + Puzzle::blockPixelSize)
+        if (y >= iy && y < iy + Puzzle::blockPixelSize)
             return true;
         else
             return false;

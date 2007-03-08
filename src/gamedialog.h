@@ -47,7 +47,7 @@ public:
     void show();
     void hide ();
 
-    void configure(QPixmap *background, const QString &text, bool fancy, bool requester = false, int timeout = 0, const QString &ls = QString::null,
+    void configure(const QString &text, bool fancy, bool requester = false, int timeout = 0, const QString &ls = QString::null,
                    const QString &ms = QString::null, const QString &rs = QString::null);
 
     inline QString requesterText()
@@ -71,7 +71,7 @@ private:
     };
 
     void updateFireworks();
-    void createTintedBackground(QPixmap *back);
+    void createTintedBackground(const QPixmap &back);
 
     QString dText;
     bool needsButtons;

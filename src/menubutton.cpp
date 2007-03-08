@@ -54,11 +54,11 @@ void MenuButton::paintEvent(QPaintEvent *)
     QFontMetrics fm = painter.fontMetrics();
     int y = (height() - fm.height()) / 2 ;
     int x = 2;
-    if ( centered ) {
+    if (centered) {
         x = (width() - fm.width(text())) / 2;
     }
 
-    if ( isDown() || hasFocus()) {
+    if (isDown() || hasFocus()) {
         //if (textFocusCache.isNull()) {
         /*    textFocusCache = QImage(width(), height(), QImage::Format_ARGB32);
             textFocusCache.fill(0);
@@ -86,8 +86,8 @@ void MenuButton::paintEvent(QPaintEvent *)
         MenuButton::drawColorizedText(text(), x, y, &painter, QApplication::palette().color(QPalette::ButtonText), 150);
     }
 
-    if ( drawFrame ) {
-        if ( !isDown() )
+    if (drawFrame) {
+        if (!isDown() )
             painter.setPen(QColor(0, 96, 165));
         else
             painter.setPen(Qt::white);
@@ -97,7 +97,7 @@ void MenuButton::paintEvent(QPaintEvent *)
 
 void MenuButton::drawColorizedText(const QString& text, int x, int y, QPainter *p, const QColor& clr, int min)
 {
-    if ( !p || !p->isActive() || text.isEmpty())
+    if (!p || !p->isActive() || text.isEmpty())
         return;
 
     p->save();
@@ -117,14 +117,14 @@ void MenuButton::drawColorizedText(const QString& text, int x, int y, QPainter *
     QColor tmp = clr;
     tmp.getHsv(&cs, &ch, &cv);
     int step = (cv - min) / qMax(((int)text.length() / 2), 1);
-    if ( step < 0 ) {
+    if (step < 0) {
         step = 0;
         min = 0;
     }
 
-    for (int i = 0;i < text.length();i++ ) {
+    for (int i = 0;i < text.length();i++) {
         clr.getHsv(&cs, &ch, &cv);
-        if ( i < text.length() / 2 )
+        if (i < text.length() / 2 )
             tmp.setHsv(cs, ch, min + (step*i));
         else
             tmp.setHsv(cs, ch, cv - (step*(i - (text.length() / 2))));

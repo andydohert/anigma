@@ -7,8 +7,9 @@ OBJECTS_DIR = build
 MOC_DIR = build
 UI_DIR = build
 
-#CONFIG		+= qt warn_on debug
-CONFIG		+= qt warn_on release
+CONFIG		+= qt warn_on debug
+#unix:QMAKE_POST_LINK=strip $(TARGET)
+#CONFIG		+= qt warn_on release
 #DEFINES	= DEMO_VERSION
 
 RESOURCES     = resources.qrc
@@ -24,7 +25,6 @@ mac {
 }
 
 
-unix:QMAKE_POST_LINK=strip $(TARGET)
 
 INSTALLS += sound
 

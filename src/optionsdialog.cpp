@@ -50,7 +50,7 @@ OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar
     setFont(QFont("Helvetica", 10, QFont::Bold));
     setFixedSize(220, 260);
 
-    if ( parentWidget() ) {
+    if (parentWidget()) {
         QRect pr = parentWidget()->frameGeometry ();
         move(pr.x() + (pr.width() - width()) / 2, (pr.y() + (pr.height() - height()) / 2) + 20);
     }
@@ -82,8 +82,8 @@ OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar
     gameSpeed->addItem("Very Fast");
 
     int i;
-    for ( i = 0;i < 5;i++ ) {
-        if ( *igs == OptionsDialog::sOptions[i] )
+    for ( i = 0;i < 5;i++) {
+        if (*igs == OptionsDialog::sOptions[i] )
             break;
     }
     gameSpeed->setCurrentIndex(i);
@@ -94,7 +94,7 @@ OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar
 
     themes = new QComboBox(this);
     QDir dir(ROOTHOME + "/pics/themes");
-    if ( dir.exists() )
+    if (dir.exists() )
     {
         dir.setFilter( QDir::Dirs);
         const QFileInfoList list = dir.entryInfoList();
@@ -102,10 +102,10 @@ OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar
         for (int j = 0; j < list.count(); ++j) {
             QFileInfo info = list.at(j);
             QString fName = info.fileName();
-            if ( fName!="." && fName!="..")
+            if (fName!="." && fName!="..")
             {
                 themes->addItem(fName);
-                if ( fName==*the )
+                if (fName==*the )
                 {
                     themes->setCurrentIndex(i);
                 }
@@ -119,7 +119,7 @@ OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar
     customLevel->setEnabled(false);
 #endif
 
-    QDir cl(ROOTHOME+"/pics/levels");
+    QDir cl(ROOTHOME + "/pics/levels");
     if (cl.exists()) {
         if (ile->isEmpty())
             customLevel->setCurrentIndex(0);
@@ -130,10 +130,10 @@ OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar
         {
             QFileInfo info = list.at(i);
             QString fName = info.fileName();
-            if ( fName!="." && fName!=".." && QFile::exists(info.absoluteFilePath()+"/levels") )
+            if (fName!="." && fName!=".." && QFile::exists(info.absoluteFilePath() + "/levels") )
             {
                 customLevel->addItem(fName);
-                if ( fName==*ile )
+                if (fName==*ile )
                 {
                     customLevel->setCurrentIndex(i);
                 }
@@ -143,7 +143,7 @@ OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar
     }
 }
 
-void OptionsDialog::paintEvent ( QPaintEvent * )
+void OptionsDialog::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
     p.fillRect(0, 0, width(), height(), QColor(0, 0, 0));
@@ -161,7 +161,7 @@ void OptionsDialog::paintEvent ( QPaintEvent * )
     p.drawRect(0, 0, width() - 1, height() - 1);
 }
 
-void OptionsDialog::resizeEvent ( QResizeEvent * )
+void OptionsDialog::resizeEvent(QResizeEvent *)
 {
     // just hardcode everything ...
     OKButton->setGeometry(10, height() - 35, 60, 20);
@@ -181,7 +181,7 @@ void OptionsDialog::accept()
     *itl = !timeLimit->currentIndex();
     *igs = sOptions[gameSpeed->currentIndex()];
     QString cit = customLevel->currentText();
-    if ( cit == "Default" )
+    if (cit == "Default" )
         *ile = "";
     else
         *ile = cit;

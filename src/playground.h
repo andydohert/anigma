@@ -186,7 +186,7 @@ private:
     inline bool isBlockStatic(Playblock *pb) const
     {
         QRect r = pixelCoordinatesAt(pb->bx(), pb->by());
-        if(r.y() == pb->y())
+        if (r.y() == pb->y())
             return true;
         else
             return false;
