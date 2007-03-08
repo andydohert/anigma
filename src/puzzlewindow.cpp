@@ -438,7 +438,10 @@ void PuzzleWindow::init()
 #ifdef Q_OS_MAC
     Puzzle::initSounds("sounds");
 #else
-    Puzzle::initSounds("/usr/share/puzzle/sounds");
+    QString location = "/usr/share/puzzle/sounds";
+    if (!QFile::exists(location))
+        location = "sounds";
+    Puzzle::initSounds(location);
 #endif
     mainButtonList = new MenuButtonList(this);
     playGameButton = new MenuButton("Play the game", this);

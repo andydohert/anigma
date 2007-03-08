@@ -318,7 +318,7 @@ void GameDialog::configure(const QString &text, bool fancy,
     if (buttonGroup) {
         connect(buttonGroup, SIGNAL(buttonClicked(int)), this, SLOT(buttonClicked(int)));
     }
-    
+
     Q_ASSERT(par);
     if (parentWidget()) {
         QPixmap background = QPixmap::grabWidget(par, QRect(0, 0, par->width(), par->height()));
@@ -342,6 +342,6 @@ void GameDialog::createTintedBackground(const QPixmap &back)
     QRect r = parentWidget()->geometry();
     QRect source(x() - r.x(), y() - r.y(), width(), height());
     QRectF target(0.0, 0.0, tinted.width(), tinted.height());
-    p.setOpacity(0.75);
+    p.setOpacity(0.60);
     p.drawPixmap(target, back, source);
 }
