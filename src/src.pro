@@ -29,6 +29,14 @@ INSTALLS += sound
 !mac:unix {
     target.path=/usr/bin
     INSTALLS += target
+
+    desktop.files = ../anigma.desktop ../anigma.png
+    desktop.path = /usr/share/applications/games/
+
+    desktopicon.files = ../anigma.png
+    desktopicon.path = /usr/share/icons/hicolor/16x16/
+
+    INSTALLS += target desktop desktopicon
 }
 
 # Input
