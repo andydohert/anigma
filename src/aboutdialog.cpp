@@ -51,7 +51,7 @@ const char *historyData =
         "   colored blocks ( themes.)<br>"
         "- new themes ( Flags and Letters)<br>"
         "- 400 new levels courtesy of Vexed<br>"
-        "   project ( ported to Puzz-le level<br>"
+        "   project ( ported to Anigma level<br>"
         "   format by Alexander Paersch )<br>"
         "- minor bug fixes ..<br>"
         "<p>"
@@ -61,7 +61,7 @@ const char *historyData =
         "- minor bug fixes ..<br>";
 
 const char *infoData =
-        "Puzz-le is an arcade puzzler."
+        "Anigma is an arcade puzzler."
         "<P>"
         "Your task is to eliminate all of"
         "the colored blocks by putting them"

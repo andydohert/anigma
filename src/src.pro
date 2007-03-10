@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = puzz-le
+TARGET = anigma
 DEPENDPATH += .
 INCLUDEPATH += .
 DESTDIR = ../
@@ -15,16 +15,14 @@ CONFIG		+= qt warn_on debug
 RESOURCES     = resources.qrc
 
 sound.files = ../sounds/*
-sound.path = /usr/share/puzzle/sounds
+sound.path = /usr/share/anigma/sounds
 
 mac {
-    ICON = puzzle.icns
+    ICON = anigma.icns
     QMAKE_INFO_PLIST = Info_mac.plist
-    TARGET = Puzz-le
-    sound.path = ../Puzz-le.app/Contents/MacOS/sounds/
+    TARGET = Anigma
+    sound.path = ../Anigma.app/Contents/MacOS/sounds/
 }
-
-
 
 INSTALLS += sound
 

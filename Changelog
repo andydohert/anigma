@@ -1,4 +1,4 @@
-Version 2.0.1 (February 26, 2007)
+Version 2.2.1 (March 10th, 2007)
  - Ported to Qt 4 and remove Qt3 compatibility classes
  - Rewrote SoundRepository
  - Ran all of the files through astyle
@@ -6,12 +6,14 @@ Version 2.0.1 (February 26, 2007)
  - Created Demo class containing the majority of demo functionality.
  - Reorganized files within the project
  - Simplified MenuButton and MenuButtonList
+ - Added make install functionality and debian directory
+ - Renamed to Anigma
 
 Version 2.0.0 (July, 15 , 2002)
 
  - added ability to create additional sets of colored blocks ( themes.)
  - new themes ( Flags and Letters)
- - 400 new levels courtesy of the Vexed project ( ported to Puzz-le level format by
+ - 400 new levels courtesy of the Vexed project ( ported to Anigma level format by
    Alexander Paersch)
  - minor bug fixes  
 

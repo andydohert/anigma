@@ -1,4 +1,4 @@
-Puzz-le is a colorful arcade logic game.
+Anigma is a colorful arcade logic game.
 
 Player uses the pointer device to pick up and move blocks around.  When two or more similar blocks are next to each other, they will disappear.  The goal is to eliminate all blocks on the given level.  Beside colored blocks there are other various objects the player can interact with This includes elevators, disappearing trap-blocks, fire pits etc...
 

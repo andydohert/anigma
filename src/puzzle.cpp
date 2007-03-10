@@ -59,9 +59,9 @@ QString Puzzle::theme = "default";
 
 QString Puzzle::currLevelsName = "";
 #ifdef DEMO_VERSION
-QString Puzzle::gameVersion = "2.1.0d";
+QString Puzzle::gameVersion = "2.2.1d";
 #else
-QString Puzzle::gameVersion = "2.1.0";
+QString Puzzle::gameVersion = "2.2.1";
 #endif
 
 #include <qicon.h>
@@ -69,7 +69,7 @@ QString Puzzle::gameVersion = "2.1.0";
 bool Puzzle::initImages()
 {
     Puzzle::images = new ImageRepository();
-    qApp->setWindowIcon(QIcon(images->findPixmap("puzz-le")));
+    qApp->setWindowIcon(QIcon(images->findPixmap("anigma")));
     bool result = Puzzle::images->initTheme(Puzzle::theme);
     if (!result) {
         Puzzle::theme = "Default";

@@ -67,16 +67,20 @@ ImageRepository::ImageRepository()
     addImage("background");
     addImage("front_title");
     addImage("freezing_animation");
-    addImage("puzz-le");
+    addImage("anigma");
+    addImage("arch");
 }
 
 void ImageRepository::addImage(const QString &name)
 {
     QImage img(ROOTHOME + "/pics/graphics/" + name + ".png");
-    if (img.isNull())
+    if (img.isNull()) {
         qWarning() << "missing image file:" << name;
-    if (img.depth() < 32)
+        return;
+    }
+    if (img.depth() < 32) {
         img = img.convertToFormat(QImage::Format_RGB32); // we MUST have 32 bit image for createHighlight to work.
+    }
     pixmaps.insert(name, QPixmap::fromImage(img));
 }
 

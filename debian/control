@@ -1,13 +1,13 @@
-Source: puzzle
+Source: anigma
 Section: games
 Priority: optional
 Maintainer: Benjamin Meyer <ben@meyerhome.net>
 Build-Depends: debhelper (>= 5),libqt4-dev,
 Standards-Version: 3.7.2
 
-Package: puzzle
+Package: anigma
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Puzz-le is a colorful arcade logic game.
+Description: Anigma is a colorful arcade logic game.
  Player uses the mouse or keyboard to pick up and move blocks around.  When two or more similar blocks are next to each other, they will disappear.  The goal is to eliminate all blocks on the given level.  Beside colored blocks there are other various objects the player can interact with This includes elevators, disappearing trap-blocks, fire pits etc.
-  Homepage: http://www.icefox.net/
+  Homepage: http://www.icefox.net/programs/

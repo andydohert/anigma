@@ -31,7 +31,7 @@
 int main(int argc, char **argv)
 {
     QApplication application(argc, argv);
-    application.setApplicationName("Puzz-le");
+    application.setApplicationName("Anigma");
     PuzzleWindow window;
     Puzzle::initVariables(argc, argv);
     window.show();

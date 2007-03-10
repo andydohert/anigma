@@ -80,10 +80,11 @@ PuzzleWindow::PuzzleWindow(QWidget * parent): QMainWindow(parent)
     pal.setColor(QPalette::WindowText, blue);
     QApplication::setPalette(pal);
 
-    setWindowTitle("Puzz-le");
+    setWindowTitle(qApp->applicationName());
     timer = 0;
     dlg = new GameDialog(this);
-    fileDialog = new FileDialog(QString(QDir::homePath()) + QString("/.puzz-le"), this);
+    QString appName = qApp->applicationName().toLower();
+    fileDialog = new FileDialog(QString(QDir::homePath()) + QString("/.%1").arg(appName), this);
     play = 0;
     connect(fileDialog, SIGNAL(loadSavedGame(const QString &)), this, SLOT(loadGame(const QString &)));
     connect(fileDialog, SIGNAL(done(void)), this, SLOT(fileDialogDone(void)));
@@ -276,12 +277,12 @@ void PuzzleWindow::resizeEvent(QResizeEvent *)
     aboutDialog->setGeometry(4, 80, width() - 8, height() - 80);
     fileDialog->setGeometry(4, 80, width() - 8, height() - 80);
 
-    playGameButton->setGeometry(110, 118, 145, 25);
-    optionsGameButton->setGeometry(playGameButton->x(), playGameButton->y() + 23, 145, playGameButton->height());
-    aboutGameButton->setGeometry(playGameButton->x(), optionsGameButton->y() + 23, 145, playGameButton->height());
-    historyGameButton->setGeometry(playGameButton->x(), aboutGameButton->y() + 23, 145, playGameButton->height());
-    loadSavedGameButton->setGeometry(playGameButton->x(), historyGameButton->y() + 23, 145 , playGameButton->height());
-    quitGameButton->setGeometry(playGameButton->x(), loadSavedGameButton->y() + 23, 145, playGameButton->height());
+    playGameButton->setGeometry(85, 118, 145, 25);
+    loadSavedGameButton->setGeometry(105, playGameButton->y() + 23, 145 , playGameButton->height());
+    optionsGameButton->setGeometry(120, loadSavedGameButton->y() + 23, 145, playGameButton->height());
+    aboutGameButton->setGeometry(130, optionsGameButton->y() + 23, 145, playGameButton->height());
+    historyGameButton->setGeometry(135, aboutGameButton->y() + 23, 145, playGameButton->height());
+    quitGameButton->setGeometry(130, historyGameButton->y() + 23, 145, playGameButton->height());
 
     backToWelcomeFromGame->setGeometry(4,
                                        height() - playGameButton->height() - 4,
@@ -333,12 +334,16 @@ void PuzzleWindow::paintEvent(QPaintEvent *event)
         break;
     }
     case InfoBar::WELCOME:
-    case InfoBar::BROWSE:
+    case InfoBar::BROWSE: {
         p.fillRect(QRect(0, 0,width(), height()), Qt::black);
         drawTitleScreen(&p);
+        QPixmap tmp = Puzzle::images->findPixmap("arch");
+        p.drawPixmap(50, 125, tmp);
         break;
+    }
     case InfoBar::ABOUT:
     case InfoBar::HISTORY:
+        p.fillRect(QRect(0, 0,width(), height()), Qt::black);
         drawAboutScreen(&p);
         break;
     default:
@@ -351,17 +356,30 @@ void PuzzleWindow::drawTitleScreen(QPainter * p)
 {
     if (Puzzle::images) {
         QPixmap tmp = Puzzle::images->findPixmap("front_title");
-        p->drawPixmap(10, 10, tmp);
-            if (gameState() != InfoBar::BROWSE) {
+        p->drawPixmap(10, 0, tmp);
+        if (gameState() != InfoBar::BROWSE) {
             tmp = Puzzle::images->findPixmap("front_1");
-            p->drawPixmap(10, loadSavedGameButton->y() + loadSavedGameButton->height() - 40, tmp);
+            p->drawPixmap(10, historyGameButton->y() + historyGameButton->height() - 40, tmp);
             p->setPen(QColor(0, 135, 234));
+
+            QFont f(font());
+            QString msg = "Copyright (C) 2005 Benjamin Meyer";
+
+            QFontMetrics fm(f);
+            int length = fm.width(msg);
+            while (length > width()) {
+                f.setPointSize(f.pointSize() - 1);
+                QFontMetrics fm(f);
+                length = fm.width(msg);
+            }
+
+            
+            MenuButton::drawColorizedText(msg,
+                                          (width() - length) / 2, 105, p, blue, 150);
             MenuButton::drawColorizedText("Copyright (C) 2001 Walter Rawdanik",
-                                          10, 80, p, blue, 150);
-            MenuButton::drawColorizedText("Copyright (C) 2005 Benjamin Meyer", 10,
-                                          95, p, blue, 150);
-            MenuButton::drawColorizedText("ver: " + Puzzle::gameVersion, 174,
-                                          278, p, blue, 150);
+                                          (width() - length) / 2, 90, p, blue, 150);
+            MenuButton::drawColorizedText("ver: " + Puzzle::gameVersion,
+                                          174, 278, p, blue, 150);
         }
     }
 }
@@ -369,7 +387,7 @@ void PuzzleWindow::drawTitleScreen(QPainter * p)
 void PuzzleWindow::drawAboutScreen(QPainter * p)
 {
     if (Puzzle::images) {
-        p->drawPixmap(10, 10, Puzzle::images->findPixmap("front_title"));
+        p->drawPixmap(10, 0, Puzzle::images->findPixmap("front_title"));
     }
 }
 
@@ -438,7 +456,7 @@ void PuzzleWindow::init()
 #ifdef Q_OS_MAC
     Puzzle::initSounds("sounds");
 #else
-    QString location = "/usr/share/puzzle/sounds";
+    QString location = "/usr/share/anigma/sounds";
     if (!QFile::exists(location))
         location = "sounds";
     Puzzle::initSounds(location);
@@ -450,7 +468,7 @@ void PuzzleWindow::init()
     connect(optionsGameButton, SIGNAL(clicked()), this, SLOT(showOptions()));
     aboutGameButton = new MenuButton("Instructions", this);
     connect(aboutGameButton, SIGNAL(clicked()), this, SLOT(showAbout()));
-    historyGameButton = new MenuButton("Changes", this);
+    historyGameButton = new MenuButton("Credits", this);
     connect(historyGameButton, SIGNAL(clicked()), this, SLOT(showHistory()));
     loadSavedGameButton = new MenuButton("Load saved game", this);
     connect(loadSavedGameButton, SIGNAL(clicked()), this, SLOT(loadSavedGame()));
@@ -752,17 +770,19 @@ void PuzzleWindow::errorMsg(const QString & error)
 
 void PuzzleWindow::saveGameState(const QString & fileName)
 {
-    QDir dir(QString(QDir::homePath()) + QString("/.puzz-le"));
+    QDir dir(QString(QDir::homePath()) + QString("/.anigma"));
     if (!dir.exists()) {
         dir.mkdir(dir.absolutePath());
     }
     QString tmp = dir.absolutePath() + "/" + fileName;
-    if (!Puzzle::levelFileName.isEmpty())
-        play->savePlayground(tmp.append(".puzzle"), infoBar->totalPoints(),
+    QString appName = qApp->applicationName().toLower();
+    if (!Puzzle::levelFileName.isEmpty()) {
+        play->savePlayground(tmp.append(QString(".%1").arg(appName)), infoBar->totalPoints(),
                              Puzzle::levelFileName);
-    else
-        play->savePlayground(tmp.append(".puzzle"), infoBar->totalPoints(),
+    } else {
+        play->savePlayground(tmp.append(".%1").arg(appName), infoBar->totalPoints(),
                              Puzzle::currLevelsName);
+    }
 }
 
 void PuzzleWindow::loadGame(const QString &fileName)
