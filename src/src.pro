@@ -31,10 +31,10 @@ INSTALLS += sound
     INSTALLS += target
 
     desktop.files = ../anigma.desktop ../anigma.png
-    desktop.path = /usr/share/applications/games/
+    desktop.path = /usr/share/applications/
 
     desktopicon.files = ../anigma.png
-    desktopicon.path = /usr/share/icons/hicolor/16x16/
+    desktopicon.path = /usr/share/icons/hicolor/16x16/apps/
 
     INSTALLS += target desktop desktopicon
 }
