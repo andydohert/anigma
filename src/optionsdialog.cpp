@@ -150,7 +150,7 @@ void OptionsDialog::paintEvent(QPaintEvent *)
 
     MenuButton::drawColorizedText("- Game Options -", 65, 20, &p, QColor(0, 148, 255), 150);
 
-    MenuButton::drawColorizedText("Play Sound Effects:", 10, 55, &p, QColor(0, 148, 255), 150);
+    MenuButton::drawColorizedText("Sound Effects:", 10, 55, &p, QColor(0, 148, 255), 150);
     MenuButton::drawColorizedText("Game Speed:", 10, 80, &p, QColor(0, 148, 255), 150);
     MenuButton::drawColorizedText("Time/Moves Limit:", 10, 105, &p, QColor(0, 148, 255), 150);
     MenuButton::drawColorizedText("Prompt on Abort:", 10, 130, &p, QColor(0, 148, 255), 150);

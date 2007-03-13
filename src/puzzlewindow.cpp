@@ -78,6 +78,7 @@ PuzzleWindow::PuzzleWindow(QWidget * parent): QMainWindow(parent)
     pal.setColor(QPalette::Button, Qt::black);
     pal.setColor(QPalette::ButtonText, blue);
     pal.setColor(QPalette::WindowText, blue);
+    pal.setColor(QPalette::Text, blue);
     QApplication::setPalette(pal);
 
     setWindowTitle(qApp->applicationName());
