@@ -358,6 +358,7 @@ void PuzzleWindow::drawTitleScreen(QPainter * p)
         QPixmap tmp = Puzzle::images->findPixmap("front_title");
         p->drawPixmap(10, 0, tmp);
         if (gameState() != InfoBar::BROWSE) {
+            int y = tmp.height() - 10;
             tmp = Puzzle::images->findPixmap("front_1");
             p->drawPixmap(10, historyGameButton->y() + historyGameButton->height() - 40, tmp);
             p->setPen(QColor(0, 135, 234));
@@ -375,9 +376,9 @@ void PuzzleWindow::drawTitleScreen(QPainter * p)
             p->setFont(f);
 
             MenuButton::drawColorizedText(msg,
-                                          (width() - length) / 2, 78, p, blue, 150);
+                                          (width() - length) / 2, y, p, blue, 150);
             MenuButton::drawColorizedText("Copyright (C) 2001 Walter Rawdanik",
-                                          (width() - length) / 2, 95, p, blue, 150);
+                                          (width() - length) / 2, y + 15, p, blue, 150);
             MenuButton::drawColorizedText("ver: " + Puzzle::gameVersion,
                                           174, 278, p, blue, 150);
         }
