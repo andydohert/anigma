@@ -372,10 +372,8 @@ void PuzzleWindow::drawTitleScreen(QPainter * p)
                 QFontMetrics fm(f);
                 length = fm.width(msg);
             }
-
-            
             MenuButton::drawColorizedText(msg,
-                                          (width() - length) / 2, 105, p, blue, 150);
+                                          (width() - length) / 2, 73, p, blue, 150);
             MenuButton::drawColorizedText("Copyright (C) 2001 Walter Rawdanik",
                                           (width() - length) / 2, 90, p, blue, 150);
             MenuButton::drawColorizedText("ver: " + Puzzle::gameVersion,

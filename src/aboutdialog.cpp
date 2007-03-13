@@ -42,9 +42,10 @@
 const char *historyData =
         "Changes:"
         "<p>"
-        "*** VERSION 2.1.0 **************<br>"
+        "*** VERSION 2.2.1 **************<br>"
         "- Ported to Qt 4<br>"
-        "  Code cleanups and bug fixes.<br>"
+        "- Code cleanups and bug fixes.<br>"
+        "- Enhanced to take advantage of Qt4.<br>"
         "<p>"
         "*** VERSION 2.0.0 **************<br>"
         "- added ability to create additional sets of<br>"
