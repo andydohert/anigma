@@ -362,20 +362,22 @@ void PuzzleWindow::drawTitleScreen(QPainter * p)
             p->drawPixmap(10, historyGameButton->y() + historyGameButton->height() - 40, tmp);
             p->setPen(QColor(0, 135, 234));
 
-            QFont f(font());
+            QFont f(p->font());
             QString msg = "Copyright (C) 2005 Benjamin Meyer";
 
             QFontMetrics fm(f);
             int length = fm.width(msg);
-            while (length > width()) {
+            while (length > width() - 40) {
                 f.setPointSize(f.pointSize() - 1);
                 QFontMetrics fm(f);
                 length = fm.width(msg);
             }
+            p->setFont(f);
+
             MenuButton::drawColorizedText(msg,
-                                          (width() - length) / 2, 73, p, blue, 150);
+                                          (width() - length) / 2, 78, p, blue, 150);
             MenuButton::drawColorizedText("Copyright (C) 2001 Walter Rawdanik",
-                                          (width() - length) / 2, 90, p, blue, 150);
+                                          (width() - length) / 2, 95, p, blue, 150);
             MenuButton::drawColorizedText("ver: " + Puzzle::gameVersion,
                                           174, 278, p, blue, 150);
         }
