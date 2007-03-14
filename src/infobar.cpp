@@ -30,13 +30,15 @@
 #include <qpainter.h>
 
 InfoBar::InfoBar(QWidget *parent) : QWidget(parent)
-, play(0)
-, m_totalPoints(0)
-, m_state(WELCOME) {
+        , play(0)
+        , m_totalPoints(0)
+        , m_state(WELCOME)
+{
     setFocusPolicy(Qt::NoFocus);
 }
 
-void InfoBar::paintEvent(QPaintEvent *) {
+void InfoBar::paintEvent(QPaintEvent *)
+{
     if (!play)
         return;
     QString msg;
@@ -44,7 +46,7 @@ void InfoBar::paintEvent(QPaintEvent *) {
     if (m_state == InfoBar::DEMO) {
         rx += 6;
         msg.sprintf("DEMO  TIME: %03d  SCORE: %05d", play->timeLimit(),
-                     m_totalPoints + play->currentPoints());
+                    m_totalPoints + play->currentPoints());
     } else {
         if (Puzzle::timeLimit) {
             if (play->gameType() == Playground::TIME_BASED)
@@ -61,8 +63,8 @@ void InfoBar::paintEvent(QPaintEvent *) {
     }
 
     QPainter p(this);
-    QLinearGradient gradient(width()/2, 0, width()/2, height());
-    QColor start(0,179,255);
+    QLinearGradient gradient(width() / 2, 0, width() / 2, height());
+    QColor start(0, 179, 255);
     QColor end(start.dark(200));
     gradient.setColorAt(0, start);
     gradient.setColorAt(1, end);
@@ -80,7 +82,7 @@ void InfoBar::paintEvent(QPaintEvent *) {
     if (Puzzle::timeLimit && play->gameType() == Playground::TIME_BASED) {
         if (play->timeLimit() < 10 && (play->timeLimit() % 2)) {
             QFontMetrics fm(font);
-            p.drawRect(fm.width("DEMO  ")-2, 2, fm.width("TIME :000 "), fm.height() - 7);
+            p.drawRect(fm.width("DEMO  ") - 2, 2, fm.width("TIME :000 "), fm.height() - 7);
         }
     }
 }

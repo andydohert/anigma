@@ -94,19 +94,16 @@ OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar
 
     themes = new QComboBox(this);
     QDir dir(ROOTHOME + "/pics/themes");
-    if (dir.exists() )
-    {
+    if (dir.exists() ) {
         dir.setFilter( QDir::Dirs);
         const QFileInfoList list = dir.entryInfoList();
         i = 0;
         for (int j = 0; j < list.count(); ++j) {
             QFileInfo info = list.at(j);
             QString fName = info.fileName();
-            if (fName!="." && fName!="..")
-            {
+            if (fName != "." && fName != "..") {
                 themes->addItem(fName);
-                if (fName==*the )
-                {
+                if (fName == *the ) {
                     themes->setCurrentIndex(i);
                 }
                 i++;
@@ -125,16 +122,13 @@ OptionsDialog::OptionsDialog(QString *currLevel, QString *th, bool *se, bool *ar
             customLevel->setCurrentIndex(0);
         cl.setFilter( QDir::Dirs);
         const QFileInfoList list = cl.entryInfoList();
-        i=1;
-        for (int i = 0; i < list.count(); ++i)
-        {
+        i = 1;
+        for (int i = 0; i < list.count(); ++i) {
             QFileInfo info = list.at(i);
             QString fName = info.fileName();
-            if (fName!="." && fName!=".." && QFile::exists(info.absoluteFilePath() + "/levels") )
-            {
+            if (fName != "." && fName != ".." && QFile::exists(info.absoluteFilePath() + "/levels") ) {
                 customLevel->addItem(fName);
-                if (fName==*ile )
-                {
+                if (fName == *ile ) {
                     customLevel->setCurrentIndex(i);
                 }
                 i++;

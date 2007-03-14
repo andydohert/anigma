@@ -36,8 +36,7 @@
 #include "levels.dat"
 
 DemoMove::DemoMove(int x, int y, int t): ix(x), iy(y), it(t)
-{
-}
+{}
 
 void Demo::loadDemo(const QString &fileName)
 {

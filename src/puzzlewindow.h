@@ -46,7 +46,7 @@ class Board;
 class PuzzleWindow: public QMainWindow
 {
 
-Q_OBJECT
+    Q_OBJECT
 
 public:
     enum BUTTONS {

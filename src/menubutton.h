@@ -68,7 +68,8 @@ class MenuButtonList: public QObject
 {
     Q_OBJECT
 public:
-    MenuButtonList(QObject * parent = 0) : QObject(parent){} ;
+    MenuButtonList(QObject * parent = 0) : QObject(parent)
+    {} ;
     void addButton(QAbstractButton *button);
     void setVisible(bool show);
 

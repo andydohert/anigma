@@ -363,7 +363,7 @@ QBitArray * Playground::paintPlayground(QPainter *p, int ox, int oy, bool drawAl
                 if (stripes.at(i)) {
                     tmp = Puzzle::images->findPixmap(ImageRepository::BACKGROUND);
                     p->drawPixmap(i*Puzzle::blockPixelSize + ox, oy, tmp, i*Puzzle::blockPixelSize + ox, oy,
-                                      Puzzle::blockPixelSize, h*Puzzle::blockPixelSize);
+                                  Puzzle::blockPixelSize, h*Puzzle::blockPixelSize);
                     for (int j = 0;j < h;j++) {
                         if (isStone(i, j)) {
                             stone->recalculatePos(i, j);
@@ -662,7 +662,7 @@ void Playground::handleDeletion()
         for (int j = 0; j < plist->count(); ++j) {
             Playblock *block = plist->at(j);
             if ((block->type() < Playblock::STONE || block->type() > Playblock::TRANSITIONAL)
-                 && block->counter()) {
+                    && block->counter()) {
                 block->setCounter(deletionCounter);
                 levelPoints += Puzzle::blockBonus / Puzzle::deletionDelay; // won't work if deletionDelay > blockBonus (make it float)
                 if (!block->counter()) {
@@ -763,7 +763,7 @@ bool Playground::handleBrokenBlock(int stripeNum, Playblock *block)
             index++;
         Playblock *prev = plist->at(index);
         if (prev && (prev->type() < Playblock::STONE || prev->type() > Playblock::TRANSITIONAL)
-            && prev->y() + Puzzle::blockPixelSize == block->y()) {
+                && prev->y() + Puzzle::blockPixelSize == block->y()) {
             if (block->counter()) {
                 block->setCounter(block->counter() - 1);
             } else {
@@ -975,58 +975,51 @@ void Playground::handleMovingBlockUp(int stripeNum, Playblock *block)
     block->setLastDirection(1);
 
     if (block->by() >= block->y1()) {
-         last = applyAcceleration(stripeNum, block, Puzzle::movingAccel * -1);
-         int i = plist->indexOf(last);
-         while ( true )
-         {
-             int oldY = last->y();
-             last->updatePos();
-             last->setUpdated(true);
-             if (isEmptyByPixel(last->x(), last->y()) )
-             {
-                 int index = plist->indexOf(last);
-                 Playblock *next = 0;
-                 if (index + 1 < plist->count())
-                        next = plist->at(index + 1);
-                 if (next )
-                 {
-                     if (next->y() + Puzzle::blockPixelSize > last->y())
-                     {
-                         last->setY(next->y() + Puzzle::blockPixelSize);
-                         if (oldY==last->y() && ((next->attached() && next->accelY()==0) || next->type()==Playblock::BROKEN_STONE) )
-                             last->setAccelY(0);
-                     }
-                 }
-                 last->recalculatePos();
-             } else {
-                 last->recalculatePos(last->bx(),last->by());
-                 last->setAccelY(0);
-             }
-             if (last == block)
-                 break;
-             else
-             {
-                 --i;
-                 last = plist->at(i);
-             }
-         }
-         if (block->type() == Playblock::MOVING_STONE && isMovingLimit(block))
-         {
-             applyAcceleration(stripeNum,block,0,true); 
-         }
-     }
-     if (!block->accelY() )
-     {
-         block->setCounter(Puzzle::movingDelay);
-     }
-     
-     needsClearCheck=true;
-     stripes.setBit(stripeNum);
+        last = applyAcceleration(stripeNum, block, Puzzle::movingAccel * -1);
+        int i = plist->indexOf(last);
+        while ( true ) {
+            int oldY = last->y();
+            last->updatePos();
+            last->setUpdated(true);
+            if (isEmptyByPixel(last->x(), last->y()) ) {
+                int index = plist->indexOf(last);
+                Playblock *next = 0;
+                if (index + 1 < plist->count())
+                    next = plist->at(index + 1);
+                if (next ) {
+                    if (next->y() + Puzzle::blockPixelSize > last->y()) {
+                        last->setY(next->y() + Puzzle::blockPixelSize);
+                        if (oldY == last->y() && ((next->attached() && next->accelY() == 0) || next->type() == Playblock::BROKEN_STONE) )
+                            last->setAccelY(0);
+                    }
+                }
+                last->recalculatePos();
+            } else {
+                last->recalculatePos(last->bx(), last->by());
+                last->setAccelY(0);
+            }
+            if (last == block)
+                break;
+            else {
+                --i;
+                last = plist->at(i);
+            }
+        }
+        if (block->type() == Playblock::MOVING_STONE && isMovingLimit(block)) {
+            applyAcceleration(stripeNum, block, 0, true);
+        }
+    }
+    if (!block->accelY() ) {
+        block->setCounter(Puzzle::movingDelay);
+    }
+
+    needsClearCheck = true;
+    stripes.setBit(stripeNum);
 }
 
 bool Playground::isEmptyByPixel(int px, int py) const
 {
-    if (py < 0) 
+    if (py < 0)
         return false;
     int bx = px / Puzzle::blockPixelSize;
     int by = py / Puzzle::blockPixelSize;
@@ -1096,9 +1089,9 @@ Playblock* Playground::applyAcceleration(int stripeNum, Playblock *block, float 
     if (block->type() == Playblock::MOVING_STONE) {
         int cy = block->by();
         QList<Playblock*> *plist = dBlocks[stripeNum];
-        for (int i = plist->indexOf(block); i>= 0 && i < plist->count(); ++i) {
+        for (int i = plist->indexOf(block); i >= 0 && i < plist->count(); ++i) {
             if (!plist->at(i)->attached() ||
-                (plist->at(i)->type() == Playblock::MOVING_STONE && plist->at(i) != block)) {
+                    (plist->at(i)->type() == Playblock::MOVING_STONE && plist->at(i) != block)) {
                 break;
             }
             last = plist->at(i);

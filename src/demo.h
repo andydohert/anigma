@@ -61,14 +61,21 @@ class Playground;
 
 class Demo : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     bool initDemo();
     bool timeout(int tick);
-    void recordDemo(const DemoMove &move) { demoList.append(move); }
-    void clearRecording() { demoList.clear(); }
-    void saveDemo() {
+    void recordDemo(const DemoMove &move)
+    {
+        demoList.append(move);
+    }
+    void clearRecording()
+    {
+        demoList.clear();
+    }
+    void saveDemo()
+    {
         saveDemoToFile();
         demoList.clear();
     }
@@ -77,7 +84,7 @@ public:
 private:
     void loadDemo(const QString &fileName);
     void saveDemoToFile();
-    
+
     int currentDemoMove;
     int demoLevel;
     DemoMove curMove;

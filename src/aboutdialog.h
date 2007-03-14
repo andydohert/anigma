@@ -39,7 +39,7 @@ class MenuButton;
 class AboutDialog : public QWidget
 {
 
-Q_OBJECT
+    Q_OBJECT
 
 signals:
     void showDemo();

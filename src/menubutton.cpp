@@ -36,20 +36,19 @@
 #include "soundrepository.h"
 
 MenuButton::MenuButton(const QString &text, QWidget* parent) : QPushButton(text, parent),
-    centered(false), drawFrame(false)
+        centered(false), drawFrame(false)
 {
     connect(this, SIGNAL(clicked()), this, SLOT(buttonClicked()));
 }
 
 MenuButton::~MenuButton()
-{
-}
+{}
 
 void MenuButton::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setOpacity(0.75);
-    painter.fillRect(QRect(0,0,width(), height()), Qt::black);
+    painter.fillRect(QRect(0, 0, width(), height()), Qt::black);
     painter.setOpacity(1.0);
     QFontMetrics fm = painter.fontMetrics();
     int y = (height() - fm.height()) / 2 ;
@@ -67,12 +66,11 @@ void MenuButton::paintEvent(QPaintEvent *)
             t.setPen(painter.pen());
             t.setBrush(painter.brush());
             */
-            MenuButton::drawColorizedText(text(), x, y, &painter, Qt::white, 150);
+        MenuButton::drawColorizedText(text(), x, y, &painter, Qt::white, 150);
         //}
         //qDebug() << t.font().key() << painter.font().key();
         //painter.drawImage(0, 0, textFocusCache);
-    }
-    else {
+    } else {
         /*
         if (textCache.isNull()) {
             textCache = QImage(width(), height(), QImage::Format_ARGB32);
@@ -103,8 +101,8 @@ void MenuButton::drawColorizedText(const QString& text, int x, int y, QPainter *
     p->save();
 #ifdef QT4GRADIANTTEXT
     QFontMetrics fm = p->fontMetrics();
-    QLinearGradient gradient(0, fm.height()/2,
-                             fm.width(text)/2, fm.height()/2);
+    QLinearGradient gradient(0, fm.height() / 2,
+                             fm.width(text) / 2, fm.height() / 2);
     gradient.setSpread(QGradient::ReflectSpread);
     gradient.setColorAt(0, clr.dark(200));
     gradient.setColorAt(1, clr);

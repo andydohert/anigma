@@ -40,70 +40,70 @@
 #include "puzzle.h"
 
 const char *historyData =
-        "Changes:"
-        "<p>"
-        "*** VERSION 2.2.1 **************<br>"
-        "- Ported to Qt 4<br>"
-        "- Code cleanups and bug fixes.<br>"
-        "- Enhanced to take advantage of Qt4.<br>"
-        "<p>"
-        "*** VERSION 2.0.0 **************<br>"
-        "- added ability to create additional sets of<br>"
-        "   colored blocks ( themes.)<br>"
-        "- new themes ( Flags and Letters)<br>"
-        "- 400 new levels courtesy of Vexed<br>"
-        "   project ( ported to Anigma level<br>"
-        "   format by Alexander Paersch )<br>"
-        "- minor bug fixes ..<br>"
-        "<p>"
-        "*** VERSION 1.0.3 **************<br>"
-        "- added option to enable/disable time limit<br>"
-        "- added ability to pause game<br>"
-        "- minor bug fixes ..<br>";
+    "Changes:"
+    "<p>"
+    "*** VERSION 2.2.1 **************<br>"
+    "- Ported to Qt 4<br>"
+    "- Code cleanups and bug fixes.<br>"
+    "- Enhanced to take advantage of Qt4.<br>"
+    "<p>"
+    "*** VERSION 2.0.0 **************<br>"
+    "- added ability to create additional sets of<br>"
+    "   colored blocks ( themes.)<br>"
+    "- new themes ( Flags and Letters)<br>"
+    "- 400 new levels courtesy of Vexed<br>"
+    "   project ( ported to Anigma level<br>"
+    "   format by Alexander Paersch )<br>"
+    "- minor bug fixes ..<br>"
+    "<p>"
+    "*** VERSION 1.0.3 **************<br>"
+    "- added option to enable/disable time limit<br>"
+    "- added ability to pause game<br>"
+    "- minor bug fixes ..<br>";
 
 const char *infoData =
-        "Anigma is an arcade puzzler."
-        "<P>"
-        "Your task is to eliminate all of"
-        "the colored blocks by putting them"
-        "together."
-        "It is relatively easy with two blocks,"
-        "but can be quite tricky with three"
-        "or more."
-        "Depending on the levels pack, there is "
-        "either a time limit (time:000) or a limited"
-        "number of moves (mov:00) you are allowed "
-        "to make."
-        "<P>"
-        "Some of the objects you will encounter"
-        "are:<br>"
-        "<img src=\"yellow.png\">  &nbsp;   colored blocks<br>"
-        "<img src=\"wall.png\"> &nbsp;    elevators<br>"
-        "<img src=\"fire.png\">  &nbsp;     fire pits<br>"
-        "<img src=\"broken.png\">   &nbsp;    damaged platforms<br>"
-        "<img src=\"trap.png\">    &nbsp;  trap doors"
-        "<P>"
-        "To pick up object, click on it."
-        "The cursor around the block turns white"
-        "while you are carrying an object."
-        "<P>"
-        "Once you have picked up a block,"
-        "you can move it horizontally."
-        "When you touch two or more similar"
-        "blocks together, they will disappear."
-        "<P>"
-        "Tap on the Demo Game button to watch "
-        "computer solving each of the 50 available"
-        "levels."
+    "Anigma is an arcade puzzler."
+    "<P>"
+    "Your task is to eliminate all of"
+    "the colored blocks by putting them"
+    "together."
+    "It is relatively easy with two blocks,"
+    "but can be quite tricky with three"
+    "or more."
+    "Depending on the levels pack, there is "
+    "either a time limit (time:000) or a limited"
+    "number of moves (mov:00) you are allowed "
+    "to make."
+    "<P>"
+    "Some of the objects you will encounter"
+    "are:<br>"
+    "<img src=\"yellow.png\">  &nbsp;   colored blocks<br>"
+    "<img src=\"wall.png\"> &nbsp;    elevators<br>"
+    "<img src=\"fire.png\">  &nbsp;     fire pits<br>"
+    "<img src=\"broken.png\">   &nbsp;    damaged platforms<br>"
+    "<img src=\"trap.png\">    &nbsp;  trap doors"
+    "<P>"
+    "To pick up object, click on it."
+    "The cursor around the block turns white"
+    "while you are carrying an object."
+    "<P>"
+    "Once you have picked up a block,"
+    "you can move it horizontally."
+    "When you touch two or more similar"
+    "blocks together, they will disappear."
+    "<P>"
+    "Tap on the Demo Game button to watch "
+    "computer solving each of the 50 available"
+    "levels."
 #ifdef DEMO_VERSION
-        ""
-        "<P>"
-        "This is a demo version that contains"
-        "a sample of 8 levels. The full version"
-        "of the game contains all 50 levels"
+    ""
+    "<P>"
+    "This is a demo version that contains"
+    "a sample of 8 levels. The full version"
+    "of the game contains all 50 levels"
 #endif
-        "<P>"
-        "Have fun and good luck !";
+    "<P>"
+    "Have fun and good luck !";
 
 AboutDialog::AboutDialog(QWidget * parent): QWidget(parent), loadedImages(false)
 {
@@ -145,19 +145,19 @@ void AboutDialog::setMode(MODE m)
     if (ir && !loadedImages) {
         loadedImages = true;
         textEdit->document()->addResource(QTextDocument::ImageResource, QUrl("yellow.png") ,
-         ir->findPixmap(ImageRepository::YELLOW));
+                                          ir->findPixmap(ImageRepository::YELLOW));
         textEdit->document()->addResource(QTextDocument::ImageResource, QUrl("wall.png") ,
-         ir->findPixmap(ImageRepository::WALL));
+                                          ir->findPixmap(ImageRepository::WALL));
         textEdit->document()->addResource(QTextDocument::ImageResource, QUrl("fire.png") ,
-         ir->findPixmap(ImageRepository::FIRE).copy(0,0,Puzzle::blockPixelSize, Puzzle::blockPixelSize));
+                                          ir->findPixmap(ImageRepository::FIRE).copy(0, 0, Puzzle::blockPixelSize, Puzzle::blockPixelSize));
         textEdit->document()->addResource(QTextDocument::ImageResource, QUrl("broken.png") ,
-         ir->findPixmap(ImageRepository::BROKEN_WALL).copy(0,0,Puzzle::blockPixelSize, Puzzle::blockPixelSize));
+                                          ir->findPixmap(ImageRepository::BROKEN_WALL).copy(0, 0, Puzzle::blockPixelSize, Puzzle::blockPixelSize));
         QPixmap left = ir->findPixmap(ImageRepository::TRAP_LEFT);
         QPixmap right = ir->findPixmap(ImageRepository::TRAP_RIGHT);
         QPainter p(&left);
         p.drawPixmap(0, 0, right);
         textEdit->document()->addResource(QTextDocument::ImageResource, QUrl("trap.png") ,
-         left);
+                                          left);
     }
     textEdit->setHtml(all);
 }
@@ -166,11 +166,11 @@ void AboutDialog::resizeEvent(QResizeEvent *)
 {
     textEdit->setGeometry(0, 1, width(), height() - backButton->height() - 9);
     textEdit->setLineWrapColumnOrWidth(width() - textEdit->horizontalScrollBar()->width());
-    backButton->setGeometry(4,height() - backButton->height() - 4,
-                                        110, backButton->height());
+    backButton->setGeometry(4, height() - backButton->height() - 4,
+                            110, backButton->height());
     demoButton->setGeometry(width() - 110 - 4,
-                          height() - backButton->height() - 4, 110,
-                          backButton->height());
+                            height() - backButton->height() - 4, 110,
+                            backButton->height());
 }
 
 void AboutDialog::paintEvent(QPaintEvent *)

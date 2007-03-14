@@ -60,7 +60,7 @@ QString Playblock::toString() const
 bool Playblock::fromString(const QString &s)
 {
     if (sscanf( s.toLatin1(), "%d-%d-%d-%d-%f-%f-%d-%d-%d-%d-%d-%d-%f-%f-%d-%d-%d-%d",
-                 (int*)&itype, &iSel, &iGrab, &iaf, &ix, &iy, &cx, &cy, &ix1, &iy1, &ix2, &iy2, &iay, &iax, &iat, &cnt, &iUpd, &iDir) == 18 )
+                (int*)&itype, &iSel, &iGrab, &iaf, &ix, &iy, &cx, &cy, &ix1, &iy1, &ix2, &iy2, &iay, &iax, &iat, &cnt, &iUpd, &iDir) == 18 )
         return true;
     else
         return false;
@@ -86,7 +86,7 @@ QPixmap Playblock::createBlendedImage(const QPixmap &tile) const
     backImage.fill(Qt::transparent);
     QPainter p(&backImage);
     QRectF target(0.0, 0.0, backImage.width(), backImage.height());
-    p.setOpacity((float)1/16 * cnt);
+    p.setOpacity((float)1 / 16 * cnt);
     p.drawPixmap(target, tile, target);
     return backImage;
 }

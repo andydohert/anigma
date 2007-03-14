@@ -174,7 +174,7 @@ void GameDialog::updateFireworks()
     MenuButton::drawColorizedText(dText, (width() - textWidth) / 2, topPos, &p, QColor(255, 255, 255), 180);
 
     p.setPen(QColor(0, 148, 255));
-    p.drawRect(0, 0, width()-1, height()-1);
+    p.drawRect(0, 0, width() - 1, height() - 1);
 }
 
 void GameDialog::show()
@@ -197,11 +197,11 @@ void GameDialog::hide()
 }
 
 void GameDialog::configure(const QString &text, bool fancy,
-        bool requester, int timeout, const QString &ls,
+                           bool requester, int timeout, const QString &ls,
                            const QString &ms, const QString &rs )
 {
     QWidget *par = parentWidget();
-    
+
     if (leftButton) leftButton->deleteLater();
     if (rightButton) rightButton->deleteLater();
     if (middleButton) middleButton->deleteLater();

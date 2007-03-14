@@ -52,9 +52,11 @@
 #include "optionsdialog.h"
 #include <qapplication.h>
 
-class Board : public QWidget {
+class Board : public QWidget
+{
 public:
-    Board(QWidget * parent) : QWidget(parent), play(0), isPaused(false) {}
+    Board(QWidget * parent) : QWidget(parent), play(0), isPaused(false)
+    {}
     Playground *play;
     InfoBar *infoBar;
     bool isPaused;
@@ -294,8 +296,8 @@ void PuzzleWindow::resizeEvent(QResizeEvent *)
     restartCurrent->setGeometry(width() - 75 - 4,
                                 height() - playGameButton->height() - 4, 75,
                                 playGameButton->height());
-    endDemo->setGeometry(8,height() - endDemo->height() - 4,
-                                        110, endDemo->height());
+    endDemo->setGeometry(8, height() - endDemo->height() - 4,
+                         110, endDemo->height());
 }
 
 // Update screen using background pixmap (which is in turn updated by Playground::painPlayground() handler )
@@ -315,7 +317,7 @@ void Board::paintEvent(QPaintEvent *event)
         // hardcoded position
         MenuButton::drawColorizedText("Game Paused", 80, 140, &p, QColor(0, 148, 255), 150);
         MenuButton::drawColorizedText("Click 'Resume' to unpause the Game",
-                          30, 170, &p, QColor(0, 148, 255), 150);
+                                      30, 170, &p, QColor(0, 148, 255), 150);
 
     } else {
         play->paintPlayground(&p, 0, 0, true);
@@ -330,21 +332,21 @@ void PuzzleWindow::paintEvent(QPaintEvent *event)
     switch (gameState()) {
     case InfoBar::GAME:
     case InfoBar::DEMO: {
-        QPixmap tmp = Puzzle::images->findPixmap(ImageRepository::BACKGROUND);
-        p.drawPixmap(0, 0, tmp);
-        break;
-    }
+            QPixmap tmp = Puzzle::images->findPixmap(ImageRepository::BACKGROUND);
+            p.drawPixmap(0, 0, tmp);
+            break;
+        }
     case InfoBar::WELCOME:
     case InfoBar::BROWSE: {
-        p.fillRect(QRect(0, 0,width(), height()), Qt::black);
-        drawTitleScreen(&p);
-        QPixmap tmp = Puzzle::images->findPixmap("arch");
-        p.drawPixmap(50, 125, tmp);
-        break;
-    }
+            p.fillRect(QRect(0, 0, width(), height()), Qt::black);
+            drawTitleScreen(&p);
+            QPixmap tmp = Puzzle::images->findPixmap("arch");
+            p.drawPixmap(50, 125, tmp);
+            break;
+        }
     case InfoBar::ABOUT:
     case InfoBar::HISTORY:
-        p.fillRect(QRect(0, 0,width(), height()), Qt::black);
+        p.fillRect(QRect(0, 0, width(), height()), Qt::black);
         drawAboutScreen(&p);
         break;
     default:
@@ -637,7 +639,7 @@ void PuzzleWindow::nextLevelLoaded()
     int oy = ((height() - play->height() * Puzzle::blockPixelSize) / 2);
     oy = qMax(oy, infoBar->height());
     board->setGeometry(ox, oy, play->width() * Puzzle::blockPixelSize,
-                               play->height() * Puzzle::blockPixelSize);
+                       play->height() * Puzzle::blockPixelSize);
     play->setGameState(Playground::INPROGRESS);
     timer->start(Puzzle::timeoutValue);
     aboutDialog->hide();
@@ -679,7 +681,7 @@ void PuzzleWindow::demoCompleted()
             play->currentLevel = -1;
             if (!demo.initDemo()) {
                 switchState(InfoBar::ABOUT);     // if somebody deleted starting files
-                                        // we better get out to avoid infinite loop
+                // we better get out to avoid infinite loop
             } else {
                 infoBar->setTotalPoints(0);
                 nextLevelLoaded();

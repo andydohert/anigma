@@ -35,26 +35,26 @@
 #include "puzzle.h"
 
 static const char *imageNames[] =
-{
-    "red",
-    "green",
-    "blue",
-    "purple",
-    "yellow",
-    "cyan",
-    "white",
-    "grey",
+    {
+        "red",
+        "green",
+        "blue",
+        "purple",
+        "yellow",
+        "cyan",
+        "white",
+        "grey",
 
-    "wall",
-    "fire",
-    "trap_right",
-    "trap_left",
-    "broken_wall",
-    "front_1",
-    "background",
-    "front_title",
-    "freezing_animation"
-};
+        "wall",
+        "fire",
+        "trap_right",
+        "trap_left",
+        "broken_wall",
+        "front_1",
+        "background",
+        "front_title",
+        "freezing_animation"
+    };
 
 ImageRepository::ImageRepository()
 {
@@ -115,7 +115,7 @@ bool ImageRepository::initTheme(const QString &theme)
         QImage img(list.at(i).filePath());
         if (!img.isNull()) {
             if (img.width() != Puzzle::blockPixelSize
-                || img.height() != Puzzle::blockPixelSize) {
+                    || img.height() != Puzzle::blockPixelSize) {
                 img = img.scaled(Puzzle::blockPixelSize, Puzzle::blockPixelSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
             }
             if (img.depth() < 32)

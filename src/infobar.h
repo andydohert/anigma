@@ -34,7 +34,7 @@ class Playground;
 
 class InfoBar : public QWidget
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     enum GAME_STATE {
@@ -49,10 +49,22 @@ public:
     InfoBar(QWidget *parent);
     void paintEvent(QPaintEvent *);
 
-    void setState(GAME_STATE newState) { m_state = newState; update(); }
-    void setTotalPoints(int points) { m_totalPoints = points; update(); }
-    inline GAME_STATE state() { return m_state; }
-    inline int totalPoints() { return m_totalPoints; }
+    void setState(GAME_STATE newState)
+    {
+        m_state = newState; update();
+    }
+    void setTotalPoints(int points)
+    {
+        m_totalPoints = points; update();
+    }
+    inline GAME_STATE state()
+    {
+        return m_state;
+    }
+    inline int totalPoints()
+    {
+        return m_totalPoints;
+    }
 
     Playground *play;
 

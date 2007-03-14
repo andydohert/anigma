@@ -61,7 +61,7 @@ protected:
 private slots:
     void deleteSelected();
     void load();
-    
+
 private:
     QString directory;
 

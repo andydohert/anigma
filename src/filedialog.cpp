@@ -127,13 +127,11 @@ void FileDialog::refresh()
         d.setSorting(QDir::Time);
         d.setNameFilters(QStringList("*.puzzle"));
         const QFileInfoList list = d.entryInfoList();
-        for (int i = 0; i < list.count(); ++i)
-        {
+        for (int i = 0; i < list.count(); ++i) {
             QFileInfo info = list.at(i);
             unsigned int level;
             unsigned int points;
-            if (Playground::savedPlaygroundInfo(info.absoluteFilePath(), &points, &level) )
-            {
+            if (Playground::savedPlaygroundInfo(info.absoluteFilePath(), &points, &level) ) {
                 model->insertRow(model->rowCount());
                 QModelIndex idx = model->index(model->rowCount() - 1, 0);
                 model->itemFromIndex(idx)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);

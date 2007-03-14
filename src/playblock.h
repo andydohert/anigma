@@ -65,7 +65,7 @@ public:
     void recalculatePos(int nx, int ny);
     void recalculatePos();
     QPixmap createBlendedImage(const QPixmap &tile) const;
-    
+
     inline bool attached() const
     {
         return iat;

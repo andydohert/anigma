@@ -69,7 +69,7 @@ public:
 private:
     void addImage(const QString &name);
     void createHighlighted(QImage &img) const;
-    QHash<QString, QPixmap> pixmaps;  // both theme and stock icons 
+    QHash<QString, QPixmap> pixmaps;  // both theme and stock icons
     QList<QPixmap> currentTheme;
     QList<QPixmap> currentHighlightTheme;
 };
