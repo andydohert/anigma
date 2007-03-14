@@ -71,7 +71,7 @@ FileDialog::FileDialog(const QString &dir, QWidget *parent): QWidget(parent)
 
 void FileDialog::keyPressEvent( QKeyEvent *e )
 {
-    switch(e->key()) {
+    switch (e->key()) {
     case  Qt::Key_F33:
         load();
         break;
