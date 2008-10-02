@@ -1,0 +1,4 @@
+Makefile
+src/build
+src/qrc_*
+Anigma.app
